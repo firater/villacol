@@ -184,7 +184,7 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
       <form
         onSubmit={handleSubmit}
         aria-label={t("title")}
-        className="hero-search-bar flex w-full flex-col gap-0 overflow-hidden rounded-2xl border border-stone-200/60 bg-white md:flex-row md:items-stretch md:rounded-full md:p-2"
+        className="hero-search-bar flex w-full flex-col gap-0 overflow-visible rounded-2xl border border-stone-200/60 bg-white md:flex-row md:items-stretch md:rounded-full md:p-2"
       >
         <Field
           ref={locationRef}
