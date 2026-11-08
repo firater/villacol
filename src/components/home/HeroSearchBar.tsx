@@ -57,6 +57,20 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
 
   const datesRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const locationSelectRef = useRef<HTMLSelectElement>(null);
+  const guestsSelectRef = useRef<HTMLSelectElement>(null);
+
+  const openNativeSelect = useCallback((select: HTMLSelectElement | null) => {
+    if (!select) return;
+    select.focus();
+    if (typeof select.showPicker === "function") {
+      try {
+        select.showPicker();
+      } catch {
+        select.click();
+      }
+    }
+  }, []);
   const minSelectable = useMemo(() => fromApiDate(minDate as DateString), [minDate]);
   const maxSelectable = useMemo(() => {
     const end = fromApiDate(minDate as DateString);
@@ -143,13 +157,16 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
           label={t("destination")}
           htmlFor={`${fieldId}-location`}
           icon={<PinIcon />}
-          className="min-w-0 flex-[1.35] md:flex-[1.5]"
+          interactive
+          onClick={() => openNativeSelect(locationSelectRef.current)}
+          className="min-w-0 flex-[1.35] rounded-t-2xl md:flex-[1.5] md:rounded-l-full md:rounded-tr-none"
         >
           <select
+            ref={locationSelectRef}
             id={`${fieldId}-location`}
             value={location}
             onChange={(event) => setLocation(event.target.value)}
-            className="w-full truncate bg-transparent text-sm font-semibold text-zinc-900 outline-none"
+            className="w-full cursor-pointer truncate bg-transparent font-sans text-base font-medium tracking-tight text-stone-900 outline-none"
           >
             <option value="">{t("anyDestination")}</option>
             {locations.map((option) => (
@@ -165,15 +182,17 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
           label={t("dates")}
           htmlFor={`${fieldId}-dates`}
           icon={<CalendarIcon />}
+          interactive
+          asButton
           onClick={openDatesPopover}
-          className="relative min-w-0 flex-[1.35] cursor-pointer md:flex-[1.85]"
+          className="relative min-w-0 flex-[1.35] md:flex-[1.85]"
           aria-expanded={datesOpen}
           aria-haspopup="dialog"
         >
           <span
             id={`${fieldId}-dates`}
-            className={`block w-full truncate text-sm font-semibold ${
-              hasDates ? "text-zinc-900" : "text-zinc-400"
+            className={`block w-full truncate font-serif text-base font-normal tracking-tight ${
+              hasDates ? "text-stone-900" : "text-stone-400"
             }`}
           >
             {datesLabel}
@@ -184,13 +203,16 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
           label={t("guests")}
           htmlFor={`${fieldId}-guests`}
           icon={<UserIcon />}
+          interactive
+          onClick={() => openNativeSelect(guestsSelectRef.current)}
           className="min-w-0 flex-[0.95]"
         >
           <select
+            ref={guestsSelectRef}
             id={`${fieldId}-guests`}
             value={guests}
             onChange={(event) => setGuests(event.target.value)}
-            className="w-full bg-transparent text-sm font-semibold text-zinc-900 outline-none"
+            className="w-full cursor-pointer bg-transparent font-sans text-base font-medium tracking-tight text-stone-900 outline-none"
           >
             <option value="">{t("anyGuests")}</option>
             {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
@@ -240,38 +262,44 @@ const Field = forwardRef<
     icon: ReactNode;
     children: ReactNode;
     className?: string;
+    interactive?: boolean;
+    asButton?: boolean;
     onClick?: () => void;
     "aria-expanded"?: boolean;
     "aria-haspopup"?: "dialog" | boolean;
   }
 >(function Field(
-  { label, htmlFor, icon, children, className, onClick, ...a11y },
+  { label, htmlFor, icon, children, className, interactive, asButton, onClick, ...a11y },
   ref,
 ) {
+  const isActivatable = Boolean(onClick);
+
   return (
     <div
       ref={ref}
       onClick={onClick}
       onKeyDown={
-        onClick
+        isActivatable
           ? (event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                onClick();
+                onClick?.();
               }
             }
           : undefined
       }
-      role={onClick ? "button" : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      className={`flex min-h-[4.5rem] flex-col justify-center border-b border-neutral-100 px-4 py-3 md:min-h-0 md:border-b-0 md:border-r md:border-neutral-100 md:px-6 md:py-4 ${className ?? "min-w-0 flex-1"}`}
+      role={asButton ? "button" : undefined}
+      tabIndex={isActivatable ? 0 : undefined}
+      className={`flex min-h-[4.5rem] flex-col justify-center border-b border-neutral-100 px-4 py-3 transition-colors md:min-h-0 md:border-b-0 md:border-r md:border-neutral-100 md:px-6 md:py-4 ${
+        interactive ? "cursor-pointer hover:bg-stone-50/90" : ""
+      } ${className ?? "min-w-0 flex-1"}`}
       {...a11y}
     >
       <div className="flex items-center gap-2 text-brand">
         {icon}
         <label
           htmlFor={htmlFor}
-          className="pointer-events-none text-[0.65rem] font-bold uppercase tracking-[0.14em] text-zinc-500"
+          className="pointer-events-none font-sans text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-stone-500"
         >
           {label}
         </label>
