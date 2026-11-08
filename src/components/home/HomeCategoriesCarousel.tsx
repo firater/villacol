@@ -189,11 +189,15 @@ function CategoryCarouselCard({
             </span>
           ) : null}
           <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/30 via-transparent to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+            className={`pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t via-transparent to-transparent transition-opacity duration-500 ${
+              showCategoryOfDayBadge
+                ? "from-stone-950/75 via-stone-900/15 opacity-100 group-hover:from-stone-950/85"
+                : "from-stone-900/30 opacity-80 group-hover:opacity-100"
+            }`}
             aria-hidden
           />
+          {showCategoryOfDayBadge ? <CategoryOfDayBadge /> : null}
         </div>
-        {showCategoryOfDayBadge ? <CategoryOfDayBadge /> : null}
       </div>
       <div className="mt-3">
         <h3 className="font-serif text-lg leading-snug text-stone-900">{label}</h3>
@@ -212,7 +216,11 @@ function CategoryCarouselCard({
             })}
           </span>
           <span className="text-stone-400">{perNight}</span>
-          {isGoodDeal && !showCategoryOfDayBadge ? (
+          {showCategoryOfDayBadge ? (
+            <span className="mt-1.5 block max-w-[13.5rem] font-serif text-base leading-snug text-brand">
+              {t("categoriesNoFeeRental")}
+            </span>
+          ) : isGoodDeal ? (
             <span className="mt-1.5 block max-w-[13.5rem] font-serif text-base leading-snug text-brand">
               {t("categoriesPromotionsStack")}
             </span>
@@ -231,50 +239,59 @@ const CATEGORY_OF_DAY_TOOLTIP =
 
 function CategoryOfDayBadge() {
   const tooltipId = useId();
-
   const labelId = `${tooltipId}-label`;
 
   return (
     <div
-      className="pointer-events-none absolute top-2.5 left-2.5 z-30 max-w-[calc(100%-0.5rem)] overflow-visible"
+      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 w-full overflow-visible"
       aria-labelledby={labelId}
     >
-      <div className="pointer-events-auto rounded-xl border border-orange-200/70 bg-orange-50/95 px-3 py-2.5 shadow-sm shadow-orange-950/5 backdrop-blur-md">
-        <div className="flex items-start gap-1.5">
-          <p
-            id={labelId}
-            className="min-w-0 flex-1 font-sans text-[10px] leading-snug tracking-[0.02em] text-stone-800"
+      <div className="pointer-events-auto relative w-full border-t border-white/10 bg-stone-950/82 px-3 py-2.5 backdrop-blur-md sm:py-3">
+        <span
+          className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand/70 to-transparent"
+          aria-hidden
+        />
+        <span className="group/info pointer-events-auto absolute top-2 right-2 z-30">
+          <button
+            type="button"
+            className="flex size-5 items-center justify-center rounded-full border border-stone-500/40 bg-white/95 p-0 text-stone-800 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            aria-label="How the direct booking discount works"
+            aria-describedby={tooltipId}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+            }}
           >
-            <span className="font-bold text-brand">%20</span>
-            <span className="font-semibold"> Direct Booking Discount</span>
-          </p>
-          <span className="group/info relative mt-px shrink-0">
-            <button
-              type="button"
-              className="flex size-4 items-center justify-center rounded-full border border-stone-300/80 bg-white/90 text-stone-600 transition hover:border-stone-400 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-              aria-label="How the direct booking discount works"
-              aria-describedby={tooltipId}
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-            >
-              <span className="font-sans text-[9px] font-semibold leading-none" aria-hidden>
-                i
-              </span>
-            </button>
-            <span
-              id={tooltipId}
-              role="tooltip"
-              className="absolute top-[calc(100%+0.35rem)] right-0 z-50 w-[13.5rem] rounded-lg border border-stone-700/50 bg-stone-900/95 px-3 py-2.5 font-sans text-[11px] leading-snug font-normal tracking-normal text-stone-100 shadow-xl opacity-0 transition-opacity duration-200 pointer-events-none group-hover/info:opacity-100 group-focus-within/info:opacity-100"
-            >
-              {CATEGORY_OF_DAY_TOOLTIP}
-            </span>
+            <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
+              <circle cx="8" cy="8" r="6.25" stroke="currentColor" strokeWidth="1.5" />
+              <path
+                d="M8 7.25V11M8 5.5h.01"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+          <span
+            id={tooltipId}
+            role="tooltip"
+            className="absolute bottom-[calc(100%+0.4rem)] right-0 z-50 w-[13.5rem] rounded-lg border border-stone-700/50 bg-stone-900/95 px-3 py-2.5 text-left font-sans text-[11px] leading-snug font-normal tracking-normal text-stone-100 shadow-xl opacity-0 transition-opacity duration-200 pointer-events-none group-hover/info:opacity-100 group-focus-within/info:opacity-100"
+          >
+            {CATEGORY_OF_DAY_TOOLTIP}
           </span>
+        </span>
+        <div className="relative px-6 text-center">
+          <p className="font-sans text-[8px] font-medium tracking-[0.22em] text-stone-400 uppercase">
+            Category of the day
+          </p>
+          <p id={labelId} className="mt-1 font-serif text-sm leading-tight tracking-tight text-white">
+            <span className="text-brand">%20</span> Direct Discount
+          </p>
+          <div className="mx-auto mt-1 h-px w-7 bg-white/20" aria-hidden />
+          <p className="mt-1 font-sans text-[8px] font-medium tracking-[0.18em] text-stone-300 uppercase">
+            Best price guarantee
+          </p>
         </div>
-        <p className="mt-1.5 font-sans text-[8px] tracking-[0.2em] text-stone-500 uppercase">
-          Best price guarantee
-        </p>
       </div>
     </div>
   );

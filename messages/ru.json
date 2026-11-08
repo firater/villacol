@@ -46,6 +46,7 @@
       "categoriesStartingFrom": "От <amount></amount>",
       "categoriesPerNight": "/ ночь",
       "categoriesPromotionsStack": "Суммируемые акции учтены",
+      "categoriesNoFeeRental": "Сегодня без комиссии агентства!!",
       "promoTabs": {
         "aria": "Типы акций",
         "all": "Все акции",

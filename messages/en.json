@@ -46,6 +46,7 @@
       "categoriesStartingFrom": "From <amount></amount>",
       "categoriesPerNight": "/ night",
       "categoriesPromotionsStack": "Stackable promotions applied",
+      "categoriesNoFeeRental": "No agency commission today!!",
       "promoTabs": {
         "aria": "Offer types",
         "all": "All offers",
