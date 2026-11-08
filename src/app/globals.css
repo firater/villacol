@@ -90,6 +90,12 @@ body {
   width: 100%;
 }
 
+/* Hero search bar — field values and custom menus. */
+.hero-search-bar .hero-search-value {
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+
 /*
  * Homepage search date picker.
  *

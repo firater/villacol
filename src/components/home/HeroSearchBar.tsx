@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
   type FormEvent,
+  type MouseEvent,
   type ReactNode,
 } from "react";
 import type { DateRange } from "react-day-picker";
@@ -29,6 +30,9 @@ type Props = {
   minDate: string;
   maxGuests: number;
 };
+
+const VALUE_CLASS =
+  "hero-search-value block w-full truncate font-serif text-xl font-normal tracking-tight";
 
 function formatHeroDateRange(
   range: DateRange | undefined,
@@ -53,30 +57,43 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
   const [pickerRange, setPickerRange] = useState<DateRange | undefined>();
   const [committedRange, setCommittedRange] = useState<DateRange | undefined>();
   const [datesOpen, setDatesOpen] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [guestsOpen, setGuestsOpen] = useState(false);
   const [twoMonths, setTwoMonths] = useState(false);
 
+  const barRef = useRef<HTMLDivElement>(null);
   const datesRef = useRef<HTMLDivElement>(null);
-  const popoverRef = useRef<HTMLDivElement>(null);
-  const locationSelectRef = useRef<HTMLSelectElement>(null);
-  const guestsSelectRef = useRef<HTMLSelectElement>(null);
+  const datesPopoverRef = useRef<HTMLDivElement>(null);
+  const locationRef = useRef<HTMLDivElement>(null);
+  const locationMenuRef = useRef<HTMLDivElement>(null);
+  const guestsRef = useRef<HTMLDivElement>(null);
+  const guestsMenuRef = useRef<HTMLDivElement>(null);
 
-  const openNativeSelect = useCallback((select: HTMLSelectElement | null) => {
-    if (!select) return;
-    select.focus();
-    if (typeof select.showPicker === "function") {
-      try {
-        select.showPicker();
-      } catch {
-        select.click();
-      }
-    }
-  }, []);
   const minSelectable = useMemo(() => fromApiDate(minDate as DateString), [minDate]);
   const maxSelectable = useMemo(() => {
     const end = fromApiDate(minDate as DateString);
     end.setFullYear(end.getFullYear() + 2);
     return end;
   }, [minDate]);
+
+  const locationLabel = useMemo(() => {
+    if (location === "") return t("anyDestination");
+    return locations.find((item) => item.value === location)?.label ?? location;
+  }, [location, locations, t]);
+
+  const guestCounts = useMemo(
+    () => Array.from({ length: maxGuests }, (_, index) => index + 1),
+    [maxGuests],
+  );
+
+  const guestsLabel = guests === "" ? t("anyGuests") : guests;
+
+  const closeMenus = useCallback(() => {
+    setDatesOpen(false);
+    setLocationOpen(false);
+    setGuestsOpen(false);
+    setPickerRange(committedRange);
+  }, [committedRange]);
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -87,25 +104,25 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
   }, []);
 
   useEffect(() => {
-    if (!datesOpen) return;
+    const anyOpen = datesOpen || locationOpen || guestsOpen;
+    if (!anyOpen) return;
+
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      const inPopover = popoverRef.current?.contains(target) ?? false;
-      const inDatesColumn = datesRef.current?.contains(target) ?? false;
-      if (!inPopover && !inDatesColumn) {
-        setDatesOpen(false);
-        setPickerRange(committedRange);
-      }
+      const inside =
+        datesRef.current?.contains(target) ||
+        datesPopoverRef.current?.contains(target) ||
+        locationRef.current?.contains(target) ||
+        locationMenuRef.current?.contains(target) ||
+        guestsRef.current?.contains(target) ||
+        guestsMenuRef.current?.contains(target);
+      if (!inside) closeMenus();
     };
+
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [datesOpen, committedRange]);
+  }, [closeMenus, datesOpen, guestsOpen, locationOpen]);
 
-  /**
-   * `resetOnSelect` on the picker already restarts the range whenever a
-   * completed one is on screen, so this only has to commit and close once both
-   * ends are known.
-   */
   const handleRangeSelect = useCallback((range: DateRange | undefined) => {
     setPickerRange(range);
 
@@ -119,9 +136,23 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
   }, []);
 
   const openDatesPopover = useCallback(() => {
+    setLocationOpen(false);
+    setGuestsOpen(false);
     setPickerRange(committedRange);
     setDatesOpen(true);
   }, [committedRange]);
+
+  const openLocationMenu = useCallback(() => {
+    setDatesOpen(false);
+    setGuestsOpen(false);
+    setLocationOpen((open) => !open);
+  }, []);
+
+  const openGuestsMenu = useCallback(() => {
+    setDatesOpen(false);
+    setLocationOpen(false);
+    setGuestsOpen((open) => !open);
+  }, []);
 
   const datesLabel = formatHeroDateRange(committedRange, locale, t("addDates"));
   const hasDates = Boolean(committedRange?.from && committedRange.to);
@@ -145,36 +176,68 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
   };
 
   const monthCount = twoMonths ? 2 : 1;
+  const locationMenuId = `${fieldId}-location-menu`;
+  const guestsMenuId = `${fieldId}-guests-menu`;
 
   return (
-    <div className="relative w-full">
+    <div ref={barRef} className="relative w-full">
       <form
         onSubmit={handleSubmit}
         aria-label={t("title")}
-        className="flex w-full flex-col gap-0 overflow-hidden rounded-2xl border border-stone-200/60 bg-white md:flex-row md:items-stretch md:rounded-full md:p-2"
+        className="hero-search-bar flex w-full flex-col gap-0 overflow-hidden rounded-2xl border border-stone-200/60 bg-white md:flex-row md:items-stretch md:rounded-full md:p-2"
       >
         <Field
+          ref={locationRef}
           label={t("destination")}
           htmlFor={`${fieldId}-location`}
           icon={<PinIcon />}
           interactive
-          onClick={() => openNativeSelect(locationSelectRef.current)}
-          className="min-w-0 flex-[1.35] rounded-t-2xl md:flex-[1.5] md:rounded-l-full md:rounded-tr-none"
+          asButton
+          onClick={openLocationMenu}
+          aria-expanded={locationOpen}
+          aria-haspopup="listbox"
+          className="relative z-[210] min-w-0 flex-[1.35] rounded-t-2xl md:flex-[1.5] md:rounded-l-full md:rounded-tr-none"
         >
-          <select
-            ref={locationSelectRef}
+          <span
             id={`${fieldId}-location`}
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            className="w-full cursor-pointer truncate bg-transparent font-sans text-base font-medium tracking-tight text-stone-900 outline-none"
+            role="combobox"
+            aria-controls={locationMenuId}
+            aria-expanded={locationOpen}
+            className={`${VALUE_CLASS} ${location === "" ? "text-stone-400" : "text-stone-900"}`}
           >
-            <option value="">{t("anyDestination")}</option>
-            {locations.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            {locationLabel}
+          </span>
+          {locationOpen ? (
+            <div
+              ref={locationMenuRef}
+              id={locationMenuId}
+              role="listbox"
+              aria-labelledby={`${fieldId}-location`}
+              className="absolute top-[calc(100%+0.35rem)] left-0 z-[220] max-h-64 min-w-[min(100%,16rem)] w-max max-w-[calc(100vw-3rem)] overflow-y-auto rounded-2xl border border-stone-200/90 bg-white py-2 shadow-2xl"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <HeroSearchMenuOption
+                selected={location === ""}
+                label={t("anyDestination")}
+                onPick={() => {
+                  setLocation("");
+                  setLocationOpen(false);
+                }}
+              />
+              {locations.map((option) => (
+                <HeroSearchMenuOption
+                  key={option.value}
+                  selected={location === option.value}
+                  label={option.label}
+                  onPick={() => {
+                    setLocation(option.value);
+                    setLocationOpen(false);
+                  }}
+                />
+              ))}
+            </div>
+          ) : null}
         </Field>
 
         <Field
@@ -191,36 +254,64 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
         >
           <span
             id={`${fieldId}-dates`}
-            className={`block w-full truncate font-serif text-base font-normal tracking-tight ${
-              hasDates ? "text-stone-900" : "text-stone-400"
-            }`}
+            className={`${VALUE_CLASS} ${hasDates ? "text-stone-900" : "text-stone-400"}`}
           >
             {datesLabel}
           </span>
         </Field>
 
         <Field
+          ref={guestsRef}
           label={t("guests")}
           htmlFor={`${fieldId}-guests`}
           icon={<UserIcon />}
           interactive
-          onClick={() => openNativeSelect(guestsSelectRef.current)}
-          className="min-w-0 flex-[0.95]"
+          asButton
+          onClick={openGuestsMenu}
+          aria-expanded={guestsOpen}
+          aria-haspopup="listbox"
+          className="relative z-[210] min-w-0 flex-[0.95]"
         >
-          <select
-            ref={guestsSelectRef}
+          <span
             id={`${fieldId}-guests`}
-            value={guests}
-            onChange={(event) => setGuests(event.target.value)}
-            className="w-full cursor-pointer bg-transparent font-sans text-base font-medium tracking-tight text-stone-900 outline-none"
+            role="combobox"
+            aria-controls={guestsMenuId}
+            aria-expanded={guestsOpen}
+            className={`${VALUE_CLASS} ${guests === "" ? "text-stone-400" : "text-stone-900"}`}
           >
-            <option value="">{t("anyGuests")}</option>
-            {Array.from({ length: maxGuests }, (_, index) => index + 1).map((count) => (
-              <option key={count} value={count}>
-                {count}
-              </option>
-            ))}
-          </select>
+            {guestsLabel}
+          </span>
+          {guestsOpen ? (
+            <div
+              ref={guestsMenuRef}
+              id={guestsMenuId}
+              role="listbox"
+              aria-labelledby={`${fieldId}-guests`}
+              className="absolute top-[calc(100%+0.35rem)] left-0 z-[220] max-h-64 min-w-[min(100%,12rem)] overflow-y-auto rounded-2xl border border-stone-200/90 bg-white py-2 shadow-2xl"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <HeroSearchMenuOption
+                selected={guests === ""}
+                label={t("anyGuests")}
+                onPick={() => {
+                  setGuests("");
+                  setGuestsOpen(false);
+                }}
+              />
+              {guestCounts.map((count) => (
+                <HeroSearchMenuOption
+                  key={count}
+                  selected={guests === String(count)}
+                  label={String(count)}
+                  onPick={() => {
+                    setGuests(String(count));
+                    setGuestsOpen(false);
+                  }}
+                />
+              ))}
+            </div>
+          ) : null}
         </Field>
 
         <button
@@ -234,7 +325,7 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
 
       {datesOpen ? (
         <div
-          ref={popoverRef}
+          ref={datesPopoverRef}
           role="dialog"
           aria-label={t("dates")}
           className="absolute top-full left-0 z-[200] mt-4 w-max max-w-[calc(100vw-2rem)] rounded-[2rem] border border-stone-200/80 bg-white p-5 shadow-2xl sm:p-6"
@@ -254,6 +345,35 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
   );
 }
 
+function HeroSearchMenuOption({
+  label,
+  selected,
+  onPick,
+}: {
+  label: string;
+  selected: boolean;
+  onPick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="option"
+      aria-selected={selected}
+      onClick={(event) => {
+        event.stopPropagation();
+        onPick();
+      }}
+      className={`w-full px-5 py-2.5 text-left font-serif text-lg tracking-tight transition-colors ${
+        selected
+          ? "bg-orange-50 text-stone-900"
+          : "text-stone-800 hover:bg-stone-50"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
 const Field = forwardRef<
   HTMLDivElement,
   {
@@ -264,9 +384,9 @@ const Field = forwardRef<
     className?: string;
     interactive?: boolean;
     asButton?: boolean;
-    onClick?: () => void;
+    onClick?: (event: MouseEvent<HTMLDivElement>) => void;
     "aria-expanded"?: boolean;
-    "aria-haspopup"?: "dialog" | boolean;
+    "aria-haspopup"?: "dialog" | "listbox" | boolean;
   }
 >(function Field(
   { label, htmlFor, icon, children, className, interactive, asButton, onClick, ...a11y },
@@ -283,7 +403,7 @@ const Field = forwardRef<
           ? (event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                onClick?.();
+                onClick?.(event);
               }
             }
           : undefined
