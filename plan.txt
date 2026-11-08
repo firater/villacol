@@ -1,0 +1,264 @@
+# Villa Platform Backend Architecture Plan
+
+Target: Next.js 16.4.5 (App Router, `cacheComponents: true`), Drizzle ORM 0.45, Neon serverless Postgres, next-intl 4.14, better-auth 1.7. Backend only, no UI.
+
+## Decisions that differ from doktrin.txt (and why)
+
+- **Money is integer cents, never `numeric`.** Every monetary column becomes `integer` named `*_cents` holding EUR minor units. `numeric` comes back from Drizzle as a `string`, and sequentially compounding discounts over stringified decimals is the single biggest source of off-by-a-cent bugs. All rounding happens once per discount step via `Math.round` on integers.
+- **One calendar table, one row per villa-night.** doktrin had `daily_prices` plus a range-based `availability` table; overlapping ranges make "is this night free" a correctness minefield. Replaced by `villa_calendar` keyed `(villa_id, date)` carrying price, min-stay override, and block state together.
+- **No per-villa `base_currency`.** Base is always EUR per project rules; GBP/RUB are display-time conversions from `exchange_rates`.
+- **Turkish dropped.** Locales are `en`, `de`, `ru` only, default `en`.
+- **`proxy.ts`, not `middleware.ts`.** `middleware.js` is deprecated in Next 16; see `node_modules/next/dist/docs/01-app/03-api-reference/03-file-conventions/middleware.md`.
+- **Two DB clients.** `drizzle-orm/neon-http` throws `"No transactions support in neon-http driver"` (`node_modules/drizzle-orm/neon-http/session.js:152`). Cron and multi-table admin writes need a pooled WebSocket client.
+- **`promotions` uses typed value columns** (`percent_bp`, `fixed_amount_cents`, `free_nights`) instead of doktrin's single ambiguous `value`, with a CHECK constraint so exactly one is populated per `discount_type`.
+
+---
+
+## Phase 0 - Foundations
+
+Dependencies to add: `next-intl`, `better-auth`, `zod`, `nanoid`, and `vitest` + `@vitest/coverage-v8` as dev deps (the pricing engine is worthless without unit tests).
+
+- `drizzle.config.ts` - `dialect: "postgresql"`, `schema: "./src/db/schema.ts"`, `out: "./drizzle"`, `casing: "snake_case"`.
+- `src/env.ts` - Zod-validated env access. Exports `env` with `DATABASE_URL`, `CRON_SECRET`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `FX_API_URL`, `FX_API_KEY`. Fails fast at import.
+- `src/db/index.ts` - keeps `db` (neon-http) as the **read-path** client.
+- `src/db/pool.ts` - adds `dbPool` via `drizzle-orm/neon-serverless` + `Pool`, the **transactional write-path** client. Every cron job and every multi-table admin mutation uses `dbPool.transaction(...)`.
+- `src/lib/money.ts` - `type Cents = number`; `toCents`, `fromCents`, `sumCents`, `percentOfCents(cents, bp)`, `clampCents`. Pure, no I/O.
+- `src/lib/dates.ts` - all dates are `YYYY-MM-DD` strings; nights are the half-open interval `[check_in, check_out)`.
+  - `BUSINESS_TIMEZONE = "Europe/Istanbul"`
+  - `getBusinessToday(): DateString` - uses `Intl.DateTimeFormat("en-CA", { timeZone: BUSINESS_TIMEZONE })`. **Nothing in the cron path ever calls bare `new Date()`**; that is how "closest available date" silently drifts a day.
+  - `enumerateNights(checkIn, checkOut): DateString[]`, `addDays`, `diffInNights`, `isBefore`.
+
+## Phase 1 - Schema
+
+Physical layout: table modules in `src/db/tables/*.ts`, with `src/db/schema.ts` as the barrel that re-exports everything (satisfies the project rule that the schema lives at `src/db/schema.ts` while keeping files reviewable). `src/db/relations.ts` holds all Drizzle `relations()`.
+
+### Enums (`src/db/tables/enums.ts`)
+
+- `locale_enum`: `en`, `de`, `ru`
+- `currency_enum`: `EUR`, `GBP`, `RUB`
+- `user_role_enum`: `admin`, `editor`, `guest`
+- `booking_status_enum`: `inquiry`, `pending`, `awaiting_payment`, `confirmed`, `cancelled`, `completed`
+- `discount_type_enum`: `percentage`, `fixed_amount`, `free_days`
+- `promotion_trigger_enum`: `always`, `long_stay`, `last_minute`, `early_bird`, `coupon`, `exit_intent`
+- `calendar_block_source_enum`: `admin`, `booking`, `ical`
+- `price_cache_window_enum`: `min_stay`, `promo_free_days`
+- `cron_run_status_enum`: `running`, `succeeded`, `failed`, `skipped_locked`
+- `contact_status_enum`: `new`, `read`, `archived`
+
+### Auth (`src/db/tables/auth.ts`)
+
+better-auth's Drizzle adapter owns `user`, `session`, `account`, `verification`. `user` gets an extra `role: user_role_enum default 'guest'` via better-auth `additionalFields`. Domain tables never FK into `user` for guest data - bookings carry their own `guest_*` snapshot so a booking survives account deletion.
+
+### Taxonomy with hybrid i18n
+
+Short labels live in `jsonb` (`{ en, de, ru }`); searchable long text and localized slugs live in translation tables with a `(entity_id, locale)` unique index.
+
+- `locations` - `id`, `parent_id` (self-FK, Kas > Kalkan > Islamlar), `type`, `is_featured`, `order_value`, `latitude`, `longitude`
+- `location_translations` - `location_id`, `locale`, `slug` (unique per locale), `name`, `description`, `meta_title`, `meta_description`
+- `categories` - `id`, `is_featured`, `order_value` (doktrin's "collections": honeymoon, luxury, ...)
+- `category_translations` - `category_id`, `locale`, `slug`, `name`, `description`, `meta_title`, `meta_description`
+- `amenities` - `id`, `key` (unique English key), `label_i18n jsonb`, `icon`, `group`, `is_filterable`, `order_value`
+- `features` - same shape as `amenities`, kept separate per the admin spec
+- `villa_rules` - `id`, `key`, `label_i18n jsonb`, `description_i18n jsonb`, `icon`, `order_value`
+
+### Villas
+
+- `villas` - `id`, `location_id`, `ref_code` (unique), `slug` (brand slug, locale-independent), `capacity`, `bedrooms`, `bathrooms`, `default_min_stay`, `default_nightly_price_cents` (fallback when no calendar row), `cleaning_fee_cents`, `deposit_cents`, `check_in_time`, `check_out_time`, `latitude`, `longitude`, `is_active`, `is_featured`, **`order_value`** (the listing sort key from your spec), `created_at`, `updated_at`
+- `villa_translations` - `villa_id`, `locale`, `slug`, `title`, `summary`, `description`, `meta_title`, `meta_description`
+- `villa_images` - `id`, `villa_id`, `url`, `alt_i18n jsonb`, `order_value`, `is_main`
+- Join tables, all composite-PK with `onDelete: "cascade"`: `villa_amenities`, `villa_features` (both with `is_highlighted`), `villa_categories`, `villa_rule_links`
+
+### Calendar (the availability source of truth)
+
+`villa_calendar` - PK `(villa_id, date)`
+- `price_cents` (EUR, admin-edited per date)
+- `min_stay` (nullable override of `villas.default_min_stay`)
+- `is_blocked`, `block_source` (`calendar_block_source_enum`), `booking_id` (nullable FK)
+- `note`
+- Indexes: `idx_villa_calendar_villa_date` on `(villa_id, date)`, partial index `(villa_id, date) WHERE is_blocked = false` to make the next-available scan cheap.
+
+A night is bookable iff a row exists and `is_blocked = false`, **or** no row exists and the villa has a `default_nightly_price_cents` and the date is inside the open horizon. Admin price edits and blocks both write here; confirmed bookings write blocked rows with `block_source = 'booking'`.
+
+### Promotions
+
+`promotions`
+- `id`, `name` (internal), `display_name_i18n jsonb`, `description_i18n jsonb`
+- `discount_type` (`discount_type_enum`), `trigger_type` (`promotion_trigger_enum`)
+- Typed value columns, exactly one non-null per type (CHECK constraint): `percent_bp` (basis points; 1000 = 10%), `fixed_amount_cents`, `free_nights` + `free_nights_threshold` (pay-6-stay-7 is `free_nights = 1`, `free_nights_threshold = 7`)
+- Trigger conditions: `min_nights`, `max_nights`, `last_minute_within_days`, `early_bird_min_days`, `code` (nullable; non-null means user must supply it)
+- Windows: `booking_window_start/end` (when the booking is made), `travel_window_start/end` (when the stay happens)
+- **`priority_order integer not null default 100`** - lower runs first in the sequential chain
+- **`is_stackable boolean not null default true`** - `false` means exclusive: if selected, no other promotion applies
+- `is_active`, `max_redemptions`, `redemption_count`, `created_at`, `updated_at`
+
+`villa_promotions` - composite PK `(villa_id, promotion_id)`, plus `priority_override` so one villa can reorder a shared promotion.
+
+`exit_intent_codes` - `id`, `code` (unique, nanoid uppercase), `promotion_id`, `visitor_id`, `issued_at`, `expires_at`, `redeemed_at`, `booking_id`. One live code per `visitor_id`.
+
+### Pre-computed caches
+
+`villa_price_cache` - PK `(villa_id, window_kind)` where `window_kind` is `price_cache_window_enum`. Composite rather than one-row-per-villa so the min-stay window and the pay-6-stay-7 window coexist without nullable column sprawl.
+- `check_in`, `check_out`, `night_count`
+- `base_total_cents`, `total_discount_cents`, `discounted_total_cents`, `avg_nightly_cents`, `min_nightly_cents`, `max_nightly_cents`
+- `cleaning_fee_cents` - carried but **never** inside the totals
+- `applied_promotions jsonb` - array of `{ promotionId, name, displayNameI18n, discountType, discountCents }`, which is what the card and detail page render
+- `has_active_discount boolean`
+- `computed_at`, `computed_by` (`cron` | `admin_edit`), `engine_version` (bump to force a full recompute after an engine change)
+- Indexes on `(window_kind, discounted_total_cents)` for price sorting and `(has_active_discount)` for the offers page.
+
+`similar_villas` - PK `(villa_id, similar_villa_id)`, plus `score integer`, `is_manual boolean` (admin override wins over the computed set), `computed_at`.
+
+`exchange_rates` - PK `(base_currency, quote_currency)`, plus `rate numeric(18,8)`, `fetched_at`, `source`. Base is always `EUR`.
+
+### Search
+
+- Postgres extensions `pg_trgm` and `unaccent`, enabled through a custom migration step.
+- `villa_search_documents` - PK `(villa_id, locale)`, plus `document text` (title + summary + location + category + amenity labels concatenated), `tsv tsvector` generated with the per-locale config (`english` / `german` / `russian`), `updated_at`. GIN index on `tsv` and a GIN trgm index on `document`.
+- `search_synonyms` - `id`, `locale`, `term`, `canonical_term`, `kind` (`location` | `category` | `amenity` | `misc`) - powers intent parsing and typo mapping (`honeymun` -> `honeymoon`).
+
+### Bookings, deals, contact, observability
+
+- `bookings` - `id`, `villa_id`, `user_id` (nullable), `guest_name`, `guest_email`, `guest_phone`, `guest_address`, `guest_note`, `guest_count`, `extra_guests jsonb`, `check_in`, `check_out`, `night_count`, `status`, **`display_currency`** + `display_total_cents` + `fx_rate_used` (what the guest saw), `base_total_cents`, `total_discount_cents`, `nightly_total_cents`, `cleaning_fee_cents`, `deposit_cents`, `grand_total_cents`, **`price_breakdown jsonb`** (the full `PriceQuote`, frozen at booking time so an admin can always reconstruct the math), `terms_accepted_at`, `contract_accepted_at`, `created_at`
+  - Payment-ready but not wired: nullable `payment_provider`, `payment_intent_id`, `paid_at`, plus the `awaiting_payment` status already in the enum.
+- `booking_promotions` - `(booking_id, promotion_id)`, `discount_cents`, `step_index` - a normalized, queryable copy of the discount chain for reporting.
+- `deals` - `id`, `title_i18n`, `body_i18n`, `link`, `starts_at`, `ends_at`, `is_active`, `order_value`, `created_at`
+- `deal_reads` - PK `(deal_id, visitor_id)`, `read_at`. Unread count is active deals minus this visitor's reads, so the bell's pulsing dot is per-visitor without requiring an account.
+- `contact_messages` - `id`, `name`, `email`, `phone`, `message`, `locale`, `status` (`contact_status_enum`), `admin_note`, `created_at`, `read_at`
+- `cron_runs` - `id`, `job_name`, `status`, `started_at`, `finished_at`, `duration_ms`, `processed_count`, `failed_count`, `error`, `payload jsonb`. Non-negotiable for debugging a job that runs while you sleep.
+
+Migrations are generated per phase with `npx drizzle-kit generate` and applied with `migrate`, never `push`, so the history is reviewable.
+
+## Phase 2 - Auth
+
+- `src/lib/auth.ts` - `betterAuth({ database: drizzleAdapter(db, { provider: "pg", schema }) })`, email+password, `user.additionalFields.role`.
+- `src/app/api/auth/[...all]/route.ts` - better-auth handler.
+- `src/lib/auth-guard.ts` - `getCurrentUser()`, `requireUser()`, `requireAdmin()`. **Every** admin server action starts with `await requireAdmin()`; a `'use server'` export is a public HTTP endpoint and nothing else protects it.
+
+## Phase 3 - Pricing engine (build before the cron)
+
+`src/lib/pricing.engine.ts` - pure functions only. **Zero imports from `@/db`.** Everything it needs arrives fully materialized in its input, which is what makes it exhaustively unit-testable.
+
+### Types (`src/lib/pricing.types.ts`)
+
+- `NightRate` - `{ date, priceCents, minStay, isBlocked }`
+- `PromotionRule` - the flattened `promotions` row plus `priorityOrder` / `isStackable`
+- `PricingContext` - `{ today, bookedAt, guestCount, couponCode, locale }`
+- `PricingInput` - `{ villaId, checkIn, checkOut, nights, cleaningFeeCents, depositCents, defaultMinStay, promotions, context }`
+- `DiscountStep` - `{ stepIndex, promotionId, promotionName, discountType, balanceBeforeCents, discountCents, balanceAfterCents }`
+- `PriceQuote` - `{ nightCount, baseTotalCents, discountSteps, totalDiscountCents, nightlyTotalCents, cleaningFeeCents, depositCents, grandTotalCents, avgNightlyCents, appliedPromotions, engineVersion }`
+
+### Functions, in call order
+
+- `calculateBaseTotal(nights): Cents` - plain sum of `priceCents`.
+- `isPromotionEligible(promotion, input): { eligible, reason }` - one pure predicate per trigger:
+  - `long_stay`: `nightCount >= min_nights` (and `<= max_nights` when set)
+  - `last_minute`: `diffInNights(context.today, checkIn) <= last_minute_within_days`
+  - `early_bird`: `diffInNights(context.today, checkIn) >= early_bird_min_days`
+  - `coupon` / `exit_intent`: `context.couponCode` case-insensitively equals `promotion.code`
+  - All triggers additionally check `is_active`, both windows, and `redemption_count < max_redemptions`.
+- `selectApplicablePromotions(promotions, input): PromotionRule[]` - filter by eligibility, sort ascending by `priorityOrder` (tiebreak on `id` for determinism), then walk the list: take the first eligible; if it is non-stackable, stop there; otherwise keep taking subsequent stackable ones. Deterministic, and the "exclusive promotion" rule has exactly one meaning.
+- `applyPercentageDiscount(balanceCents, percentBp): Cents` -> `Math.round(balanceCents * percentBp / 10_000)`
+- `applyFixedAmountDiscount(balanceCents, amountCents): Cents` -> `Math.min(balanceCents, amountCents)`, so a chain can never go negative.
+- `applyFreeDaysDiscount(nights, freeNights, balanceBeforeCents, baseTotalCents): Cents` - values the `freeNights` **cheapest** nights (deterministic; never "the last night", which varies with sort order), then scales by `balanceBeforeCents / baseTotalCents` so a free night granted after a percentage discount is worth the already-discounted night, not the original. This interaction is the subtlest bug in the whole system and is why the scaling factor is an explicit parameter rather than an implicit assumption.
+- `calculateSequentialDiscounts(baseTotalCents, nights, selectedPromotions): { steps, totalDiscountCents, finalTotalCents }` - the compounding core. Carries a `runningBalanceCents`, starting at `baseTotalCents`; each promotion is computed **against the running balance**, never the original, and each step is recorded as a `DiscountStep`. The step log is the audit trail that makes a wrong total diagnosable in seconds.
+- `validateStay(input): { valid, errors }` - `minStay` is taken from the **check-in night's** `minStay` falling back to `defaultMinStay` (industry standard, and avoids a single expensive mid-stay night dictating the whole booking); also rejects any blocked night, gaps in the night list, `checkOut <= checkIn`, and `guestCount > capacity`.
+- `calculateQuote(input): PriceQuote` - the single public entry point. Orchestrates the above, and computes `nightlyTotalCents = baseTotalCents - totalDiscountCents`, `grandTotalCents = nightlyTotalCents + cleaningFeeCents`.
+- `assertQuoteInvariants(quote)` - throws in non-production:
+  - `baseTotalCents - totalDiscountCents === nightlyTotalCents`
+  - `nightlyTotalCents >= 0`
+  - `sum(discountSteps[].discountCents) === totalDiscountCents`
+  - each step's `balanceAfterCents === balanceBeforeCents - discountCents`
+  - `cleaningFeeCents` appears in no step (the cleaning fee is never discounted and never part of the nightly total)
+
+Currency conversion deliberately lives **outside** the engine, in `src/lib/currency.ts` (`convertCents`, `formatMoney`), because it is a display concern and mixing it in would make cached EUR totals unreproducible.
+
+### Test matrix (`src/lib/pricing.engine.test.ts`)
+
+Single percentage; single fixed; fixed larger than balance; two percentages compounded (verify 10% then 10% is 19%, not 20%); percentage then fixed vs fixed then percentage (asserting `priority_order` actually changes the total); pay-6-stay-7 alone; pay-6-stay-7 combined with a percentage in both orders; non-stackable promotion beating a stackable one; coupon with wrong code; expired booking window vs valid travel window; last-minute and early-bird boundary days (exactly N, N-1, N+1); min-stay violation; blocked night inside the range; odd-cent rounding across a 7-night stay; empty promotion list.
+
+## Phase 4 - Data access layer
+
+`src/db/queries/` - one module per read concern, each cached with `use cache` + `cacheTag` + `cacheLife`, since Cache Components is enabled.
+
+- `villas.queries.ts` - `getVillaBySlug(slug, locale)`, `getVillaListing(filters)`, `getVillaDetailBundle(villaId, locale)`. Tags: `villas`, `villa-${id}`; `cacheLife("hours")`.
+- `landing.queries.ts` - `getLocationLandingVillas(slug, locale)`, `getCategoryLandingVillas(slug, locale)`, `getOfferVillas(filters)`.
+- `pricing.queries.ts` - `loadVillaPricingContext(villaId, checkIn, checkOut)`: the one function allowed to join `villa_calendar` + `villas` + `promotions` and hand back a `PricingInput`. This is the seam that keeps DB access out of the engine.
+- `rates.queries.ts` - `getExchangeRates()`, tag `exchange-rates`, `cacheLife("hours")`.
+- `deals.queries.ts`, `search.queries.ts`, `similar.queries.ts`.
+
+Revalidation discipline: admin server actions use `updateTag(...)` (read-your-own-writes, Server Actions only) so an admin sees their edit immediately; cron route handlers use `revalidateTag(tag, "max")` (stale-while-revalidate). Request-dependent reads - a live quote for user-picked dates, the currency cookie - are **not** cached under a shared tag; they sit behind `<Suspense>` or `use cache: private`.
+
+## Phase 5 - Cron infrastructure (host-agnostic)
+
+Data flow:
+
+    Any scheduler (Vercel Cron, GH Actions, QStash)
+      -- Bearer CRON_SECRET -->  /api/cron/[job]/route.ts
+                                   -> cron/registry.ts (job name -> handler)
+                                     -> withJobLock (pg_advisory_lock) -> cron_runs row
+                                       -> rebuildVillaPriceCache
+                                          -> loadVillaCalendarHorizon
+                                          -> findNextAvailableWindows
+                                          -> calculateQuote (pure)
+                                          -> dbPool.transaction: upsert villa_price_cache
+                                          -> revalidateTag
+                                       -> rebuildSimilarVillas
+                                       -> refreshExchangeRates
+
+- `src/app/api/cron/[job]/route.ts` - single secured entry for every job. `GET` and `POST`; verifies `Authorization: Bearer ${env.CRON_SECRET}` in constant time. Reading `headers()` keeps the handler dynamic, which matters because under Cache Components a `GET` handler that touches nothing request-specific gets prerendered at build time. Returns the `cron_runs` summary as JSON.
+- `src/lib/cron/registry.ts` - `CRON_JOBS: Record<string, CronJobHandler>` mapping `daily-rebuild`, `rebuild-similar-villas`, `refresh-exchange-rates`, `cleanup-expired-codes`. Adding a job is one entry; the scheduler choice stays a deployment detail you can change later without touching code.
+- `src/lib/cron/with-job-lock.ts` - `withJobLock(jobName, fn)`: takes `pg_try_advisory_lock(hashtext(jobName))` on a pooled connection, writes the `cron_runs` row (`running` -> `succeeded`/`failed`), returns `skipped_locked` instead of running concurrently. Without this, two overlapping runs interleave their `villa_price_cache` upserts.
+- `src/lib/cron/jobs/rebuild-villa-price-cache.ts`
+  - `rebuildVillaPriceCache(villaIds?: number[])` - full sweep when called with no argument, targeted when called from an admin edit.
+  - `PRICE_CACHE_HORIZON_DAYS = 540`.
+  - Per villa: `loadVillaCalendarHorizon` -> `findNextAvailableWindows(calendar, { minStay, horizonDays, promoNightCounts })` -> `calculateQuote` per window -> upsert.
+  - `findNextAvailableWindows` returns a `min_stay` window (earliest run of `minStay` consecutive bookable nights, respecting the check-in night's own `min_stay` override) and, when the villa has any `free_days` promotion, a `promo_free_days` window of `free_nights_threshold` nights.
+  - Writes both rows in one `dbPool.transaction` with `onConflictDoUpdate` on `(villa_id, window_kind)`, stamping `computed_at`, `computed_by`, `engine_version`.
+  - Villas processed in batches with bounded concurrency (`CRON_BATCH_SIZE = 25`); a single villa's failure increments `failed_count` and is logged without aborting the sweep.
+  - Finishes with `revalidateTag("villa-price-cache", "max")` and `revalidateTag("villas", "max")`.
+- `src/lib/cron/jobs/rebuild-similar-villas.ts` - uses pure `scoreVillaSimilarity(a, b)` from `src/lib/similarity.ts`: weighted sum of same-location (40) / sibling-location (20), capacity delta (25), bedroom delta (15), price-band delta (20). Keeps the top `SIMILAR_VILLAS_LIMIT = 6` per villa, preserves `is_manual = true` rows, and also recomputes the villas that previously pointed *at* a changed villa so the mapping stays symmetric.
+- `src/lib/cron/jobs/refresh-exchange-rates.ts` - upserts EUR->GBP and EUR->RUB; on fetch failure keeps the last known rate and marks the run failed rather than writing a zero.
+- `src/lib/cron/trigger.ts` - `enqueueVillaCacheRebuild(villaId, reason)`, which wraps `after(() => rebuildVillaPriceCache([villaId]))` so an admin save returns immediately while the recompute runs post-response. This is the "trigger the cache update also when an admin edits a villa" requirement.
+- Schedule: Turkey is permanently UTC+3 with no DST, so 00:00 Istanbul is `0 21 * * *` UTC. The job still derives its own notion of today from `getBusinessToday()`, so a misconfigured scheduler shifts *when* it runs, never *what* it computes.
+
+## Phase 6 - Admin server actions
+
+`src/actions/admin/`, every file `'use server'`, every export opening with `await requireAdmin()` and a Zod `parse` of its input. Each returns a discriminated `ActionResult<T>` (`{ ok: true, data }` / `{ ok: false, error, fieldErrors }`) rather than throwing.
+
+- `villa.actions.ts` - `createVilla`, `updateVilla`, `updateVillaTranslations`, `setVillaActive`, `updateVillaOrderValue`. Mutations that touch villa, translations, and join tables run in one `dbPool.transaction`, then call `updateTag("villas")` + `updateTag("villa-${id}")`, `enqueueVillaCacheRebuild(id, "admin_edit")`, and `enqueueSimilarVillasRebuild(id)`.
+- `location.actions.ts`, `category.actions.ts`, `amenity.actions.ts`, `feature.actions.ts`, `villa-rule.actions.ts` - create/update/reorder, each with its translation or `label_i18n` payload.
+- `image.actions.ts` - `createVillaImage`, `updateVillaImage`, `reorderVillaImages`, `setMainImage`, `deleteVillaImage`.
+- `calendar.actions.ts` - `setCalendarPrices(villaId, dateRange, priceCents)`, `setCalendarBlocked(villaId, dateRange, isBlocked)`, `setCalendarMinStay`, `clearCalendarOverrides`. Bulk-upserts one row per date; returns the affected dates so the admin calendar can indicate blocked and custom-priced days.
+- `promotion.actions.ts` - `createPromotion`, `updatePromotion`, `setPromotionActive`, `setPromotionPriority`, `setPromotionStackable`, `attachPromotionToVillas`, `detachPromotionFromVillas`. Any of these rebuilds the price cache for every affected villa.
+- `deal.actions.ts` - `createDeal`, `updateDeal`, `setDealActive`, `deleteDeal`.
+- `contact.actions.ts` - `markContactRead`, `archiveContactMessage`, `addContactNote`.
+- `booking.actions.ts` - `updateBookingStatus`; confirming a booking writes `block_source = 'booking'` rows into `villa_calendar` inside the same transaction, then rebuilds that villa's cache.
+- `system.actions.ts` - `triggerFullPriceCacheRebuild`, `triggerSimilarVillasRebuild` (manual escape hatches that reuse the identical job handlers, so the manual and scheduled paths can never diverge).
+
+## Phase 7 - Public server actions
+
+`src/actions/public/`
+
+- `quote.actions.ts` - `getVillaQuote({ villaId, checkIn, checkOut, guestCount, couponCode })`: loads context, calls `calculateQuote`, converts to the cookie currency for display while returning EUR cents as the source of truth. Powers the detail page's total, the named applied promotions with amounts, and the separately-listed cleaning fee.
+- `booking.actions.ts` - `createBookingInquiry(input)`: **recomputes the quote server-side and ignores any client-supplied price**, re-validates availability inside the transaction, inserts `bookings` + `booking_promotions`, freezes `price_breakdown`, and redeems an `exit_intent_codes` row if one was used.
+- `search.actions.ts` - `searchVillas({ query, locale, filters })` combining `websearch_to_tsquery` ranking with `similarity()` trigram fallback, and pure `parseSearchIntent(query, locale)` from `src/lib/search/intent.ts` that pulls guest count, bedroom count, location, and category out of free text via `search_synonyms`, returning `{ filters, residualQuery }`.
+- `contact.actions.ts` - `submitContactForm`, Zod-validated and rate-limited by `visitor_id`.
+- `deal.actions.ts` - `getUnreadDeals()`, `markDealsRead(dealIds)` writing `deal_reads` keyed by the visitor cookie.
+- `exit-intent.actions.ts` - `issueExitIntentCode()`, idempotent per `visitor_id` (returns the existing live code rather than minting a second), and `validateExitIntentCode(code)`.
+- `preferences.actions.ts` - `setLocalePreference(locale)`, `setCurrencyPreference(currency)` writing the cookies.
+
+## Phase 8 - i18n, currency, and routing plumbing
+
+- `proxy.ts` - root-level, exporting `proxy` (not `middleware`). Composes the next-intl handler with: resolving locale from the `villa_locale` cookie, then `Accept-Language`, then `en`; ensuring a `villa_currency` cookie defaulting to `EUR`; and minting an httpOnly `villa_visitor` UUID used by deals, exit intent, and rate limiting.
+- `src/i18n/routing.ts` - `defineRouting({ locales: ["en","de","ru"], defaultLocale: "en", localePrefix: "always", pathnames })` where `pathnames` carries the localized static routes: `/villas` -> `/villen` / `/villy`, `/villa-offers` -> `/villa-angebote` / `/predlozheniya`, and the location and category landing paths.
+- `src/lib/preferences.ts` - `LOCALE_COOKIE`, `CURRENCY_COOKIE`, `VISITOR_COOKIE`, `COOKIE_MAX_AGE`, and `resolvePreferences()`. Cookies rather than localStorage, read on the server so SSR output already has the right language and currency and nothing shifts after hydration. Under Cache Components these reads sit behind `<Suspense>` or `use cache: private`.
+- `src/lib/search-params.ts` - the filter contract. `FILTER_KEYS` is a frozen list of **universal English keys**: `bedrooms`, `bathrooms`, `guests`, `min_price`, `max_price`, `location`, `category`, `amenities`, `features`, `check_in`, `check_out`, `offers_only`, `sort`, `page`. `villaFilterSchema` (Zod) parses them, `parseVillaFilters(searchParams)` and `buildVillaFilterQuery(filters)` are the only places that touch key names, and localized labels come from next-intl messages. Nothing becomes a path segment.
+- `/[locale]/villas` and `/[locale]/villa-offers` share one data loader; the offers route forces `offers_only=true` as a locked filter while every other filter still applies. Default ordering is `villas.order_value`.
+- Dictionary files `messages/en.json`, `messages/de.json`, `messages/ru.json` cover filter labels, promotion trigger names, validation errors, and email copy.
+
+## Phase 9 - Seed and verification
+
+- `src/db/seed.ts` - admin user, locations (Kas > Kalkan > Islamlar), categories, amenities, features, villa rules, 3 villas fully translated in all three locales, 180 days of calendar rows, and one promotion per `discount_type` x `trigger_type` combination so the engine's whole surface is exercisable by hand.
+- `npm run test` (vitest) - engine suite plus pure-function tests for `findNextAvailableWindows`, `scoreVillaSimilarity`, `parseSearchIntent`, and `parseVillaFilters`.
+- An integration check that runs `rebuildVillaPriceCache` against the seed and asserts `villa_price_cache` rows match a `calculateQuote` call made directly, so a drift between the cached and live price paths fails loudly instead of quietly showing two different prices on the card and the detail page.
+- Scripts: `db:generate`, `db:migrate`, `db:seed`, `db:studio`, `test`, `test:watch`.

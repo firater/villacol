@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: Poppins, Helvetica, sans-serif;
+}
+
+:root {
+  --ref-bg: #ffffff;
+  --ref-fg: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ref-bg: #0a0a0a;
+    --ref-fg: #ededed;
+  }
+}
+
+.refhome-root {
+  background: var(--ref-bg);
+  color: var(--ref-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .ref-scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .ref-scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .ref-no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .ref-no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.ref-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 100%;
+}
+
+@media (min-width: 40rem) {
+  .ref-container {
+    max-width: 40rem;
+  }
+}
+@media (min-width: 48rem) {
+  .ref-container {
+    max-width: 48rem;
+  }
+}
+@media (min-width: 64rem) {
+  .ref-container {
+    max-width: 64rem;
+  }
+}
+@media (min-width: 80rem) {
+  .ref-container {
+    max-width: 80rem;
+  }
+}
+@media (min-width: 96rem) {
+  .ref-container {
+    max-width: 96rem;
+  }
+}
+
+.ref-blur-delay {
+  animation-delay: 2s;
+}
+
+.ref-pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.ref-mobile-content-pad {
+  padding-bottom: 4.5rem;
+}
+
+@media (min-width: 48rem) {
+  .ref-mobile-content-pad {
+    padding-bottom: 0;
+  }
+}

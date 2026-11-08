@@ -1,0 +1,875 @@
+/
+├── .env                                      <-- Environment variables (DB_URL, STRIPE_KEY, etc.)
+├── .gitignore                                <-- Git ignore rules
+├── drizzle.config.ts                         <-- Drizzle Kit config for DB migrations
+├── next.config.mjs                           <-- Next.js config (Strict mode, Image domains)
+├── middleware.ts                             <-- [NEW] Routing logic: Redirects / -> /tr, handles Exit Intent Cookies
+├── package.json                              <-- Dependencies
+├── tsconfig.json                             <-- TypeScript configuration
+│
+├── messages/                                 <-- [NEW] Static UI Translations (The "Interface" Text)
+│   ├── tr.json                               <-- Turkish UI (Buttons, Placeholders)
+│   ├── en.json                               <-- English UI
+│   ├── de.json                               <-- German UI (Strategic for Antalya market)
+│   └── ru.json                               <-- Russian UI (Critical for Antalya market)
+│
+├── actions/                                  <-- SERVER ACTIONS (Mutations / Form Submissions)
+│   ├── admin/                                <-- Protected Admin Actions
+│   │   ├── availability-actions.ts           <-- toggleBlockDates() : Admin blocks calendar dates
+│   │   ├── contact-actions.ts                <-- [NEW] markMessageRead() : Manage contact form submissions
+│   │   ├── feature-actions.ts                <-- toggleFeature() : Add/Remove amenities from villa
+│   │   ├── image-actions.ts                  <-- reorderImages(), deleteImage() : Gallery management
+│   │   ├── notification-actions.ts           <-- [NEW] createDealNotification() : Create pulsing "Bell" alerts
+│   │   ├── price-actions.ts                  <-- updatePriceCalendar() : Bulk update daily prices
+│   │   ├── promotion-actions.ts              <-- createPromotion() : Create coupons & deals
+│   │   ├── property-actions.ts               <-- createVilla(), updateVilla() : Core CRUD
+│   │   └── system-actions.ts                 <-- createLocation(), createCollection() : Master data
+│   └── front/                                <-- Public Actions
+│       ├── booking-actions.ts                <-- createBookingIntent() : Calculate price & start checkout
+│       ├── contact-actions.ts                <-- [NEW] submitContactForm() : User sends message
+│       └── search-actions.ts                 <-- [NEW] fuzzySearch() : Handle "honeymun" -> "Honeymoon" logic
+│
+├── app/                                      <-- APP ROUTER (Pages & Layouts)
+│   ├── api/                                  <-- Backend API Routes
+│   │   ├── cron/
+│   │   │   └── daily-sync/route.ts           <-- [NEW] CRON (00:00): Updates 'property_search_index' (Prices, Promos)
+│   │   └── upload/route.ts                   <-- POST: Handles file uploads (S3 or Local)
+│   │
+│   ├── [locale]/                             <-- Localized Routes (e.g. /tr, /en)
+│   │   ├── (admin)/                          <-- Admin Layout Group (Sidebar, Auth Guard)
+│   │   │   └── admin/
+│   │   │       ├── collections/page.tsx      <-- [NEW] SEO Categories (e.g. "Honeymoon Villas" manager)
+│   │   │       ├── contacts/page.tsx         <-- [NEW] Inbox for Contact Form messages
+│   │   │       ├── features/page.tsx         <-- Master Feature/Amenity List
+│   │   │       ├── locations/page.tsx        <-- Location Hierarchy (Kas > Kalkan > Islamlar)
+│   │   │       ├── notifications/page.tsx    <-- [NEW] Manage "Bell" Alerts & Active Deals
+│   │   │       ├── promotions/page.tsx       <-- Promo Engine & Coupon Creator
+│   │   │       ├── properties/
+│   │   │       │   ├── create/page.tsx       <-- "Add New Villa" Wizard
+│   │   │       │   └── [id]/edit/page.tsx    <-- Main Villa Editor (Tabs: Info, Gallery, Price, SEO)
+│   │   │       └── page.tsx                  <-- Admin Dashboard (Stats, Recent Bookings)
+│   │   │
+│   │   ├── (storefront)/                     <-- Public Layout Group (Navbar, Footer, CookieConsent)
+│   │   │   ├── categories/[slug]/page.tsx    <-- [NEW] SEO Landing: /balayi-villalari, /honeymoon-villas
+│   │   │   ├── regions/[slug]/page.tsx       <-- SEO Landing: /kas-kiralik-villa, /kalkan-villas
+│   │   │   ├── contact/page.tsx              <-- [NEW] Contact Us Page
+│   │   │   ├── search/page.tsx               <-- Main Search Results (Filters + Listing)
+│   │   │   ├── villa/[slug]/page.tsx         <-- Villa Detail Page (SSR + Cached Data)
+│   │   │   └── book/page.tsx                 <-- Checkout / Payment Page
+│   │   │
+│   │   ├── layout.tsx                        <-- Root Layout (Html tag, Fonts, Providers)
+│   │   ├── page.tsx                          <-- Home Page (Hero, Recommendations, Blog)
+│   │   └── not-found.tsx                     <-- Custom 404 Page
+│   │
+│   ├── global-error.tsx                      <-- Error Boundary
+│   ├── robots.ts                             <-- SEO: robots.txt generator
+│   └── sitemap.ts                            <-- SEO: sitemap.xml generator
+│
+├── components/                               <-- REACT COMPONENTS (UI Blocks)
+│   ├── admin/                                <-- Admin-Only Components
+│   │   ├── CollectionManager.tsx             <-- [NEW] SEO Inputs for Collections
+│   │   ├── ContactTable.tsx                  <-- [NEW] Data table for messages
+│   │   ├── FeatureManager.tsx                <-- Checkboxes + Highlight Star
+│   │   ├── ImageManager.tsx                  <-- Drag-and-drop Gallery Editor
+│   │   ├── MarketingManager.tsx              <-- SEO Title/Desc inputs & Rank Score
+│   │   ├── NotificationBuilder.tsx           <-- [NEW] Form to create pulsing alerts
+│   │   ├── PriceCalendar.tsx                 <-- DatePicker for Daily Prices
+│   │   ├── PromoManager.tsx                  <-- Active Deals list controller
+│   │   ├── PublishToggle.tsx                 <-- Active/Passive Switch
+│   │   └── SimilarPropertyPicker.tsx         <-- [NEW] Manual override for "Similar Villas"
+│   │
+│   └── front/                                <-- User-Facing Components
+│       ├── BookingPageClient.tsx             <-- Wrapper for Checkout Logic
+│       ├── BookingWidget.tsx                 <-- Sidebar Calculator (Sticky)
+│       ├── ExitIntentModal.tsx               <-- [NEW] "Wait! Don't go" popup logic
+│       ├── NotificationBell.tsx              <-- [NEW] Pulsing Dot & Dropdown logic
+│       ├── ReservationForm.tsx               <-- Guest Details Input
+│       ├── SearchBar.tsx                     <-- [NEW] Fuzzy Search Input with Suggestions
+│       ├── VillaBreadcrumb.tsx               <-- Navigation Path
+│       └── VillaCard.tsx                     <-- Standard Villa Grid Item
+│
+├── db/                                       <-- DATABASE LAYER
+│   ├── index.ts                              <-- DB Connection Pool
+│   ├── schema.ts                             <-- [UPDATED] Full Database Schema
+│   └── seed.ts                               <-- Initial Data Script
+│
+├── lib/                                      <-- UTILITIES
+│   ├── i18n-helpers.ts                       <-- [NEW] slugify(), getLocalizedPath()
+│   └── utils.ts                              <-- cn() (Tailwind merger), formatCurrency()
+│
+├── public/                                   <-- STATIC ASSETS
+│   ├── icons/                                <-- SVGs
+│   └── images/                               <-- Placeholders / Logos
+│
+├── services/                                 <-- THE BRAIN (Business Logic)
+│   ├── indexer.ts                            <-- [CRITICAL] Updates 'property_search_index' table
+│   ├── price-calculator.ts                   <-- [CRITICAL] Complex Promo Math & Stacking Rules
+│   └── front/
+│       └── property-service.ts               <-- Data Fetching (GetVilla, SearchVillas)
+│
+└── types/                                    <-- TYPESCRIPT DEFINITIONS
+    └── index.ts                              <-- Shared Interfaces (BookingStep, SearchParams)
+
+
+## 3. Database Schema
+import { pgTable, serial, text, integer, numeric, boolean, timestamp, date, uuid, jsonb, uniqueIndex, primaryKey, pgEnum } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+
+// --- ENUMS ---
+export const userRoleEnum = pgEnum('user_role', ['admin', 'editor', 'guest']);
+export const bookingStatusEnum = pgEnum('booking_status', ['pending', 'awaiting_payment', 'confirmed', 'cancelled', 'completed']);
+export const discountTypeEnum = pgEnum('discount_type', ['percentage', 'fixed_amount', 'free_days']);
+export const featureCategoryEnum = pgEnum('feature_category', ['pool', 'kitchen', 'outdoor', 'entertainment', 'other']);
+export const triggerTypeEnum = pgEnum('trigger_type', ['general', 'exit_intent', 'early_bird', 'last_minute', 'long_stay']);
+
+// --- 1. CORE SYSTEM ---
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").unique().notNull(),
+  passwordHash: text("password_hash"),
+  fullName: text("full_name"),
+  role: userRoleEnum("role").default('guest'),
+  phone: text("phone"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// --- 2. HIERARCHICAL LOCATIONS (For /kas, /kalkan) ---
+export const locations = pgTable("locations", {
+  id: serial("id").primaryKey(),
+  parentId: integer("parent_id"), 
+  slug: text("slug").unique().notNull(), // Default TR slug
+  slugEn: text("slug_en").unique(),      // EN slug
+  slugDe: text("slug_de").unique(),      // DE slug
+  slugRu: text("slug_ru").unique(),      // RU slug
+  
+  name: jsonb("name").notNull(), // {tr:"", en:"", de:"", ru:""}
+  type: text("type").default('district'), 
+  
+  metaTitle: jsonb("meta_title"),
+  metaDesc: jsonb("meta_desc"),
+  isFeatured: boolean("is_featured").default(false),
+});
+
+// --- 2.5 SEO COLLECTIONS (For /honeymoon, /luxury) ---
+// [NEW] This handles "www.villa.com/balayi" etc.
+export const collections = pgTable("collections", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").unique().notNull(), // balayi
+  slugEn: text("slug_en").unique(),      // honeymoon
+  slugDe: text("slug_de").unique(),      // flitterwochen
+  slugRu: text("slug_ru").unique(),      // медовыймесяц
+  
+  name: jsonb("name").notNull(),
+  metaTitle: jsonb("meta_title"),
+  metaDesc: jsonb("meta_desc"),
+  
+  isFeatured: boolean("is_featured").default(false),
+});
+
+// --- 3. FILTER FEATURES ---
+export const features = pgTable("features", {
+  id: serial("id").primaryKey(),
+  key: text("key").unique().notNull(),
+  label: jsonb("label").notNull(),
+  category: featureCategoryEnum("category").default('other'),
+  icon: text("icon"),
+  isFilterable: boolean("is_filterable").default(true),
+});
+
+// --- 4. PROPERTIES (VILLAS) ---
+export const properties = pgTable("properties", {
+  id: serial("id").primaryKey(),
+  locationId: integer("location_id").references(() => locations.id),
+  
+  slug: text("slug").unique().notNull(), // "villa-sunset" (Brand name)
+  refCode: text("ref_code").unique().notNull(),
+  
+  title: jsonb("title").notNull(),
+  description: jsonb("description"),
+  
+  isPromoted: boolean("is_promoted").default(false), 
+  isRecommended: boolean("is_recommended").default(false),
+  
+  capacity: integer("capacity").notNull().default(2),
+  bedrooms: integer("bedrooms").notNull().default(1),
+  bathrooms: integer("bathrooms").notNull().default(1),
+  
+  baseCurrency: text("base_currency").default("TRY"), // Admin enters prices in this
+  defaultMinStay: integer("default_min_stay").default(5),
+  checkInTime: text("check_in_time").default("16:00"),
+  checkOutTime: text("check_out_time").default("10:00"),
+  
+  cleaningFee: numeric("cleaning_fee", { precision: 10, scale: 2 }),
+  depositFee: numeric("deposit_fee", { precision: 10, scale: 2 }),
+  minStayForCleaning: integer("min_stay_for_cleaning").default(7),
+  
+  isActive: boolean("is_active").default(true),
+  isInstantBook: boolean("is_instant_book").default(false),
+  
+  seoMeta: jsonb("seo_meta"),
+  rank: integer("rank").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// --- 4.5 SIMILAR PROPERTIES (For "Alternatives" Section) ---
+// [NEW] Pre-calculated groups of similar villas
+export const similarProperties = pgTable("similar_properties", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  similarId: integer("similar_id").references(() => properties.id, { onDelete: 'cascade' }),
+  score: integer("score").default(0), // Relevance score
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.similarId] }),
+]);
+
+// --- 4.6 PROPERTY COLLECTIONS LINK ---
+export const propertyCollections = pgTable("property_collections", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  collectionId: integer("collection_id").references(() => collections.id, { onDelete: 'cascade' }),
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.collectionId] }),
+]);
+
+// --- 5. MEDIA ---
+export const propertyImages = pgTable("property_images", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  url: text("url").notNull(),
+  order: integer("order").default(0),
+  isMain: boolean("is_main").default(false),
+});
+
+// --- 6. SEARCH INDEX (Speed Layer) ---
+export const propertySearchIndex = pgTable("property_search_index", {
+  propertyId: integer("property_id").primaryKey().references(() => properties.id, { onDelete: 'cascade' }),
+  
+  minPrice: numeric("min_price"), 
+  maxPrice: numeric("max_price"),
+  // [NEW] Specifically for Homepage "Total with/without discount" display
+  displayPrice: numeric("display_price"), 
+  originalPrice: numeric("original_price"), 
+  discountAmount: numeric("discount_amount"),
+  cleaningFee: numeric("cleaning_fee"), 
+  
+  avgRating: numeric("avg_rating"),
+  reviewCount: integer("review_count").default(0),
+  
+  nextAvailableDate: date("next_available_date"),
+  nextAvailableGap: integer("next_available_gap"),
+  
+  activePromoTags: jsonb("active_promo_tags"), // Names of applied promos
+  
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// --- 7. MANY-TO-MANY FEATURES ---
+export const propertyFeatures = pgTable("property_features", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  featureId: integer("feature_id").references(() => features.id, { onDelete: 'cascade' }),
+  isHighlighted: boolean("is_highlighted").default(false),
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.featureId] }),
+]);
+
+// --- 8. PRICING & AVAILABILITY ---
+export const dailyPrices = pgTable("daily_prices", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  date: date("date").notNull(), 
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").default("TRY"),
+  minStay: integer("min_stay"),
+}, (t) => [
+  uniqueIndex("price_date_unique_idx").on(t.propertyId, t.date),
+]);
+
+export const availability = pgTable("availability", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  isBlocked: boolean("is_blocked").default(true),
+  source: text("source"), 
+});
+
+// --- 9. PROMOTIONS & DEALS ---
+export const promotions = pgTable("promotions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // Admin name
+  displayName: jsonb("display_name"), // {tr: "Erken Rez", en: "Early Bird"}
+  
+  type: discountTypeEnum("type").notNull(), 
+  triggerType: triggerTypeEnum("trigger_type").default('general'), 
+  
+  value: numeric("value").notNull(), 
+  
+  code: text("code"), 
+  
+  minStay: integer("min_stay"), 
+  advanceBookingDays: integer("advance_booking_days"), 
+  
+  bookingWindowStart: date("booking_window_start"),
+  bookingWindowEnd: date("booking_window_end"),
+  travelWindowStart: date("travel_start"),
+  travelWindowEnd: date("travel_end"),
+
+  isStackable: boolean("is_stackable").default(false),
+  isActive: boolean("is_active").default(false),
+});
+
+export const propertyPromotions = pgTable("property_promotions", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  promotionId: integer("promotion_id").references(() => promotions.id, { onDelete: 'cascade' }),
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.promotionId] }),
+]);
+
+// --- 10. SYSTEM NOTIFICATIONS (BELL) ---
+// [NEW] Active deals shown in the Navbar Bell
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  title: jsonb("title").notNull(), 
+  message: jsonb("message").notNull(),
+  link: text("link"), 
+  type: text("type").default('deal'), 
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// --- 11. CONTACT FORMS ---
+// [NEW] To store user messages
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  message: text("message"),
+  status: text("status").default('new'), // new, read, archived
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// --- 12. BOOKINGS ---
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").notNull(), 
+  
+  guestName: text("guest_name").notNull(),
+  guestEmail: text("guest_email").notNull(),
+  guestPhone: text("guest_phone").notNull(),
+  guestAddress: text("guest_address"),
+  guestNote: text("guest_note"),
+  
+  guestCount: integer("guest_count").notNull(),
+  otherGuests: jsonb("other_guests"), 
+
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  status: bookingStatusEnum("status").default("pending"),
+  
+  totalPrice: numeric("total_price").notNull(),
+  currency: text("currency").default("TRY"), 
+
+  priceDetails: jsonb("price_details"), 
+  
+  isTermsAccepted: boolean("is_terms_accepted").default(false), 
+  isContractAccepted: boolean("is_contract_accepted").default(false), 
+  
+  createdAt: timestamp("created_at").defaultNow(), 
+});
+
+// --- RELATIONS ---
+
+// 1. Properties
+export const propertyRelations = relations(properties, ({ one, many }) => ({
+  location: one(locations, { fields: [properties.locationId], references: [locations.id] }),
+  searchIndex: one(propertySearchIndex, { fields: [properties.id], references: [propertySearchIndex.propertyId] }),
+  
+  images: many(propertyImages),
+  prices: many(dailyPrices),
+  availability: many(availability),
+  bookings: many(bookings),
+  
+  features: many(propertyFeatures),
+  promotions: many(propertyPromotions),
+  collections: many(propertyCollections),
+  
+  similarVillas: many(similarProperties, { relationName: "source_property" }),
+}));
+
+// 2. Locations
+export const locationRelations = relations(locations, ({ many }) => ({
+  properties: many(properties),
+}));
+
+// 3. Features
+export const featureRelations = relations(features, ({ many }) => ({
+  properties: many(propertyFeatures),
+}));
+
+export const propertyFeaturesRelations = relations(propertyFeatures, ({ one }) => ({
+  property: one(properties, { fields: [propertyFeatures.propertyId], references: [properties.id] }),
+  feature: one(features, { fields: [propertyFeatures.featureId], references: [features.id] }),
+}));
+
+// 4. Collections (SEO)
+export const collectionRelations = relations(collections, ({ many }) => ({
+  properties: many(propertyCollections),
+}));
+
+export const propertyCollectionsRelations = relations(propertyCollections, ({ one }) => ({
+  property: one(properties, { fields: [propertyCollections.propertyId], references: [properties.id] }),
+  collection: one(collections, { fields: [propertyCollections.collectionId], references: [collections.id] }),
+}));
+
+// 5. Promotions
+export const promotionRelations = relations(promotions, ({ many }) => ({
+  properties: many(propertyPromotions),
+}));
+
+export const propertyPromotionsRelations = relations(propertyPromotions, ({ one }) => ({
+  property: one(properties, { fields: [propertyPromotions.propertyId], references: [properties.id] }),
+  promotion: one(promotions, { fields: [propertyPromotions.promotionId], references: [promotions.id] }),
+}));
+
+// 6. Similar Properties
+export const similarPropertiesRelations = relations(similarProperties, ({ one }) => ({
+  sourceProperty: one(properties, {
+    fields: [similarProperties.propertyId],
+    references: [properties.id],
+    relationName: "source_property"
+  }),
+  targetProperty: one(properties, {
+    fields: [similarProperties.similarId],
+    references: [properties.id],
+  }),
+}));
+
+// 7. Images, Prices, Availability, Bookings, Search Index
+export const propertyImagesRelations = relations(propertyImages, ({ one }) => ({
+  property: one(properties, { fields: [propertyImages.propertyId], references: [properties.id] }),
+}));
+
+export const dailyPricesRelations = relations(dailyPrices, ({ one }) => ({
+  property: one(properties, { fields: [dailyPrices.propertyId], references: [properties.id] }),
+}));
+
+export const availabilityRelations = relations(availability, ({ one }) => ({
+  property: one(properties, { fields: [availability.propertyId], references: [properties.id] }),
+}));
+
+export const bookingRelations = relations(bookings, ({ one }) => ({
+  property: one(properties, { fields: [bookings.propertyId], references: [properties.id] }),
+}));
+
+export const searchIndexRelations = relations(propertySearchIndex, ({ one }) => ({
+  property: one(properties, { fields: [propertySearchIndex.propertyId], references: [properties.id] }),
+}));
+
+
+
+
+
+Schema
+import { pgTable, serial, text, integer, numeric, boolean, timestamp, date, uuid, jsonb, uniqueIndex, primaryKey, pgEnum } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+
+// --- ENUMS ---
+export const userRoleEnum = pgEnum('user_role', ['admin', 'editor', 'guest']);
+export const bookingStatusEnum = pgEnum('booking_status', ['pending', 'awaiting_payment', 'confirmed', 'cancelled', 'completed']);
+// Added 'free_days' for your "Pay 6 Stay 7" logic
+export const discountTypeEnum = pgEnum('discount_type', ['percentage', 'fixed_amount', 'free_days']);
+export const featureCategoryEnum = pgEnum('feature_category', ['pool', 'kitchen', 'outdoor', 'entertainment', 'other']);
+export const triggerTypeEnum = pgEnum('trigger_type', ['general', 'exit_intent', 'early_bird', 'last_minute', 'long_stay']);
+
+// --- 1. CORE SYSTEM ---
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").unique().notNull(),
+  passwordHash: text("password_hash"),
+  fullName: text("full_name"),
+  role: userRoleEnum("role").default('guest'),
+  phone: text("phone"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// --- 2. HIERARCHICAL LOCATIONS (For /kas, /kalkan) ---
+export const locations = pgTable("locations", {
+  id: serial("id").primaryKey(),
+  parentId: integer("parent_id"), 
+  slug: text("slug").unique().notNull(), // Default TR slug
+  slugEn: text("slug_en").unique(),      // EN slug
+  slugDe: text("slug_de").unique(),      // DE slug
+  slugRu: text("slug_ru").unique(),      // RU slug
+  
+  name: jsonb("name").notNull(), // {tr:"", en:"", de:"", ru:""}
+  type: text("type").default('district'), 
+  
+  metaTitle: jsonb("meta_title"),
+  metaDesc: jsonb("meta_desc"),
+  isFeatured: boolean("is_featured").default(false),
+});
+
+// --- 2.5 SEO COLLECTIONS (For /honeymoon, /luxury) ---
+// [NEW] This handles "www.villa.com/balayi" etc.
+export const collections = pgTable("collections", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").unique().notNull(), // balayi
+  slugEn: text("slug_en").unique(),      // honeymoon
+  slugDe: text("slug_de").unique(),      // flitterwochen
+  slugRu: text("slug_ru").unique(),      // медовыймесяц
+  
+  name: jsonb("name").notNull(),
+  metaTitle: jsonb("meta_title"),
+  metaDesc: jsonb("meta_desc"),
+  
+  // Logic: Allows us to tag villas with this collection ID
+  isFeatured: boolean("is_featured").default(false),
+});
+
+// --- 3. FILTER FEATURES ---
+export const features = pgTable("features", {
+  id: serial("id").primaryKey(),
+  key: text("key").unique().notNull(),
+  label: jsonb("label").notNull(),
+  category: featureCategoryEnum("category").default('other'),
+  icon: text("icon"),
+  isFilterable: boolean("is_filterable").default(true),
+});
+
+// --- 4. PROPERTIES (VILLAS) ---
+export const properties = pgTable("properties", {
+  id: serial("id").primaryKey(),
+  locationId: integer("location_id").references(() => locations.id),
+  
+  slug: text("slug").unique().notNull(), // "villa-sunset" (Brand name, universal)
+  refCode: text("ref_code").unique().notNull(),
+  
+  title: jsonb("title").notNull(),
+  description: jsonb("description"),
+  
+  isPromoted: boolean("is_promoted").default(false), 
+  isRecommended: boolean("is_recommended").default(false),
+  
+  capacity: integer("capacity").notNull().default(2),
+  bedrooms: integer("bedrooms").notNull().default(1),
+  bathrooms: integer("bathrooms").notNull().default(1),
+  
+  baseCurrency: text("base_currency").default("EUR"), // Admin enters prices in this
+  defaultMinStay: integer("default_min_stay").default(5),
+  checkInTime: text("check_in_time").default("16:00"),
+  checkOutTime: text("check_out_time").default("10:00"),
+  
+  cleaningFee: numeric("cleaning_fee", { precision: 10, scale: 2 }),
+  depositFee: numeric("deposit_fee", { precision: 10, scale: 2 }),
+  minStayForCleaning: integer("min_stay_for_cleaning").default(7),
+  
+  isActive: boolean("is_active").default(true),
+  isInstantBook: boolean("is_instant_book").default(false),
+  
+  seoMeta: jsonb("seo_meta"),
+  rank: integer("rank").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// --- 4.5 SIMILAR PROPERTIES (For "Alternatives" Section) ---
+// [NEW] Pre-calculated groups of similar villas
+export const similarProperties = pgTable("similar_properties", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  similarId: integer("similar_id").references(() => properties.id, { onDelete: 'cascade' }),
+  score: integer("score").default(0), // Relevance score (calc by admin/script)
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.similarId] }),
+]);
+
+// --- 4.6 PROPERTY COLLECTIONS LINK ---
+// Links a villa to "Honeymoon" collection
+export const propertyCollections = pgTable("property_collections", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  collectionId: integer("collection_id").references(() => collections.id, { onDelete: 'cascade' }),
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.collectionId] }),
+]);
+
+// --- 5. MEDIA ---
+export const propertyImages = pgTable("property_images", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  url: text("url").notNull(),
+  order: integer("order").default(0),
+  isMain: boolean("is_main").default(false),
+});
+
+// --- 6. SEARCH INDEX (Speed Layer) ---
+// Updated to support your specific "Pay 6 Stay 7" display logic
+export const propertySearchIndex = pgTable("property_search_index", {
+  propertyId: integer("property_id").primaryKey().references(() => properties.id, { onDelete: 'cascade' }),
+  
+  minPrice: numeric("min_price"), 
+  maxPrice: numeric("max_price"),
+  // [NEW] Specifically for Homepage "Total with/without discount" display
+  displayPrice: numeric("display_price"), // The final discounted price for X days
+  originalPrice: numeric("original_price"), // Price before discount
+  discountAmount: numeric("discount_amount"), // How much was saved
+  cleaningFee: numeric("cleaning_fee"), // Kept separate as requested
+  
+  avgRating: numeric("avg_rating"),
+  reviewCount: integer("review_count").default(0),
+  
+  nextAvailableDate: date("next_available_date"),
+  nextAvailableGap: integer("next_available_gap"),
+  
+  activePromoTags: jsonb("active_promo_tags"), // Names of applied promos
+  
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// --- 7. MANY-TO-MANY FEATURES ---
+export const propertyFeatures = pgTable("property_features", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  featureId: integer("feature_id").references(() => features.id, { onDelete: 'cascade' }),
+  isHighlighted: boolean("is_highlighted").default(false),
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.featureId] }),
+]);
+
+// --- 8. PRICING & AVAILABILITY ---
+export const dailyPrices = pgTable("daily_prices", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  date: date("date").notNull(), 
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").default("EUR"),
+  minStay: integer("min_stay"),
+}, (t) => [
+  uniqueIndex("price_date_unique_idx").on(t.propertyId, t.date),
+]);
+
+export const availability = pgTable("availability", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  isBlocked: boolean("is_blocked").default(true),
+  source: text("source"), // 'manual', 'booking', 'ical'
+});
+
+// --- 9. PROMOTIONS & DEALS ---
+export const promotions = pgTable("promotions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // Admin name
+  displayName: jsonb("display_name"), // {tr: "Erken Rez", en: "Early Bird"}
+  
+  type: discountTypeEnum("type").notNull(), // percentage, fixed_amount, free_days
+  triggerType: triggerTypeEnum("trigger_type").default('general'), // exit_intent, general
+  
+  value: numeric("value").notNull(), // 10 (%), 1 (day), 100 (eur)
+  
+  code: text("code"), // If filled, requires user input. If null, auto-apply.
+  
+  minStay: integer("min_stay"), 
+  advanceBookingDays: integer("advance_booking_days"), 
+  
+  // Date Ranges
+  bookingWindowStart: date("booking_window_start"),
+  bookingWindowEnd: date("booking_window_end"),
+  travelWindowStart: date("travel_start"),
+  travelWindowEnd: date("travel_end"),
+
+  isStackable: boolean("is_stackable").default(false),
+  isActive: boolean("is_active").default(false),
+});
+
+export const propertyPromotions = pgTable("property_promotions", {
+  propertyId: integer("property_id").references(() => properties.id, { onDelete: 'cascade' }),
+  promotionId: integer("promotion_id").references(() => promotions.id, { onDelete: 'cascade' }),
+}, (t) => [
+  primaryKey({ columns: [t.propertyId, t.promotionId] }),
+]);
+
+// --- 10. SYSTEM NOTIFICATIONS (BELL) ---
+// [NEW] Active deals shown in the Navbar Bell
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  title: jsonb("title").notNull(), // {tr: "Fırsat!", en: "Deal!"}
+  message: jsonb("message").notNull(),
+  link: text("link"), // Link to a collection or property
+  type: text("type").default('deal'), 
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// --- 11. CONTACT FORMS ---
+// [NEW] To store user messages
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  message: text("message"),
+  status: text("status").default('new'), // new, read, archived
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// --- 12. BOOKINGS ---
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").notNull(), 
+  
+  guestName: text("guest_name").notNull(),
+  guestEmail: text("guest_email").notNull(),
+  guestPhone: text("guest_phone").notNull(),
+  guestAddress: text("guest_address"),
+  guestNote: text("guest_note"),
+  
+  guestCount: integer("guest_count").notNull(),
+  otherGuests: jsonb("other_guests"), 
+
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  status: bookingStatusEnum("status").default("pending"),
+  
+  totalPrice: numeric("total_price").notNull(),
+  currency: text("currency").default("EUR"), // Stored in the currency they paid
+
+  priceDetails: jsonb("price_details"), // Snapshot of math
+  
+  isTermsAccepted: boolean("is_terms_accepted").default(false), 
+  isContractAccepted: boolean("is_contract_accepted").default(false), 
+  
+  createdAt: timestamp("created_at").defaultNow(), 
+});
+
+
+// --- RELATIONS (THE COMPLETE LIST) ---
+// 1. Properties: The center of the universe
+export const propertyRelations = relations(properties, ({ one, many }) => ({
+  location: one(locations, { 
+    fields: [properties.locationId], 
+    references: [locations.id] 
+  }),
+  searchIndex: one(propertySearchIndex, { 
+    fields: [properties.id], 
+    references: [propertySearchIndex.propertyId] 
+  }),
+  // One-to-Many
+  images: many(propertyImages),
+  prices: many(dailyPrices),
+  availability: many(availability),
+  bookings: many(bookings),
+  
+  // Many-to-Many Connectors
+  features: many(propertyFeatures),
+  promotions: many(propertyPromotions),
+  collections: many(propertyCollections),
+  
+  // Self-Referencing (Similar Villas)
+  similarVillas: many(similarProperties, { relationName: "source_property" }),
+}));
+
+// 2. Locations: Have many properties
+export const locationRelations = relations(locations, ({ many }) => ({
+  properties: many(properties),
+}));
+
+// 3. Features: Many-to-Many link
+export const featureRelations = relations(features, ({ many }) => ({
+  properties: many(propertyFeatures),
+}));
+
+export const propertyFeaturesRelations = relations(propertyFeatures, ({ one }) => ({
+  property: one(properties, { 
+    fields: [propertyFeatures.propertyId], 
+    references: [properties.id] 
+  }),
+  feature: one(features, { 
+    fields: [propertyFeatures.featureId], 
+    references: [features.id] 
+  }),
+}));
+
+// 4. Collections (SEO Landing Pages): Many-to-Many link
+export const collectionRelations = relations(collections, ({ many }) => ({
+  properties: many(propertyCollections),
+}));
+
+export const propertyCollectionsRelations = relations(propertyCollections, ({ one }) => ({
+  property: one(properties, { 
+    fields: [propertyCollections.propertyId], 
+    references: [properties.id] 
+  }),
+  collection: one(collections, { 
+    fields: [propertyCollections.collectionId], 
+    references: [collections.id] 
+  }),
+}));
+
+// 5. Promotions: Many-to-Many link
+export const promotionRelations = relations(promotions, ({ many }) => ({
+  properties: many(propertyPromotions),
+}));
+
+export const propertyPromotionsRelations = relations(propertyPromotions, ({ one }) => ({
+  property: one(properties, { 
+    fields: [propertyPromotions.propertyId], 
+    references: [properties.id] 
+  }),
+  promotion: one(promotions, { 
+    fields: [propertyPromotions.promotionId], 
+    references: [promotions.id] 
+  }),
+}));
+
+// 6. Similar Properties (Linking Villa A to Villa B)
+export const similarPropertiesRelations = relations(similarProperties, ({ one }) => ({
+  sourceProperty: one(properties, {
+    fields: [similarProperties.propertyId],
+    references: [properties.id],
+    relationName: "source_property"
+  }),
+  targetProperty: one(properties, {
+    fields: [similarProperties.similarId],
+    references: [properties.id],
+    // We don't usually need a reverse relation name here unless querying backwards explicitly
+  }),
+}));
+
+// 7. Child Tables (Images, Prices, Availability)
+export const propertyImagesRelations = relations(propertyImages, ({ one }) => ({
+  property: one(properties, { 
+    fields: [propertyImages.propertyId], 
+    references: [properties.id] 
+  }),
+}));
+
+export const dailyPricesRelations = relations(dailyPrices, ({ one }) => ({
+  property: one(properties, {
+    fields: [dailyPrices.propertyId],
+    references: [properties.id],
+  }),
+}));
+
+export const availabilityRelations = relations(availability, ({ one }) => ({
+  property: one(properties, {
+    fields: [availability.propertyId],
+    references: [properties.id],
+  }),
+}));
+
+// 8. Bookings
+export const bookingRelations = relations(bookings, ({ one }) => ({
+  property: one(properties, {
+    fields: [bookings.propertyId],
+    references: [properties.id],
+  }),
+}));
+
+// 9. Search Index
+export const searchIndexRelations = relations(propertySearchIndex, ({ one }) => ({
+  property: one(properties, { 
+    fields: [propertySearchIndex.propertyId], 
+    references: [properties.id] 
+  }),
+}));
