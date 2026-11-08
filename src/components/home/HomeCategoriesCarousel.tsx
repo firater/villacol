@@ -38,8 +38,56 @@ type Props = {
   kicker: string;
 };
 
-/** One card width (228px) + gap-4 (16px). */
-const SCROLL_STEP_PX = 244;
+/** One card width (272px at sm+) + gap-6 (24px). */
+const SCROLL_STEP_PX = 296;
+
+const ISTANBUL_TZ = "Europe/Istanbul";
+
+function getHoursMinutesUntilIstanbulMidnight(now = new Date()): { hours: number; minutes: number } {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: ISTANBUL_TZ,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).formatToParts(now);
+
+  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? 0);
+  const second = Number(parts.find((part) => part.type === "second")?.value ?? 0);
+
+  const secondsLeft = 24 * 3600 - (hour * 3600 + minute * 60 + second);
+  const clamped = Math.max(0, secondsLeft);
+
+  return {
+    hours: Math.floor(clamped / 3600),
+    minutes: Math.floor((clamped % 3600) / 60),
+  };
+}
+
+function CategoryOfDayTopBadges() {
+  const t = useTranslations("layout.home");
+  const [timeLeft, setTimeLeft] = useState(() => getHoursMinutesUntilIstanbulMidnight());
+
+  useEffect(() => {
+    const sync = () => setTimeLeft(getHoursMinutesUntilIstanbulMidnight());
+    sync();
+    const intervalId = window.setInterval(sync, 30_000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  return (
+    <span className="absolute top-2.5 left-2.5 z-10 inline-flex max-w-[calc(100%-1.25rem)] items-center gap-2 rounded-full border border-white/25 bg-brand/88 px-2.5 py-1 text-white shadow-sm backdrop-blur-md">
+      <span className="font-serif text-[13px] leading-tight tracking-tight sm:text-sm">
+        {t("categoriesOfTheDay")}
+      </span>
+      <span className="h-3 w-px shrink-0 bg-white/35" aria-hidden />
+      <span className="shrink-0 font-sans text-[10px] font-medium tabular-nums tracking-normal text-white/95 sm:text-[11px]">
+        {t("categoriesDayEndsTr", { hours: timeLeft.hours, minutes: timeLeft.minutes })}
+      </span>
+    </span>
+  );
+}
 
 export function HomeCategoriesCarousel({
   editorsChoice,
@@ -114,10 +162,10 @@ export function HomeCategoriesCarousel({
       </header>
       <ul
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth pb-2"
+        className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-6 overflow-x-auto overscroll-x-contain scroll-smooth pb-2"
         aria-label={heading}
       >
-        <li className="shrink-0 snap-start">
+        <li className="flex shrink-0 snap-start">
           <CategoryCarouselCard
             href="/villas"
             label={editorsChoice.label}
@@ -129,7 +177,7 @@ export function HomeCategoriesCarousel({
           />
         </li>
         {categories.map((category, index) => (
-          <li key={category.slug} className="shrink-0 snap-start">
+          <li key={category.slug} className="flex shrink-0 snap-start">
             <CategoryCarouselCard
               href={{ pathname: "/villas", query: { category: category.slug } }}
               label={category.label}
@@ -172,24 +220,34 @@ function CategoryCarouselCard({
 
   const perNight = t("categoriesPerNight");
 
+  const promoLine = showCategoryOfDayBadge
+    ? t("categoriesNoFeeRental")
+    : isGoodDeal
+      ? t("categoriesPromotionsStack")
+      : null;
+
   return (
-    <Link href={href} className="group block w-[200px] sm:w-[228px]">
-      <div className="relative overflow-visible">
-        <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-stone-200 ring-1 ring-stone-200/90 ring-inset">
-          <Image
-            src={image}
-            alt=""
-            fill
-            sizes="(max-width: 640px) 200px, 228px"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-          />
-          {!showCategoryOfDayBadge ? (
+    <Link href={href} className="group flex h-full w-[240px] flex-col sm:w-[272px]">
+      <div className="flex h-full w-full flex-col rounded-none border border-stone-200/80 bg-stone-50 px-3 pb-3 pt-0 sm:px-4 sm:pb-4">
+        <div className="relative -mx-3 aspect-[4/5] shrink-0 overflow-visible bg-stone-200 sm:-mx-4">
+          <div className="absolute inset-0 overflow-hidden">
+            <Image
+              src={image}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 240px, 272px"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          </div>
+          {showCategoryOfDayBadge ? (
+            <CategoryOfDayTopBadges />
+          ) : (
             <span className="absolute top-2.5 left-2.5 z-10 inline-flex max-w-[calc(100%-1.25rem)] items-center rounded-full border border-white/30 bg-white/92 px-2 py-1 font-sans text-[9px] font-medium tracking-tight text-stone-800 uppercase backdrop-blur-md shadow-sm">
               {countLabel}
             </span>
-          ) : null}
+          )}
           <div
-            className={`pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t via-transparent to-transparent transition-opacity duration-500 ${
+            className={`pointer-events-none absolute inset-0 z-[1] overflow-hidden bg-gradient-to-t via-transparent to-transparent transition-opacity duration-500 ${
               showCategoryOfDayBadge
                 ? "from-stone-950/75 via-stone-900/15 opacity-100 group-hover:from-stone-950/85"
                 : "from-stone-900/30 opacity-80 group-hover:opacity-100"
@@ -198,37 +256,35 @@ function CategoryCarouselCard({
           />
           {showCategoryOfDayBadge ? <CategoryOfDayBadge /> : null}
         </div>
-      </div>
-      <div className="mt-3">
-        <h3 className="font-serif text-lg leading-snug text-stone-900">{label}</h3>
-        <p className="mt-1.5 font-sans text-xs leading-snug text-stone-500">
-          <span>
-            {t.rich("categoriesStartingFrom", {
-              amount: () => (
-                <span
-                  className={
-                    isGoodDeal ? "font-semibold text-brand" : "font-medium text-stone-800"
-                  }
-                >
-                  {priceFormatted}
-                </span>
-              ),
-            })}
-          </span>
-          <span className="text-stone-400">{perNight}</span>
-          {showCategoryOfDayBadge ? (
-            <span className="mt-1.5 block max-w-[13.5rem] font-serif text-base leading-snug text-brand">
-              {t("categoriesNoFeeRental")}
-            </span>
-          ) : isGoodDeal ? (
-            <span className="mt-1.5 block max-w-[13.5rem] font-serif text-base leading-snug text-brand">
-              {t("categoriesPromotionsStack")}
-            </span>
-          ) : null}
-        </p>
-        <p className="mt-1 font-sans text-[10px] tracking-[0.18em] text-stone-400 uppercase transition-colors group-hover:text-stone-600">
-          {kicker}
-        </p>
+        <div className="flex flex-1 flex-col pt-4 text-left">
+          <h3 className="line-clamp-2 min-h-[2.375rem] font-serif text-xl leading-tight text-stone-900 sm:min-h-[2.875rem] sm:text-2xl">
+            {label}
+          </h3>
+          <div className="mt-0 flex flex-1 flex-col border-t border-stone-200/60 pt-3">
+            <p className="font-sans text-xs leading-snug text-stone-500">
+              <span>
+                {t.rich("categoriesStartingFrom", {
+                  amount: () => (
+                    <span
+                      className={
+                        isGoodDeal ? "font-semibold text-brand" : "font-medium text-stone-800"
+                      }
+                    >
+                      {priceFormatted}
+                    </span>
+                  ),
+                })}
+              </span>
+              <span className="text-stone-400">{perNight}</span>
+              <span className="mt-1.5 block min-h-[2.75rem] font-serif text-base leading-snug text-brand">
+                {promoLine ?? <span className="invisible select-none" aria-hidden>—</span>}
+              </span>
+            </p>
+            <p className="mt-0.5 font-sans text-[10px] tracking-[0.18em] text-stone-400 uppercase transition-colors group-hover:text-stone-600">
+              {kicker}
+            </p>
+          </div>
+        </div>
       </div>
     </Link>
   );
@@ -281,11 +337,8 @@ function CategoryOfDayBadge() {
           </span>
         </span>
         <div className="relative px-6 text-center">
-          <p className="font-sans text-[8px] font-medium tracking-[0.22em] text-stone-400 uppercase">
-            Category of the day
-          </p>
-          <p id={labelId} className="mt-1 font-serif text-sm leading-tight tracking-tight text-white">
-            <span className="text-brand">%20</span> Direct Discount
+          <p id={labelId} className="font-serif text-base leading-tight tracking-tight text-white">
+            <span className="text-brand">%20</span> Direct Booking Discount
           </p>
           <div className="mx-auto mt-1 h-px w-7 bg-white/20" aria-hidden />
           <p className="mt-1 font-sans text-[8px] font-medium tracking-[0.18em] text-stone-300 uppercase">

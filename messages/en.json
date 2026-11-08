@@ -46,7 +46,9 @@
       "categoriesStartingFrom": "From <amount></amount>",
       "categoriesPerNight": "/ night",
       "categoriesPromotionsStack": "Stackable promotions applied",
-      "categoriesNoFeeRental": "No agency commission today!!",
+      "categoriesNoFeeRental": "No agency commission on family villas today!!",
+      "categoriesOfTheDay": "Category of the day",
+      "categoriesDayEndsTr": "{hours}h {minutes}m",
       "promoTabs": {
         "aria": "Offer types",
         "all": "All offers",

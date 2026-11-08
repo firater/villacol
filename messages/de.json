@@ -46,7 +46,9 @@
       "categoriesStartingFrom": "Ab <amount></amount>",
       "categoriesPerNight": "/ Nacht",
       "categoriesPromotionsStack": "Kombinierbare Aktionen angewendet",
-      "categoriesNoFeeRental": "Heute keine Agenturprovision!!",
+      "categoriesNoFeeRental": "Heute keine Agenturprovision bei Familienvillen!!",
+      "categoriesOfTheDay": "Kategorie des Tages",
+      "categoriesDayEndsTr": "{hours}h {minutes}m",
       "promoTabs": {
         "aria": "Angebotstypen",
         "all": "Alle Angebote",
