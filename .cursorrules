@@ -1,0 +1,21 @@
+# Project Context
+Luxury Villa Booking Platform.
+Tech Stack: Next.js (App Router), TypeScript, Drizzle ORM, Neon (Serverless Postgres), next-intl.
+
+# Code Style & Conventions
+- Use `snake_case` for database columns and `camelCase` for TypeScript variables/functions.
+- Always use TypeScript strict types. Avoid `any`.
+- For server actions and API routes, always import the database instance from `@/db`.
+
+# Architecture Rules
+- NO UI: Do NOT generate React components, Tailwind classes, or frontend code unless explicitly requested. Focus 100% on database schema, server actions, cron jobs, and business logic.
+- i18n & Currency: Base currency is always EUR. Use cookies for user language and currency preferences.
+- Routing: Filter pages must use URL query parameters (e.g., `?bedrooms=3`), never path segments. Query parameter keys must remain universal English.
+- Pricing Engine: All calculations (discounts, sequential compounding) MUST be isolated in pure functions within `src/lib/pricing.engine.ts`. Do not mix DB queries with pricing logic.
+- Database: Always update the Drizzle schema in `src/db/schema.ts` and use `drizzle-kit` for migrations.
+
+# UI/UX Rules
+- **ZERO Layout Shift (CLS):** Always prevent Cumulative Layout Shift. 
+- Use `next/image` for ALL images. Always provide explicit `width` and `height` (or `fill` with `sizes` and an `aspect-ratio` container).
+- For dynamic data fetching (like villa lists), use React `<Suspense>` with skeleton loaders so the layout reserves the exact space before the data arrives.
+- Never use standard `<img>` tags.

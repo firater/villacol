@@ -1,0 +1,461 @@
+{
+  "layout": {
+    "nav": {
+      "ariaMain": "Main navigation",
+      "home": "Home",
+      "villas": "Villas",
+      "findVilla": "Find my villa",
+      "offers": "Offers",
+      "contact": "Contact",
+      "about": "About"
+    },
+    "megaMenu": {
+      "label": "Menu",
+      "open": "Open menu",
+      "close": "Close menu",
+      "homeColumn": "Home page",
+      "realEstate": "Villa collection",
+      "categoriesColumn": "Stay categories",
+      "allCategories": "Browse all categories",
+      "featuredEyebrow": "Featured collection",
+      "featuredKicker": "Curated for you",
+      "featuredPlace": "Discover Kalkan",
+      "featuredTitle": "Mediterranean retreats",
+      "featuredBody": "Hand-picked villas with live pricing from the next available stay.",
+      "moreLinks": "Quick links"
+    },
+    "footer": {
+      "tagline": "Hand-picked villas on the Turkish Mediterranean coast.",
+      "browse": "Browse",
+      "legal": "Legal",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "copyright": "© {year} {brand}. All rights reserved."
+    },
+    "home": {
+      "heroEyebrow": "Villa Collection",
+      "heroTitle": "Best price guarantee",
+      "heroTitleLine1": "Best price",
+      "heroTitleLine2": "guarantee",
+      "heroSubtitle": "Hand-picked villas with live pricing from the next available stay — search, compare, and book with confidence.",
+      "exclusiveSeal": "Exclusive offers",
+      "categoriesHeading": "Categories",
+      "categoriesBrowse": "Explore",
+      "promoTabs": {
+        "aria": "Offer types",
+        "all": "All offers",
+        "featured": "Featured",
+        "bestValue": "Best value"
+      },
+      "dailyPromo": {
+        "chip": "Villa promotions",
+        "title": "Today's picks",
+        "body": "Live offer list from our collection"
+      },
+      "amenityPills": {
+        "aria": "Quick amenities",
+        "more": "More filters"
+      },
+      "offersKicker": "Seasonal",
+      "featuredKicker": "Editors' pick",
+      "bestValueKicker": "Smart stay",
+      "heroCta": "Explore the collection",
+      "heroSecondaryCta": "Let us choose for you",
+      "search": {
+        "title": "Search villas",
+        "destination": "Destination",
+        "anyDestination": "Anywhere",
+        "checkIn": "Check in",
+        "checkOut": "Check out",
+        "dates": "Dates",
+        "addDates": "Add dates",
+        "guests": "Guests",
+        "anyGuests": "Any",
+        "submit": "Search"
+      },
+      "featuredHeading": "Recommended villas",
+      "featuredSubtitle": "Hand-picked from the collection, priced from the next available stay.",
+      "featuredEmpty": "No featured villas are available yet. Run the seed and price-cache rebuild, or check back soon.",
+      "offersHeading": "Promotions",
+      "offersSubtitle": "Live discounts already applied to the price you see — early booking, long stays, and free nights.",
+      "offersEmpty": "No offers are running right now. New discounts are published every season.",
+      "bestValueHeading": "Best value",
+      "bestValueSubtitle": "The most generous space, pool, and view for the nightly rate.",
+      "bestValueEmpty": "No best-value picks are published yet.",
+      "viewAllVillas": "View all villas",
+      "viewAllOffers": "View all offers",
+      "concierge": {
+        "eyebrow": "Personal concierge",
+        "title": "Not sure which villa is yours?",
+        "body": "Answer four short questions — who is travelling, the mood you want, and your budget — and we will put forward the three villas that fit.",
+        "cta": "Find my villa"
+      },
+      "help": {
+        "title": "Need help planning?",
+        "body": "Our team answers within one working day, in English, German, or Russian. Ask about a specific villa, a long stay, or anything the listing does not cover.",
+        "cta": "Contact us",
+        "faqTitle": "Frequently asked",
+        "questions": {
+          "booking": {
+            "q": "How does booking work?",
+            "a": "Send an inquiry with your dates and we confirm availability, the final quote, and the deposit by email. Nothing is charged until you accept."
+          },
+          "payment": {
+            "q": "When do I pay?",
+            "a": "A deposit secures the dates; the balance is due before arrival. Prices are held in euros and shown in your chosen currency at the current rate."
+          },
+          "cancellation": {
+            "q": "What is the cancellation policy?",
+            "a": "Each villa carries its own terms, stated on the villa page before you book. We confirm them in writing with your booking."
+          },
+          "concierge": {
+            "q": "Can you arrange transfers and a chef?",
+            "a": "Yes. Airport transfers, a private chef, boat days, and car hire can all be added — tell us in your inquiry and we will price it with the stay."
+          }
+        }
+      },
+      "whyUs": {
+        "eyebrow": "Our advantages",
+        "title": "Why Villa Collection?",
+        "subtitle": "A great holiday does not have to be overpriced — we stand by that.",
+        "trustPillTitle": "Verified collection",
+        "trustPillSubtitle": "Hand-checked villas · Clear EUR pricing",
+        "trustBadge": "Trusted villa experts · Clear pricing in your currency",
+        "pillars": {
+          "price": {
+            "title": "Transparent pricing",
+            "body": "Every card shows the real total from our live cache — discounts included before you inquire."
+          },
+          "support": {
+            "title": "Human support",
+            "body": "Real people reply within one working day in English, German, or Russian."
+          },
+          "curated": {
+            "title": "Curated only",
+            "body": "Featured, offer, and best-value rails are hand-flagged — never auto-filled noise."
+          }
+        }
+      },
+      "discountCta": {
+        "eyebrow": "Need a better rate?",
+        "title": "Get a discount",
+        "body": "Message us on WhatsApp with your dates and group size — we will match the best offer we can.",
+        "whatsapp": "WhatsApp",
+        "whatsappUrl": "https://wa.me/905551234567",
+        "phoneLabel": "Contact us",
+        "contactCta": "Send a message"
+      },
+      "footer": {
+        "discoverTitle": "Discover",
+        "supportTitle": "Support",
+        "concierge": "Concierge quiz",
+        "paymentsNote": "Prices in EUR · Display currency at checkout"
+      }
+    },
+    "villaCard": {
+      "nextAvailable": "Next available {range}",
+      "specialOffer": "Special offer",
+      "editorsChoice": "Editor's Choice",
+      "wasPrice": "Was {price}",
+      "perStay": "{nights, plural, one {for # night} other {for # nights}}",
+      "viewVilla": "View",
+      "firstAvailability": "Next availability",
+      "priceStartingAt": "Price starting at",
+      "perNight": "/ night"
+    },
+    "listing": {
+      "allVillas": "All villas",
+      "offers": "Special offers",
+      "subtitle": "Refine your search with filters — every choice updates the URL so you can share or bookmark results.",
+      "empty": "No villas match these filters. Try relaxing one or two criteria.",
+      "prev": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {total}",
+      "paginationLabel": "Listing pagination"
+    },
+    "notifications": {
+      "openMenu": "Open notifications",
+      "panelTitle": "Journal",
+      "panelKicker": "Latest offers",
+      "empty": "No new stories right now",
+      "viewOffer": "View offer"
+    }
+  },
+  "common": {
+    "brand": "Villa Collection",
+    "currency": "Currency",
+    "language": "Language",
+    "loading": "Loading",
+    "retry": "Try again",
+    "close": "Close",
+    "nightCount": "{count, plural, one {# night} other {# nights}}",
+    "guestCount": "{count, plural, one {# guest} other {# guests}}",
+    "bedroomCount": "{count, plural, one {# bedroom} other {# bedrooms}}",
+    "bathroomCount": "{count, plural, one {# bathroom} other {# bathrooms}}"
+  },
+  "filters": {
+    "heading": "Filters",
+    "clearAll": "Clear all",
+    "apply": "Show results",
+    "resultCount": "{count, plural, =0 {No villas} one {# villa} other {# villas}}",
+    "labels": {
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "guests": "Guests",
+      "min_price": "Minimum price",
+      "max_price": "Maximum price",
+      "location": "Location",
+      "category": "Collection",
+      "amenities": "Amenities",
+      "features": "Features",
+      "check_in": "Check-in",
+      "check_out": "Check-out",
+      "offers_only": "Special offers only",
+      "sort": "Sort by",
+      "page": "Page"
+    },
+    "sort": {
+      "default": "Recommended",
+      "price_asc": "Price: low to high",
+      "price_desc": "Price: high to low",
+      "bedrooms_desc": "Most bedrooms",
+      "relevance": "Best match"
+    },
+    "placeholders": {
+      "anyLocation": "Any location",
+      "anyCategory": "Any collection",
+      "searchQuery": "Try \"6 guests in Kalkan with a pool\""
+    }
+  },
+  "promotions": {
+    "triggers": {
+      "always": "Always available",
+      "long_stay": "Long-stay discount",
+      "last_minute": "Last-minute discount",
+      "early_bird": "Early-booking discount",
+      "coupon": "Promo code",
+      "exit_intent": "Exclusive offer"
+    },
+    "discountTypes": {
+      "percentage": "Percentage off",
+      "fixed_amount": "Fixed amount off",
+      "free_days": "Free nights"
+    },
+    "freeNights": "{count, plural, one {# night free} other {# nights free}}",
+    "appliedCount": "{count, plural, one {# offer applied} other {# offers applied}}"
+  },
+  "quote": {
+    "nightlyTotal": "Accommodation",
+    "cleaningFee": "Cleaning fee",
+    "discount": "Discount",
+    "grandTotal": "Total",
+    "deposit": "Deposit",
+    "avgNightly": "Average per night",
+    "priceOnRequest": "Price on request",
+    "fromPrice": "From {price}"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Enter a valid email address",
+    "invalidPhone": "Enter a valid phone number",
+    "invalidDate": "Enter a valid date",
+    "tooShort": "Must be at least {min} characters",
+    "tooLong": "Must be at most {max} characters",
+    "acceptTerms": "Please accept the terms to continue",
+    "stay": {
+      "invalid_date_range": "Check-out must be after check-in",
+      "calendar_gap": "We do not have rates for every night of that stay yet",
+      "blocked_night": "Those dates are not available",
+      "min_stay_not_met": "This villa has a minimum stay of {nights} nights",
+      "invalid_guest_count": "Enter the number of guests",
+      "capacity_exceeded": "This villa sleeps up to {capacity} guests"
+    },
+    "code": {
+      "invalid": "That code is not valid",
+      "expired": "That code has expired",
+      "wrong": "Incorrect code. {remaining} attempts left.",
+      "locked": "Too many incorrect codes. Try again in {minutes} minutes.",
+      "format": "Enter the 6-digit code"
+    },
+    "rateLimited": "You have sent several messages recently. Please wait a while before sending another."
+  },
+  "email": {
+    "bookingOtp": {
+      "subject": "Your booking access code",
+      "heading": "Your access code",
+      "intro": "Use this code to open your booking:",
+      "expiry": "The code expires in {minutes} minutes.",
+      "ignore": "If you did not request this, you can ignore this email."
+    },
+    "inquiryReceived": {
+      "subject": "We received your enquiry",
+      "heading": "Thank you for your enquiry",
+      "intro": "We have received your enquiry for {villaName} and will be in touch shortly.",
+      "stay": "{checkIn} to {checkOut}, {nights} nights",
+      "total": "Estimated total: {total}",
+      "signature": "The Villa Collection team"
+    }
+  },
+  "concierge": {
+    "eyebrow": "Curated AI Concierge",
+    "title": "Find my villa",
+    "intro": "Answer three short questions. We will match you with up to three Editor's Choice villas from our collection.",
+    "progressLabel": "Concierge steps",
+    "steps": {
+      "group": "Group",
+      "vibe": "Vibe",
+      "budget": "Budget"
+    },
+    "group": {
+      "heading": "Who is travelling?",
+      "hint": "We use this to size bedrooms and capacity.",
+      "couple": "Couple",
+      "family": "Family",
+      "friends": "Friends"
+    },
+    "vibe": {
+      "heading": "What is the vibe?",
+      "hint": "Each option maps to features our editors tag on the ground.",
+      "secludedLuxury": "Secluded luxury",
+      "closeToTown": "Close to town",
+      "beachfront": "Beachfront"
+    },
+    "budget": {
+      "heading": "Average nightly budget",
+      "hint": "Compared to each villa's cached average nightly rate (EUR, before fees).",
+      "upTo200": "≤ €200 / night",
+      "mid": "€200 – €500 / night",
+      "above500": "> €500 / night"
+    },
+    "continue": "Continue",
+    "back": "Back",
+    "submit": "Find my perfect villa",
+    "finding": "Curating…",
+    "results": {
+      "heading": "Your curated picks",
+      "subtitle": "Hand-selected Editor's Choice villas that fit your answers.",
+      "empty": "No Editor's Choice villas matched these filters. Try another vibe or budget.",
+      "startOver": "Start over"
+    }
+  },
+  "deals": {
+    "heading": "Offers",
+    "empty": "No offers right now",
+    "markAllRead": "Mark all as read",
+    "unreadCount": "{count, plural, one {# new offer} other {# new offers}}"
+  },
+  "exitIntent": {
+    "heading": "Before you go",
+    "intro": "Here is an exclusive code for your stay:",
+    "expiry": "Valid until {date}",
+    "dismiss": "No thanks",
+    "copy": "Copy",
+    "secureCta": "Secure my discount",
+    "copied": "Copied",
+    "loading": "Preparing your code…",
+    "unavailable": "No exclusive offer is available right now.",
+    "countdownLabel": "Expires in",
+    "stacksNote": "Stacks with all other promotions",
+    "timerLabel": "Special discount",
+    "timerAria": "Re-open your exclusive offer and view the countdown"
+  },
+  "villaDetail": {
+    "capacity": "Capacity",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "amenitiesHeading": "Amenities",
+    "calendarHeading": "Availability",
+    "calendarHint": "Select your stay — the sidebar updates with your price instantly.",
+    "calendarLegendHoliday": "Public holiday",
+    "calendarLegendCustomPrice": "Special nightly rate",
+    "calendarLegendBlocked": "Unavailable",
+    "calendarLegendDefault": "Standard rate ({price})",
+    "pricing": {
+      "title": "Pricing & availability",
+      "subtitle": "Choose dates for an estimated total. Final price at checkout.",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Guests",
+      "calculate": "Calculate price",
+      "calculating": "Calculating…",
+      "emptyHint": "Select check-in and check-out on the calendar to see your price.",
+      "selectDates": "Please select both check-in and check-out.",
+      "baseTotal": "Accommodation (before discounts)",
+      "promotions": "Applied offers",
+      "totalDiscount": "Total discounts",
+      "cleaningFee": "Cleaning fee",
+      "grandTotal": "Estimated total",
+      "footnote": "{nights, plural, one {# night} other {# nights}} · {guests, plural, one {# guest} other {# guests}}",
+      "bookNow": "Reserve"
+    }
+  },
+  "booking": {
+    "statuses": {
+      "inquiry": "Enquiry",
+      "pending": "Pending",
+      "awaiting_payment": "Awaiting payment",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "access": {
+      "heading": "Verify your email",
+      "intro": "We sent a 6-digit code to {email}.",
+      "resend": "Send a new code",
+      "verify": "Verify",
+      "signOut": "Sign out"
+    },
+    "checkout": {
+      "title": "Complete your inquiry",
+      "missingDates": "Add check-in, check-out, and guests from the villa page before continuing.",
+      "estimatedTotal": "Estimated total: {total}",
+      "datesLine": "{checkIn} → {checkOut} · {nights, plural, one {# night} other {# nights}}",
+      "guestName": "Full name",
+      "guestEmail": "Email",
+      "guestPhone": "Phone",
+      "guestCount": "Guests",
+      "guestNote": "Message (optional)",
+      "acceptTermsPrefix": "I accept the",
+      "termsLink": "Terms & Conditions",
+      "termsRequired": "You must accept the terms to continue.",
+      "submit": "Submit inquiry",
+      "submitting": "Sending…",
+      "noPaymentYet": "No payment is taken yet — we will confirm availability by email."
+    },
+    "success": {
+      "title": "Inquiry sent",
+      "body": "Check your inbox for a secure link to track this booking. You will need a one-time code from the same email to open it.",
+      "backToVillas": "Browse more villas"
+    },
+    "status": {
+      "title": "Your booking",
+      "invalidLink": "This tracking link is not valid.",
+      "otpIntro": "Enter the 6-digit code we sent to your email to view this inquiry.",
+      "sentTo": "Code sent to {email}",
+      "otpLabel": "Access code",
+      "verify": "Verify",
+      "verifying": "Verifying…",
+      "resend": "Resend code",
+      "resending": "Sending…",
+      "statusLabel": "Status: {status}",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "nights": "Nights",
+      "total": "Total",
+      "guestSection": "Guest details",
+      "guestName": "Name",
+      "guestEmail": "Email",
+      "guestPhone": "Phone",
+      "guestCount": "Guests",
+      "guestNote": "Message",
+      "statuses": {
+        "inquiry": "Inquiry",
+        "pending": "Pending",
+        "awaiting_payment": "Awaiting payment",
+        "confirmed": "Confirmed",
+        "cancelled": "Cancelled",
+        "completed": "Completed"
+      }
+    }
+  }
+}
