@@ -41,6 +41,11 @@
       "exclusiveSeal": "Exklusive Angebote",
       "categoriesHeading": "Kategorien",
       "categoriesBrowse": "Entdecken",
+      "categoriesEditorsChoice": "Villen der Redaktion",
+      "categoriesVillaCount": "{count, plural, one {# Villa} other {# Villen}}",
+      "categoriesStartingFrom": "Ab <amount></amount>",
+      "categoriesPerNight": "/ Nacht",
+      "categoriesPromotionsStack": "Kombinierbare Aktionen angewendet",
       "promoTabs": {
         "aria": "Angebotstypen",
         "all": "Alle Angebote",

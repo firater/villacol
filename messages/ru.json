@@ -41,6 +41,11 @@
       "exclusiveSeal": "Эксклюзив",
       "categoriesHeading": "Категории",
       "categoriesBrowse": "Смотреть",
+      "categoriesEditorsChoice": "Выбор редакции",
+      "categoriesVillaCount": "{count, plural, one {# вилла} few {# виллы} many {# вилл} other {# виллы}}",
+      "categoriesStartingFrom": "От <amount></amount>",
+      "categoriesPerNight": "/ ночь",
+      "categoriesPromotionsStack": "Суммируемые акции учтены",
       "promoTabs": {
         "aria": "Типы акций",
         "all": "Все акции",

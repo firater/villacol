@@ -1,15 +1,23 @@
 /** Temporary mock categories — replace with API facets when wiring real data. */
+export const HOME_EDITORS_CHOICE_LEAD = {
+  image: "/smr2.webp",
+  villaCount: 26,
+  /** EUR cents per night — display converted in `HomeCategoriesSection`. */
+  startingFromEurCents: 265_00,
+  isGoodDeal: true,
+} as const;
+
 export const HOME_CATEGORIES_MOCK = [
-  { slug: "sea-view", label: "Sea view", image: "https://placehold.co/600x800/334155/e2e8f0/png?text=+" },
-  { slug: "family", label: "Family", image: "https://placehold.co/600x800/44403c/d6d3d1/png?text=+" },
-  { slug: "honeymoon", label: "Honeymoon", image: "https://placehold.co/600x800/1e3a8a/bfdbfe/png?text=+" },
-  { slug: "luxury", label: "Luxury", image: "https://placehold.co/600x800/92400e/fde68a/png?text=+" },
-  { slug: "pet-friendly", label: "Pet friendly", image: "https://placehold.co/600x800/6b21a8/e9d5ff/png?text=+" },
-  { slug: "pool", label: "Private pool", image: "https://placehold.co/600x800/0f766e/99f6e4/png?text=+" },
-  { slug: "island", label: "Island", image: "https://placehold.co/600x800/0369a1/7dd3fc/png?text=+" },
-  { slug: "rustic", label: "Rustic", image: "https://placehold.co/600x800/78350f/fcd34d/png?text=+" },
-  { slug: "design", label: "Design", image: "https://placehold.co/600x800/18181b/faFAf9/png?text=+" },
-  { slug: "wellness", label: "Wellness", image: "https://placehold.co/600x800/831843/fbcfe8/png?text=+" },
-  { slug: "eco", label: "Eco", image: "https://placehold.co/600x800/166534/bbf7d0/png?text=+" },
-  { slug: "golf", label: "Near golf", image: "https://placehold.co/600x800/3f6212/d9f99d/png?text=+" },
+  { slug: "sea-view", label: "Sea view", image: "/smr2.webp", villaCount: 48, startingFromEurCents: 415_00, isGoodDeal: false },
+  { slug: "family", label: "Family", image: "/smr2.webp", villaCount: 62, startingFromEurCents: 238_00, isGoodDeal: true },
+  { slug: "honeymoon", label: "Honeymoon", image: "/smr2.webp", villaCount: 31, startingFromEurCents: 520_00, isGoodDeal: false },
+  { slug: "luxury", label: "Luxury", image: "/smr2.webp", villaCount: 19, startingFromEurCents: 890_00, isGoodDeal: false },
+  { slug: "pet-friendly", label: "Pet friendly", image: "/smr2.webp", villaCount: 24, startingFromEurCents: 195_00, isGoodDeal: true },
+  { slug: "pool", label: "Private pool", image: "/smr2.webp", villaCount: 57, startingFromEurCents: 372_00, isGoodDeal: false },
+  { slug: "island", label: "Island", image: "/smr2.webp", villaCount: 14, startingFromEurCents: 645_00, isGoodDeal: false },
+  { slug: "rustic", label: "Rustic", image: "/smr2.webp", villaCount: 22, startingFromEurCents: 212_00, isGoodDeal: true },
+  { slug: "design", label: "Design", image: "/smr2.webp", villaCount: 17, startingFromEurCents: 485_00, isGoodDeal: false },
+  { slug: "wellness", label: "Wellness", image: "/smr2.webp", villaCount: 11, startingFromEurCents: 558_00, isGoodDeal: false },
+  { slug: "eco", label: "Eco", image: "/smr2.webp", villaCount: 9, startingFromEurCents: 178_00, isGoodDeal: true },
+  { slug: "golf", label: "Near golf", image: "/smr2.webp", villaCount: 8, startingFromEurCents: 328_00, isGoodDeal: false },
 ] as const;

@@ -41,6 +41,11 @@
       "exclusiveSeal": "Exclusive offers",
       "categoriesHeading": "Categories",
       "categoriesBrowse": "Explore",
+      "categoriesEditorsChoice": "Editor's choice villas",
+      "categoriesVillaCount": "{count, plural, one {# villa} other {# villas}}",
+      "categoriesStartingFrom": "From <amount></amount>",
+      "categoriesPerNight": "/ night",
+      "categoriesPromotionsStack": "Stackable promotions applied",
       "promoTabs": {
         "aria": "Offer types",
         "all": "All offers",
