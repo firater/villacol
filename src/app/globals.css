@@ -140,8 +140,52 @@ body {
   color: #a8a29e;
 }
 
-.hero-date-picker .rdp-day:not(.rdp-selected) .rdp-day_button:hover:not(:disabled) {
+.hero-date-picker .rdp-day:not(.rdp-selected):not(.rdp-range_middle):not(.rdp-range_start):not(.rdp-range_end)
+  .rdp-day_button:hover:not(:disabled) {
   background-color: #f5f5f4;
+}
+
+/* Check-in chosen, mouse still — full circular highlight. */
+.hero-date-picker
+  .rdp-day.rdp-selected:not(.rdp-range_start):not(.rdp-range_end):not(.rdp-range_middle):not(
+    .rdp-day_hover_preview_anchor_forward
+  ):not(.rdp-day_hover_preview_anchor_backward)
+  .rdp-day_button {
+  border-radius: 9999px !important;
+  background-color: #ea580c;
+  border-color: #c2410c;
+  color: #fff;
+}
+
+/* In-progress range: preview band while hovering the checkout date. */
+.hero-date-picker .rdp-day_hover_preview_middle .rdp-day_button {
+  border-radius: 0;
+  border-color: transparent;
+  background-color: #fff2e8;
+}
+
+.hero-date-picker .rdp-day_hover_preview_end .rdp-day_button {
+  border-radius: 0 9999px 9999px 0;
+  background-color: #ffedd5;
+  border-color: #fdba74;
+}
+
+.hero-date-picker .rdp-day_hover_preview_start .rdp-day_button {
+  border-radius: 9999px 0 0 9999px;
+  background-color: #ffedd5;
+  border-color: #fdba74;
+}
+
+.hero-date-picker .rdp-day_hover_preview_anchor_forward .rdp-day_button {
+  border-radius: 9999px 0 0 9999px;
+  background-color: #ffedd5;
+  border-color: #fdba74;
+}
+
+.hero-date-picker .rdp-day_hover_preview_anchor_backward .rdp-day_button {
+  border-radius: 0 9999px 9999px 0;
+  background-color: #ffedd5;
+  border-color: #fdba74;
 }
 
 .hero-date-picker .rdp-disabled {
