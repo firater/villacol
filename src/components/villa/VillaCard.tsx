@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Bath, BedDouble, Star, Users, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
@@ -29,6 +30,12 @@ export type VillaCardProps = {
   capacity: number;
   layout?: VillaCardLayout;
   viewLabel?: string;
+  /** Shown under the title on promo layout only (promotions rail). */
+  promoStatLabels?: {
+    guests: string;
+    bedrooms: string;
+    bathrooms: string;
+  };
 };
 
 export function VillaCard({
@@ -55,6 +62,7 @@ export function VillaCard({
   capacity,
   layout = "default",
   viewLabel = "View",
+  promoStatLabels,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -67,6 +75,13 @@ export function VillaCard({
   const displayNightly = nightlyPrice ?? priceMain;
 
   if (layout === "promo") {
+    const imagePromotionLabels =
+      promotionLabels.length > 0
+        ? promotionLabels
+        : badgeLabel
+          ? [badgeLabel]
+          : [];
+
     return (
       <article className="group relative flex max-h-none flex-col overflow-hidden rounded-[1.5rem] border border-stone-200/60 bg-white p-2 md:max-h-[320px] md:flex-row md:hover:border-stone-300">
         <Link
@@ -81,13 +96,6 @@ export function VillaCard({
             sizes="(max-width: 768px) 100vw, 40vw"
             className="object-cover transition-transform duration-1000"
           />
-          {badgeLabel ? (
-            <div className="absolute left-4 top-4 z-20">
-              <span className="rounded-full bg-orange-600 px-3 py-1.5 text-[9px] font-medium uppercase tracking-widest text-white">
-                {badgeLabel}
-              </span>
-            </div>
-          ) : null}
           {availabilityLabel ? (
             <div className="absolute right-4 top-4 z-20 md:left-auto">
               <div className="flex items-center gap-2 rounded-full border border-stone-200/60 bg-white/95 px-3 py-1.5">
@@ -109,6 +117,8 @@ export function VillaCard({
           capacity={capacity}
           bedrooms={bedrooms}
           bathrooms={bathrooms}
+          promotionLabels={imagePromotionLabels}
+          promoStatLabels={promoStatLabels}
           priceStartingAtLabel={priceStartingAtLabel}
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
@@ -209,12 +219,72 @@ function StatsRow({
   capacity,
   bedrooms,
   bathrooms,
-}: Pick<VillaCardProps, "capacity" | "bedrooms" | "bathrooms">) {
+  promoStatLabels,
+  seamless = false,
+}: Pick<VillaCardProps, "capacity" | "bedrooms" | "bathrooms" | "promoStatLabels"> & {
+  seamless?: boolean;
+}) {
+  const rowClass = seamless
+    ? "flex items-center gap-4 py-1"
+    : "flex items-center gap-4 border-b border-neutral-100 py-1.5";
+
+  if (promoStatLabels) {
+    return (
+      <div className={rowClass}>
+        <PromoStatIconItem
+          icon={Users}
+          value={capacity}
+          ariaLabel={`${capacity} ${promoStatLabels.guests}`}
+        />
+        <PromoStatIconItem
+          icon={BedDouble}
+          value={bedrooms}
+          ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
+        />
+        <PromoStatIconItem
+          icon={Bath}
+          value={bathrooms}
+          ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center gap-5 border-b border-neutral-100 py-2 text-sm font-medium text-neutral-600">
       <span>{capacity}</span>
       <span>{bedrooms}</span>
       <span>{bathrooms}</span>
+    </div>
+  );
+}
+
+/** UI-only mock for layout review — not wired to data. */
+function PromoEditorRankingMock() {
+  return (
+    <span
+      className="inline-flex shrink-0 items-center justify-end gap-1 self-baseline"
+      title="Editor's ranking (mock)"
+    >
+      <Star className="size-3.5 fill-amber-500 text-amber-500" aria-hidden />
+      <span className="text-sm font-semibold text-stone-800">4.9</span>
+    </span>
+  );
+}
+
+function PromoStatIconItem({
+  icon: Icon,
+  value,
+  ariaLabel,
+}: {
+  icon: LucideIcon;
+  value: number;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="flex items-center gap-1.5" aria-label={ariaLabel}>
+      <Icon className="size-4 shrink-0 text-stone-400" strokeWidth={1.75} aria-hidden />
+      <span className="text-xs font-semibold text-stone-700">{value}</span>
     </div>
   );
 }
@@ -232,6 +302,8 @@ function PromoCardBody({
   priceWas,
   priceMain,
   stayLabel,
+  promotionLabels,
+  promoStatLabels,
 }: {
   title: string;
   slug: string;
@@ -239,6 +311,8 @@ function PromoCardBody({
   capacity: number;
   bedrooms: number;
   bathrooms: number;
+  promotionLabels: string[];
+  promoStatLabels?: VillaCardProps["promoStatLabels"];
   priceStartingAtLabel: string;
   displayNightly: string;
   perNightLabel: string;
@@ -247,25 +321,66 @@ function PromoCardBody({
   stayLabel: string | null;
 }) {
   return (
-    <div className="flex flex-grow flex-col justify-between px-2 pb-3 pt-4 md:px-8 md:pt-6">
+    <div className="flex min-w-0 flex-grow flex-col px-2 pb-2 pt-3 md:px-8 md:pt-5">
       <div>
+        <div
+          className={`mb-1.5 flex h-6 min-h-6 flex-row flex-nowrap items-center gap-1.5 overflow-hidden ${
+            promotionLabels.length === 0 ? "invisible" : ""
+          }`}
+          aria-hidden={promotionLabels.length === 0}
+        >
+          {promotionLabels.map((label, index) => (
+            <span
+              key={`${label}-${index}`}
+              title={label}
+              className="max-w-[46%] shrink truncate rounded-full bg-orange-600/95 px-2 py-0.5 text-[9px] font-medium uppercase tracking-widest text-white"
+            >
+              {label}
+            </span>
+          ))}
+        </div>
         <PromoTitleRow title={title} slug={slug} location={location} />
-        <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} />
+        <div className="border-b border-stone-200/70 pb-2">
+          <StatsRow
+            capacity={capacity}
+            bedrooms={bedrooms}
+            bathrooms={bathrooms}
+            promoStatLabels={promoStatLabels}
+            seamless
+          />
+        </div>
       </div>
-      <div className="flex items-center justify-between pt-3">
-        <div>
-          <p className="mb-0.5 text-xs font-medium tracking-tighter text-neutral-400">
+
+      <div className="mt-auto flex flex-col gap-1.5 pt-3">
+        <p className="sr-only">
+          {priceStartingAtLabel} {displayNightly} {perNightLabel}, {priceMain}
+          {stayLabel ? `, ${stayLabel}` : ""}
+          {priceWas ? `, ${priceWas}` : ""}
+        </p>
+
+        <div className="flex flex-wrap items-baseline justify-start gap-2 text-left">
+          <span className="font-serif text-sm font-normal tracking-wide text-stone-500">
             {priceStartingAtLabel}
-          </p>
-          <p className="font-serif text-xl text-stone-900">
-            {displayNightly}
-            <span className="font-sans text-[10px] font-normal text-stone-500"> {perNightLabel}</span>
-          </p>
-          <p className="min-h-4 text-xs text-neutral-400 line-through" aria-hidden={priceWas === null}>
-            {priceWas ?? "\u00A0"}
-          </p>
-          <p className="text-sm font-bold text-neutral-800">{priceMain}</p>
-          <p className="min-h-4 text-[10px] text-neutral-500">{stayLabel ?? "\u00A0"}</p>
+          </span>
+          <span className="text-sm font-medium text-stone-800">
+            {displayNightly} {perNightLabel}
+          </span>
+        </div>
+
+        <div className="text-left leading-tight">
+          {priceWas ? (
+            <span className="text-sm text-stone-400 line-through">{priceWas}</span>
+          ) : null}
+        </div>
+
+        <div className="flex w-full items-baseline justify-between gap-6">
+          <div className="flex min-w-0 flex-wrap items-baseline justify-start gap-2 text-left">
+            <span className="font-serif text-xl font-bold text-stone-900">{priceMain}</span>
+            {stayLabel ? (
+              <span className="text-sm font-normal text-stone-500">{stayLabel}</span>
+            ) : null}
+          </div>
+          <PromoEditorRankingMock />
         </div>
       </div>
     </div>
@@ -327,10 +442,15 @@ function PromoTitleRow({
   location: string | null;
 }) {
   return (
-    <h3 className="mb-2 line-clamp-1 text-xl font-semibold text-neutral-900">
-      <Link href={{ pathname: "/villas/[slug]", params: { slug } }}>{title}</Link>
+    <h3 className="mb-1.5 flex min-w-0 items-baseline gap-2">
+      <Link
+        href={{ pathname: "/villas/[slug]", params: { slug } }}
+        className="min-w-0 truncate font-serif text-lg font-semibold leading-tight text-stone-900 md:text-xl"
+      >
+        {title}
+      </Link>
       {location ? (
-        <span className="ml-2 text-sm font-semibold text-neutral-400">{location}</span>
+        <span className="shrink-0 text-sm font-normal text-stone-400">{location}</span>
       ) : null}
     </h3>
   );

@@ -50,10 +50,13 @@
       "categoriesOfTheDay": "Kategorie des Tages",
       "categoriesDayEndsTr": "{hours}h {minutes}m",
       "promoTabs": {
-        "aria": "Angebotstypen",
+        "aria": "Aktionstypen",
         "all": "Alle Angebote",
-        "featured": "Ausgewählt",
-        "bestValue": "Bestes Preis-Leistungs-Verhältnis"
+        "lastMinute": "Last Minute",
+        "earlyBird": "Frühbucher",
+        "longStay": "Langzeitaufenthalt",
+        "coupon": "Kupon",
+        "emptyTab": "Derzeit keine Villen für diesen Aktionstyp."
       },
       "dailyPromo": {
         "chip": "Villa-Aktionen",
@@ -65,7 +68,7 @@
         "more": "Mehr Filter"
       },
       "offersKicker": "Saison",
-      "featuredKicker": "Redaktion",
+      "featuredKicker": "Sonderangebote",
       "bestValueKicker": "Smart stay",
       "heroCta": "Kollektion entdecken",
       "heroSecondaryCta": "Wir wählen für Sie",
@@ -81,11 +84,11 @@
         "anyGuests": "Beliebig",
         "submit": "Suchen"
       },
-      "featuredHeading": "Empfohlene Villen",
-      "featuredSubtitle": "Handverlesen aus der Kollektion — Preise ab dem nächsten verfügbaren Aufenthalt.",
+      "featuredHeading": "Sonderangebote",
+      "featuredSubtitle": "Exklusive Preise mit maximalen Rabatten und flexiblen, kürzeren Aufenthalten.",
       "featuredEmpty": "Noch keine ausgewählten Villen. Führen Sie Seed und Preis-Cache-Rebuild aus, oder schauen Sie später wieder vorbei.",
       "offersHeading": "Aktionen",
-      "offersSubtitle": "Aktive Rabatte sind im angezeigten Preis schon enthalten — Frühbucher, Langzeitaufenthalte und Gratisnächte.",
+      "offersSubtitle": "Live-Rabatte inklusive. Keine Codes nötig.",
       "offersEmpty": "Derzeit laufen keine Angebote. Neue Rabatte erscheinen jede Saison.",
       "bestValueHeading": "Bestes Preis-Leistungs-Verhältnis",
       "bestValueSubtitle": "Am meisten Platz, Pool und Aussicht für den Nächtigungspreis.",
@@ -160,7 +163,10 @@
       "viewVilla": "Ansehen",
       "firstAvailability": "Nächste Verfügbarkeit",
       "priceStartingAt": "Preis ab",
-      "perNight": "/ Nacht"
+      "perNight": "/ Nacht",
+      "statGuests": "Gäste",
+      "statBedrooms": "Schlafzimmer",
+      "statBathrooms": "Badezimmer"
     },
     "listing": {
       "allVillas": "Alle Villen",

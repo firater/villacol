@@ -13,7 +13,7 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { HomeSectionHeader } from "@/components/home/HomeSectionHeader";
 import { HomeVillaSection } from "@/components/home/HomeVillaSection";
 import { HomeVillaSectionFallback } from "@/components/home/HomeVillaSectionFallback";
-import { PromoOfferTabs } from "@/components/home/PromoOfferTabs";
+import { HomePromoOffersSection } from "@/components/home/HomePromoOffersSection";
 import { WhyUsSection } from "@/components/home/WhyUsSection";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Link } from "@/i18n/navigation";
@@ -52,24 +52,22 @@ export default async function Home() {
         <section className={`${sectionShell} bg-white`}>
           <div className={sectionInner}>
             <HomeSectionHeader
+              layout="split"
               kicker={t("offersKicker")}
               title={t("offersHeading")}
               subtitle={t("offersSubtitle")}
               action={
-                <Link href="/villa-offers" className={sectionLinkClass}>
+                <Link
+                  href="/villa-offers"
+                  className="font-serif text-base text-brand underline-offset-4 transition-colors hover:text-brand-dark hover:underline md:text-lg"
+                >
                   {t("viewAllOffers")} →
                 </Link>
               }
             />
-            <PromoOfferTabs />
             <div className="min-h-[300px]">
               <Suspense fallback={<HomeVillaSectionFallback density="promo" />}>
-                <HomeVillaSection
-                  locale={locale}
-                  variant="offers"
-                  cardLayout="promo"
-                  carouselDensity="promo"
-                />
+                <HomePromoOffersSection locale={locale} />
               </Suspense>
             </div>
           </div>

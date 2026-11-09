@@ -50,10 +50,13 @@
       "categoriesOfTheDay": "Category of the day",
       "categoriesDayEndsTr": "{hours}h {minutes}m",
       "promoTabs": {
-        "aria": "Offer types",
+        "aria": "Promotion types",
         "all": "All offers",
-        "featured": "Featured",
-        "bestValue": "Best value"
+        "lastMinute": "Last minute",
+        "earlyBird": "Early bird",
+        "longStay": "Long stay",
+        "coupon": "Coupon",
+        "emptyTab": "No villas found for this offer type right now."
       },
       "dailyPromo": {
         "chip": "Villa promotions",
@@ -65,7 +68,7 @@
         "more": "More filters"
       },
       "offersKicker": "Seasonal",
-      "featuredKicker": "Editors' pick",
+      "featuredKicker": "Special offers",
       "bestValueKicker": "Smart stay",
       "heroCta": "Explore the collection",
       "heroSecondaryCta": "Let us choose for you",
@@ -81,11 +84,11 @@
         "anyGuests": "Any",
         "submit": "Search"
       },
-      "featuredHeading": "Recommended villas",
-      "featuredSubtitle": "Hand-picked from the collection, priced from the next available stay.",
+      "featuredHeading": "Special offers",
+      "featuredSubtitle": "Exclusive rates featuring maximum discounts and flexible, shorter stays.",
       "featuredEmpty": "No featured villas are available yet. Run the seed and price-cache rebuild, or check back soon.",
       "offersHeading": "Promotions",
-      "offersSubtitle": "Live discounts already applied to the price you see — early booking, long stays, and free nights.",
+      "offersSubtitle": "Live discounts applied. No codes needed.",
       "offersEmpty": "No offers are running right now. New discounts are published every season.",
       "bestValueHeading": "Best value",
       "bestValueSubtitle": "The most generous space, pool, and view for the nightly rate.",
@@ -168,8 +171,11 @@
       "perStay": "{nights, plural, one {for # night} other {for # nights}}",
       "viewVilla": "View",
       "firstAvailability": "Next availability",
-      "priceStartingAt": "Price starting at",
-      "perNight": "/ night"
+      "priceStartingAt": "Starting from",
+      "perNight": "/ night",
+      "statGuests": "Guests",
+      "statBedrooms": "Bedrooms",
+      "statBathrooms": "Bathrooms"
     },
     "listing": {
       "allVillas": "All villas",
