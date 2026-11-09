@@ -166,7 +166,10 @@
       "perNight": "/ ночь",
       "statGuests": "Гостей",
       "statBedrooms": "Спален",
-      "statBathrooms": "Ванных"
+      "statBathrooms": "Ванных",
+      "noUserReviews": "Отзывов пока нет",
+      "noUserReviewsAria": "Пока нет отзывов гостей",
+      "editorScoreLabel": "Оценка редакции"
     },
     "listing": {
       "allVillas": "Все виллы",

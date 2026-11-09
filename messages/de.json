@@ -166,7 +166,10 @@
       "perNight": "/ Nacht",
       "statGuests": "Gäste",
       "statBedrooms": "Schlafzimmer",
-      "statBathrooms": "Badezimmer"
+      "statBathrooms": "Badezimmer",
+      "noUserReviews": "Noch keine Bewertungen",
+      "noUserReviewsAria": "Noch keine Gästebewertungen",
+      "editorScoreLabel": "Redaktionsscore"
     },
     "listing": {
       "allVillas": "Alle Villen",

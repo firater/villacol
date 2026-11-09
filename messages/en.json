@@ -175,7 +175,10 @@
       "perNight": "/ night",
       "statGuests": "Guests",
       "statBedrooms": "Bedrooms",
-      "statBathrooms": "Bathrooms"
+      "statBathrooms": "Bathrooms",
+      "noUserReviews": "No reviews yet",
+      "noUserReviewsAria": "No user reviews yet",
+      "editorScoreLabel": "Editor score"
     },
     "listing": {
       "allVillas": "All villas",

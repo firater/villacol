@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Bath, BedDouble, Star, Users, type LucideIcon } from "lucide-react";
+import { Bath, BedDouble, Gem, Star, Users, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
@@ -36,7 +36,19 @@ export type VillaCardProps = {
     bedrooms: string;
     bathrooms: string;
   };
+  /** Promo layout: user vs editor rating copy (UI-only until review data exists). */
+  promoRatingLabels?: {
+    noUserReviews: string;
+    noUserReviewsAria: string;
+    editorScoreLabel: string;
+  };
 };
+
+const DEFAULT_PROMO_RATING_LABELS = {
+  noUserReviews: "No reviews yet",
+  noUserReviewsAria: "No user reviews yet",
+  editorScoreLabel: "Editor score",
+} as const;
 
 export function VillaCard({
   slug,
@@ -63,6 +75,7 @@ export function VillaCard({
   layout = "default",
   viewLabel = "View",
   promoStatLabels,
+  promoRatingLabels,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -119,6 +132,7 @@ export function VillaCard({
           bathrooms={bathrooms}
           promotionLabels={imagePromotionLabels}
           promoStatLabels={promoStatLabels}
+          promoRatingLabels={promoRatingLabels ?? DEFAULT_PROMO_RATING_LABELS}
           priceStartingAtLabel={priceStartingAtLabel}
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
@@ -259,16 +273,28 @@ function StatsRow({
   );
 }
 
-/** UI-only mock for layout review — not wired to data. */
-function PromoEditorRankingMock() {
+/** UI-only: distinguishes empty user reviews from hardcoded editor score. */
+function PromoRatingsBlock({
+  labels,
+}: {
+  labels: NonNullable<VillaCardProps["promoRatingLabels"]>;
+}) {
   return (
-    <span
-      className="inline-flex shrink-0 items-center justify-end gap-1 self-baseline"
-      title="Editor's ranking (mock)"
-    >
-      <Star className="size-3.5 fill-amber-500 text-amber-500" aria-hidden />
-      <span className="text-sm font-semibold text-stone-800">4.9</span>
-    </span>
+    <div className="flex flex-col items-end gap-1 leading-none">
+      <div className="inline-flex items-center gap-1.5" aria-label={labels.noUserReviewsAria}>
+        <Star className="size-3.5 shrink-0 text-stone-300" strokeWidth={1.75} aria-hidden />
+        <span className="text-xs font-normal text-stone-400">{labels.noUserReviews}</span>
+      </div>
+      <div className="inline-flex flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5">
+        <Gem className="size-3.5 shrink-0 fill-amber-400/90 text-amber-500" strokeWidth={1.75} aria-hidden />
+        <span className="font-serif text-sm font-bold tracking-tight text-stone-900">
+          8.5<span className="font-sans text-[11px] font-semibold text-stone-600">/10</span>
+        </span>
+        <span className="text-[9px] font-medium uppercase tracking-widest text-stone-500">
+          {labels.editorScoreLabel}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -304,6 +330,7 @@ function PromoCardBody({
   stayLabel,
   promotionLabels,
   promoStatLabels,
+  promoRatingLabels,
 }: {
   title: string;
   slug: string;
@@ -313,6 +340,7 @@ function PromoCardBody({
   bathrooms: number;
   promotionLabels: string[];
   promoStatLabels?: VillaCardProps["promoStatLabels"];
+  promoRatingLabels: NonNullable<VillaCardProps["promoRatingLabels"]>;
   priceStartingAtLabel: string;
   displayNightly: string;
   perNightLabel: string;
@@ -321,10 +349,10 @@ function PromoCardBody({
   stayLabel: string | null;
 }) {
   return (
-    <div className="flex min-w-0 flex-grow flex-col px-2 pb-2 pt-3 md:px-8 md:pt-5">
+    <div className="flex min-w-0 flex-grow flex-col px-2 pb-2 pt-0.5 md:px-8 md:pt-1">
       <div>
         <div
-          className={`mb-1.5 flex h-6 min-h-6 flex-row flex-nowrap items-center gap-1.5 overflow-hidden ${
+          className={`mb-3 flex h-8 min-h-8 flex-row flex-nowrap items-center gap-1.5 overflow-hidden ${
             promotionLabels.length === 0 ? "invisible" : ""
           }`}
           aria-hidden={promotionLabels.length === 0}
@@ -333,7 +361,7 @@ function PromoCardBody({
             <span
               key={`${label}-${index}`}
               title={label}
-              className="max-w-[46%] shrink truncate rounded-full bg-orange-600/95 px-2 py-0.5 text-[9px] font-medium uppercase tracking-widest text-white"
+              className="max-w-[46%] shrink truncate rounded-full bg-stone-200/95 px-4 py-1.5 font-serif text-[13px] font-medium leading-none text-stone-700"
             >
               {label}
             </span>
@@ -351,37 +379,40 @@ function PromoCardBody({
         </div>
       </div>
 
-      <div className="mt-auto flex flex-col gap-1.5 pt-3">
+      <div className="mt-auto flex flex-col gap-1 pt-3">
         <p className="sr-only">
           {priceStartingAtLabel} {displayNightly} {perNightLabel}, {priceMain}
           {stayLabel ? `, ${stayLabel}` : ""}
           {priceWas ? `, ${priceWas}` : ""}
         </p>
 
-        <div className="flex flex-wrap items-baseline justify-start gap-2 text-left">
-          <span className="font-serif text-sm font-normal tracking-wide text-stone-500">
+        <div className="flex flex-wrap items-baseline justify-start gap-1.5 text-left">
+          <span className="font-serif text-[11px] font-normal tracking-wide text-stone-400">
             {priceStartingAtLabel}
           </span>
-          <span className="text-sm font-medium text-stone-800">
+          <span className="text-[11px] font-normal text-stone-500">
             {displayNightly} {perNightLabel}
           </span>
         </div>
 
         <div className="text-left leading-tight">
           {priceWas ? (
-            <span className="text-sm text-stone-400 line-through">{priceWas}</span>
+            <span className="text-[11px] text-stone-400 line-through">{priceWas}</span>
           ) : null}
         </div>
 
-        <div className="flex w-full items-baseline justify-between gap-6">
-          <div className="flex min-w-0 flex-wrap items-baseline justify-start gap-2 text-left">
-            <span className="font-serif text-xl font-bold text-stone-900">{priceMain}</span>
-            {stayLabel ? (
-              <span className="text-sm font-normal text-stone-500">{stayLabel}</span>
-            ) : null}
-          </div>
-          <PromoEditorRankingMock />
+        <div className="mt-1 flex w-full flex-wrap items-baseline justify-start gap-2.5 text-left">
+          <span className="font-serif text-2xl font-bold tracking-tight text-stone-900 md:text-[1.75rem]">
+            {priceMain}
+          </span>
+          {stayLabel ? (
+            <span className="text-base font-medium text-stone-600 md:text-lg">{stayLabel}</span>
+          ) : null}
         </div>
+      </div>
+
+      <div className="mt-2 flex justify-end">
+        <PromoRatingsBlock labels={promoRatingLabels} />
       </div>
     </div>
   );

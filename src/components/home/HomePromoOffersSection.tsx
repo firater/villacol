@@ -54,6 +54,11 @@ export async function HomePromoOffersSection({ locale }: Props) {
         bedrooms: tCard("statBedrooms"),
         bathrooms: tCard("statBathrooms"),
       },
+      promoRatingLabels: {
+        noUserReviews: tCard("noUserReviews"),
+        noUserReviewsAria: tCard("noUserReviewsAria"),
+        editorScoreLabel: tCard("editorScoreLabel"),
+      },
     },
   }));
 
