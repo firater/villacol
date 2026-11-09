@@ -4,6 +4,7 @@ import { getOfferLandingVillas } from "@/db/queries/landing.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
+import { formatPromotionBadges } from "@/lib/promo-badge-labels";
 import {
   buildExchangeRateMap,
   mapVillaCardRowToProps,
@@ -48,6 +49,12 @@ export async function HomePromoOffersSection({ locale }: Props) {
     appliedPromotions: row.appliedPromotions,
     card: {
       ...mapVillaCardRowToProps(row, locale, preferences.currency, rates, cardCopy),
+      promotionBadges: formatPromotionBadges(
+        row.appliedPromotions,
+        locale,
+        preferences.currency,
+        rates,
+      ),
       viewLabel: cardCopy.view,
       promoStatLabels: {
         guests: tCard("statGuests"),

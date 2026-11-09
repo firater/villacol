@@ -3,6 +3,9 @@ import { Bath, BedDouble, Gem, Star, Users, type LucideIcon } from "lucide-react
 import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
+import { VillaPromoOfTheDayBadge } from "@/components/villa/VillaPromoOfTheDayBadge";
+import type { PromotionBadgeItem } from "@/lib/promo-badge-labels";
+import { PromoPromotionPills } from "@/components/villa/PromoPromotionPills";
 
 export type VillaCardLayout = "default" | "promo" | "recommended";
 
@@ -15,6 +18,7 @@ export type VillaCardProps = {
   stayLabel: string | null;
   availabilityLabel: string | null;
   promotionLabels: string[];
+  promotionBadges?: PromotionBadgeItem[];
   priceMain: string;
   nightlyPrice: string | null;
   priceStartingAtLabel: string;
@@ -42,6 +46,8 @@ export type VillaCardProps = {
     noUserReviewsAria: string;
     editorScoreLabel: string;
   };
+  /** Promo list card: show “category of the day” pill on the image (e.g. rail index === 1). */
+  showVillaOfTheDay?: boolean;
 };
 
 const DEFAULT_PROMO_RATING_LABELS = {
@@ -59,6 +65,7 @@ export function VillaCard({
   stayLabel,
   availabilityLabel,
   promotionLabels,
+  promotionBadges,
   priceMain,
   nightlyPrice,
   priceStartingAtLabel,
@@ -76,6 +83,7 @@ export function VillaCard({
   viewLabel = "View",
   promoStatLabels,
   promoRatingLabels,
+  showVillaOfTheDay = false,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -95,29 +103,46 @@ export function VillaCard({
           ? [badgeLabel]
           : [];
 
+    const promoBadgeItems: PromotionBadgeItem[] =
+      promotionBadges && promotionBadges.length > 0
+        ? promotionBadges
+        : imagePromotionLabels.map((name) => ({
+            name,
+            discountType: "percentage" as const,
+            savingsFormatted: null,
+            savingsAmountFormatted: null,
+            percentageLabel: null,
+          }));
+
+    const promoLocation = location ?? "Kalkan";
+
     return (
-      <article className="group relative flex max-h-none flex-col overflow-hidden rounded-[1.5rem] border border-stone-200/60 bg-white p-2 md:max-h-[320px] md:flex-row md:hover:border-stone-300">
+      <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200/70 bg-white shadow-sm transition-colors md:flex-row md:items-stretch md:rounded-[1.5rem] md:hover:border-stone-300">
         <Link
           href={{ pathname: "/villas/[slug]", params: { slug } }}
-          className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[1.2rem] bg-neutral-100 md:w-[40%]"
-          style={{ aspectRatio: "16 / 10" }}
+          className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-t-2xl bg-neutral-100 md:aspect-auto md:w-[45%] md:max-w-[48%] md:min-h-0 md:self-stretch md:rounded-l-[1.25rem] md:rounded-tr-none"
         >
           <Image
             src={imageUrl}
             alt={imageAlt}
             fill
-            sizes="(max-width: 768px) 100vw, 40vw"
-            className="object-cover transition-transform duration-1000"
+            sizes="(max-width: 768px) 100vw, 45vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
+          {showVillaOfTheDay ? <VillaPromoOfTheDayBadge /> : null}
           {availabilityLabel ? (
-            <div className="absolute right-4 top-4 z-20 md:left-auto">
-              <div className="flex items-center gap-2 rounded-full border border-stone-200/60 bg-white/95 px-3 py-1.5">
-                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-                <span className="flex flex-col leading-none">
+            <div
+              className={`absolute left-3 z-20 ${showVillaOfTheDay ? "top-[3.35rem]" : "top-3"}`}
+            >
+              <div className="flex max-w-[min(100%,14rem)] items-center gap-2 rounded-full border border-stone-200/60 bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur-sm">
+                <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-hidden />
+                <span className="flex min-w-0 flex-col leading-none">
                   <span className="text-[9px] font-medium uppercase tracking-tighter text-stone-500">
                     {firstAvailabilityTitle}
                   </span>
-                  <span className="text-[11px] font-medium text-stone-900">{availabilityLabel}</span>
+                  <span className="truncate text-[11px] font-medium text-stone-900">
+                    {availabilityLabel}
+                  </span>
                 </span>
               </div>
             </div>
@@ -126,11 +151,11 @@ export function VillaCard({
         <PromoCardBody
           title={title}
           slug={slug}
-          location={location}
+          location={promoLocation}
           capacity={capacity}
           bedrooms={bedrooms}
           bathrooms={bathrooms}
-          promotionLabels={imagePromotionLabels}
+          promotionBadges={promoBadgeItems}
           promoStatLabels={promoStatLabels}
           promoRatingLabels={promoRatingLabels ?? DEFAULT_PROMO_RATING_LABELS}
           priceStartingAtLabel={priceStartingAtLabel}
@@ -280,17 +305,17 @@ function PromoRatingsBlock({
   labels: NonNullable<VillaCardProps["promoRatingLabels"]>;
 }) {
   return (
-    <div className="flex flex-col items-end gap-1 leading-none">
-      <div className="inline-flex items-center gap-1.5" aria-label={labels.noUserReviewsAria}>
-        <Star className="size-3.5 shrink-0 text-stone-300" strokeWidth={1.75} aria-hidden />
-        <span className="text-xs font-normal text-stone-400">{labels.noUserReviews}</span>
+    <div className="flex flex-col items-end gap-0.5 leading-none">
+      <div className="inline-flex items-center gap-1" aria-label={labels.noUserReviewsAria}>
+        <Star className="size-3 shrink-0 text-stone-300" strokeWidth={1.75} aria-hidden />
+        <span className="text-[10px] font-normal text-stone-400">{labels.noUserReviews}</span>
       </div>
-      <div className="inline-flex flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5">
-        <Gem className="size-3.5 shrink-0 fill-amber-400/90 text-amber-500" strokeWidth={1.75} aria-hidden />
-        <span className="font-serif text-sm font-bold tracking-tight text-stone-900">
-          8.5<span className="font-sans text-[11px] font-semibold text-stone-600">/10</span>
+      <div className="inline-flex flex-wrap items-center justify-end gap-x-1 gap-y-0.5">
+        <Gem className="size-3 shrink-0 fill-amber-400/90 text-amber-500" strokeWidth={1.75} aria-hidden />
+        <span className="font-sans text-[10px] font-bold tracking-tight text-stone-900">
+          8.5<span className="font-semibold text-stone-600">/10</span>
         </span>
-        <span className="text-[9px] font-medium uppercase tracking-widest text-stone-500">
+        <span className="text-[8px] font-medium uppercase tracking-widest text-stone-500">
           {labels.editorScoreLabel}
         </span>
       </div>
@@ -308,9 +333,9 @@ function PromoStatIconItem({
   ariaLabel: string;
 }) {
   return (
-    <div className="flex items-center gap-1.5" aria-label={ariaLabel}>
-      <Icon className="size-4 shrink-0 text-stone-400" strokeWidth={1.75} aria-hidden />
-      <span className="text-xs font-semibold text-stone-700">{value}</span>
+    <div className="flex items-center gap-1" aria-label={ariaLabel}>
+      <Icon className="size-3.5 shrink-0 text-stone-400" strokeWidth={1.75} aria-hidden />
+      <span className="text-[11px] font-semibold text-stone-700">{value}</span>
     </div>
   );
 }
@@ -328,7 +353,7 @@ function PromoCardBody({
   priceWas,
   priceMain,
   stayLabel,
-  promotionLabels,
+  promotionBadges,
   promoStatLabels,
   promoRatingLabels,
 }: {
@@ -338,7 +363,7 @@ function PromoCardBody({
   capacity: number;
   bedrooms: number;
   bathrooms: number;
-  promotionLabels: string[];
+  promotionBadges: PromotionBadgeItem[];
   promoStatLabels?: VillaCardProps["promoStatLabels"];
   promoRatingLabels: NonNullable<VillaCardProps["promoRatingLabels"]>;
   priceStartingAtLabel: string;
@@ -349,70 +374,66 @@ function PromoCardBody({
   stayLabel: string | null;
 }) {
   return (
-    <div className="flex min-w-0 flex-grow flex-col px-2 pb-2 pt-0.5 md:px-8 md:pt-1">
+    <div className="relative flex min-w-0 flex-1 flex-col px-4 py-4 pr-24 md:px-7 md:py-6 md:pr-32 lg:px-9 lg:py-7">
       <div>
-        <div
-          className={`mb-3 flex h-8 min-h-8 flex-row flex-nowrap items-center gap-1.5 overflow-hidden ${
-            promotionLabels.length === 0 ? "invisible" : ""
-          }`}
-          aria-hidden={promotionLabels.length === 0}
-        >
-          {promotionLabels.map((label, index) => (
-            <span
-              key={`${label}-${index}`}
-              title={label}
-              className="max-w-[46%] shrink truncate rounded-full bg-stone-200/95 px-4 py-1.5 font-serif text-[13px] font-medium leading-none text-stone-700"
-            >
-              {label}
-            </span>
-          ))}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <PromoTitleRow title={title} slug={slug} location={location} />
+          <PromoPromotionPills badges={promotionBadges} />
         </div>
-        <PromoTitleRow title={title} slug={slug} location={location} />
-        <div className="border-b border-stone-200/70 pb-2">
-          <StatsRow
-            capacity={capacity}
-            bedrooms={bedrooms}
-            bathrooms={bathrooms}
-            promoStatLabels={promoStatLabels}
-            seamless
-          />
-        </div>
-      </div>
 
-      <div className="mt-auto flex flex-col gap-1 pt-3">
+        <div className="mt-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+            {promoStatLabels ? (
+              <>
+                <PromoStatIconItem
+                  icon={Users}
+                  value={capacity}
+                  ariaLabel={`${capacity} ${promoStatLabels.guests}`}
+                />
+                <PromoStatIconItem
+                  icon={BedDouble}
+                  value={bedrooms}
+                  ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
+                />
+                <PromoStatIconItem
+                  icon={Bath}
+                  value={bathrooms}
+                  ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
+                />
+              </>
+            ) : (
+              <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} seamless />
+            )}
+          </div>
+        </div>
+        <div className="mt-[20px] max-w-[calc(100%-0.5rem)]">
         <p className="sr-only">
           {priceStartingAtLabel} {displayNightly} {perNightLabel}, {priceMain}
           {stayLabel ? `, ${stayLabel}` : ""}
           {priceWas ? `, ${priceWas}` : ""}
         </p>
-
-        <div className="flex flex-wrap items-baseline justify-start gap-1.5 text-left">
-          <span className="font-serif text-[11px] font-normal tracking-wide text-stone-400">
-            {priceStartingAtLabel}
-          </span>
-          <span className="text-[11px] font-normal text-stone-500">
-            {displayNightly} {perNightLabel}
-          </span>
-        </div>
-
-        <div className="text-left leading-tight">
-          {priceWas ? (
-            <span className="text-[11px] text-stone-400 line-through">{priceWas}</span>
-          ) : null}
-        </div>
-
-        <div className="mt-1 flex w-full flex-wrap items-baseline justify-start gap-2.5 text-left">
-          <span className="font-serif text-2xl font-bold tracking-tight text-stone-900 md:text-[1.75rem]">
-            {priceMain}
-          </span>
+        <p className="mb-0.5 font-serif text-[10px] font-normal tracking-wide text-stone-400">
+          {priceStartingAtLabel}
+        </p>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="text-sm font-semibold text-stone-900">{priceMain}</span>
           {stayLabel ? (
-            <span className="text-base font-medium text-stone-600 md:text-lg">{stayLabel}</span>
+            <span className="text-xs font-medium text-stone-900">{stayLabel}</span>
           ) : null}
+        </div>
+        <p className="mt-1.5 text-xs font-medium text-stone-800">
+          {displayNightly} {perNightLabel}
+        </p>
+        {priceWas ? (
+          <p className="mt-0.5 text-xs font-normal text-stone-500 line-through">{priceWas}</p>
+        ) : null}
         </div>
       </div>
 
-      <div className="mt-2 flex justify-end">
-        <PromoRatingsBlock labels={promoRatingLabels} />
+      <div className="pointer-events-none absolute right-[10px] bottom-[10px]">
+        <div className="pointer-events-auto">
+          <PromoRatingsBlock labels={promoRatingLabels} />
+        </div>
       </div>
     </div>
   );
@@ -473,7 +494,7 @@ function PromoTitleRow({
   location: string | null;
 }) {
   return (
-    <h3 className="mb-1.5 flex min-w-0 items-baseline gap-2">
+    <h3 className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
       <Link
         href={{ pathname: "/villas/[slug]", params: { slug } }}
         className="min-w-0 truncate font-serif text-lg font-semibold leading-tight text-stone-900 md:text-xl"
@@ -481,7 +502,7 @@ function PromoTitleRow({
         {title}
       </Link>
       {location ? (
-        <span className="shrink-0 text-sm font-normal text-stone-400">{location}</span>
+        <span className="shrink-0 text-xs font-normal text-stone-400">{location}</span>
       ) : null}
     </h3>
   );
