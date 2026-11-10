@@ -1,4 +1,6 @@
 /** Temporary mock categories — replace with API facets when wiring real data. */
+export const HOME_CATEGORY_OF_THE_DAY_INDEX = 1;
+
 export const HOME_EDITORS_CHOICE_LEAD = {
   image: "/smr2.webp",
   villaCount: 26,

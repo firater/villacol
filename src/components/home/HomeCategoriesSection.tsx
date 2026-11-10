@@ -9,6 +9,7 @@ import { buildExchangeRateMap } from "@/lib/villa-listing-cards";
 import { HomeCategoriesCarousel } from "./HomeCategoriesCarousel";
 import {
   HOME_CATEGORIES_MOCK,
+  HOME_CATEGORY_OF_THE_DAY_INDEX,
   HOME_EDITORS_CHOICE_LEAD,
 } from "./homeCategoriesMock";
 
@@ -52,8 +53,12 @@ export async function HomeCategoriesSection({ locale }: Props) {
         editorsChoice={editorsChoice}
         categories={categories}
         heading={t("categoriesHeading")}
+        subtitle={t("categoriesSubtitle")}
+        categoryOfTheDayLabel={t("categoriesOfTheDay")}
+        categoryOfTheDayName={categories[HOME_CATEGORY_OF_THE_DAY_INDEX]?.label ?? ""}
+        bestPriceGuaranteeLabel={t("categoriesBestPriceGuarantee")}
         viewAllLabel={t("viewAllVillas")}
-        kicker={t("categoriesBrowse")}
+        locale={locale}
       />
     </div>
   );

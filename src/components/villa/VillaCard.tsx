@@ -374,64 +374,63 @@ function PromoCardBody({
   stayLabel: string | null;
 }) {
   return (
-    <div className="relative flex min-w-0 flex-1 flex-col px-4 py-4 pr-24 md:px-7 md:py-6 md:pr-32 lg:px-9 lg:py-7">
-      <div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-          <PromoTitleRow title={title} slug={slug} location={location} />
-          <PromoPromotionPills badges={promotionBadges} />
-        </div>
+    <div className="flex min-w-0 flex-1 flex-col px-2 py-4 md:px-3.5 md:py-5 lg:px-4 lg:py-[22px]">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <PromoTitleRow title={title} slug={slug} location={location} />
+        <PromoPromotionPills badges={promotionBadges} />
+      </div>
 
-        <div className="mt-3">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-            {promoStatLabels ? (
-              <>
-                <PromoStatIconItem
-                  icon={Users}
-                  value={capacity}
-                  ariaLabel={`${capacity} ${promoStatLabels.guests}`}
-                />
-                <PromoStatIconItem
-                  icon={BedDouble}
-                  value={bedrooms}
-                  ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
-                />
-                <PromoStatIconItem
-                  icon={Bath}
-                  value={bathrooms}
-                  ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
-                />
-              </>
-            ) : (
-              <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} seamless />
-            )}
-          </div>
-        </div>
-        <div className="mt-[20px] max-w-[calc(100%-0.5rem)]">
-        <p className="sr-only">
-          {priceStartingAtLabel} {displayNightly} {perNightLabel}, {priceMain}
-          {stayLabel ? `, ${stayLabel}` : ""}
-          {priceWas ? `, ${priceWas}` : ""}
-        </p>
-        <p className="mb-0.5 font-serif text-[10px] font-normal tracking-wide text-stone-400">
-          {priceStartingAtLabel}
-        </p>
-        <div className="flex flex-wrap items-baseline gap-2">
-          <span className="text-sm font-semibold text-stone-900">{priceMain}</span>
-          {stayLabel ? (
-            <span className="text-xs font-medium text-stone-900">{stayLabel}</span>
-          ) : null}
-        </div>
-        <p className="mt-1.5 text-xs font-medium text-stone-800">
-          {displayNightly} {perNightLabel}
-        </p>
-        {priceWas ? (
-          <p className="mt-0.5 text-xs font-normal text-stone-500 line-through">{priceWas}</p>
-        ) : null}
+      <div className="mt-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+          {promoStatLabels ? (
+            <>
+              <PromoStatIconItem
+                icon={Users}
+                value={capacity}
+                ariaLabel={`${capacity} ${promoStatLabels.guests}`}
+              />
+              <PromoStatIconItem
+                icon={BedDouble}
+                value={bedrooms}
+                ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
+              />
+              <PromoStatIconItem
+                icon={Bath}
+                value={bathrooms}
+                ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
+              />
+            </>
+          ) : (
+            <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} seamless />
+          )}
         </div>
       </div>
 
-      <div className="pointer-events-none absolute right-[10px] bottom-[10px]">
-        <div className="pointer-events-auto">
+      <div className="mt-5 flex items-end justify-between gap-4">
+        <div className="min-w-0 flex-1 text-left">
+          <p className="sr-only">
+            {priceStartingAtLabel} {displayNightly} {perNightLabel}, {priceMain}
+            {stayLabel ? `, ${stayLabel}` : ""}
+            {priceWas ? `, ${priceWas}` : ""}
+          </p>
+          <p className="mb-0.5 font-serif text-[10px] font-normal tracking-wide text-stone-400">
+            {priceStartingAtLabel}
+          </p>
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="text-sm font-semibold text-stone-900">{priceMain}</span>
+            {stayLabel ? (
+              <span className="text-xs font-medium text-stone-900">{stayLabel}</span>
+            ) : null}
+          </div>
+          <p className="mt-1.5 text-xs font-medium text-stone-800">
+            {displayNightly} {perNightLabel}
+          </p>
+          {priceWas ? (
+            <p className="mt-0.5 text-xs font-normal text-stone-500 line-through">{priceWas}</p>
+          ) : null}
+        </div>
+
+        <div className="shrink-0">
           <PromoRatingsBlock labels={promoRatingLabels} />
         </div>
       </div>

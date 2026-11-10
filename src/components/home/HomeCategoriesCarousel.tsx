@@ -1,17 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { Heart, Home } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   useCallback,
   useEffect,
-  useId,
   useRef,
   useState,
   type ComponentProps,
 } from "react";
 
 import { Link } from "@/i18n/navigation";
+import { formatBusinessLongDate } from "@/lib/dates";
+import type { Locale } from "@/lib/locales";
+
+import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoriesMock";
 
 export type HomeCategoryCarouselItem = {
   slug: string;
@@ -34,12 +38,18 @@ type Props = {
   editorsChoice: HomeEditorsChoiceCarouselItem;
   categories: readonly HomeCategoryCarouselItem[];
   heading: string;
+  subtitle: string;
+  categoryOfTheDayLabel: string;
+  categoryOfTheDayName: string;
+  bestPriceGuaranteeLabel: string;
   viewAllLabel: string;
-  kicker: string;
+  locale: Locale;
 };
 
-/** One card width (272px at sm+) + gap-6 (24px). */
-const SCROLL_STEP_PX = 296;
+const HIGHLIGHT_DURATION_MS = 2_800;
+
+/** Card width + gap-8 (32px) at sm+. */
+const SCROLL_STEP_PX = 268;
 
 const ISTANBUL_TZ = "Europe/Istanbul";
 
@@ -77,12 +87,12 @@ function CategoryOfDayTopBadges() {
   }, []);
 
   return (
-    <span className="absolute top-2.5 left-2.5 z-10 inline-flex max-w-[calc(100%-1.25rem)] items-center gap-2 rounded-full border border-white/25 bg-brand/88 px-2.5 py-1 text-white shadow-sm backdrop-blur-md">
-      <span className="font-serif text-[13px] leading-tight tracking-tight sm:text-sm">
+    <span className="absolute top-3 left-3 z-10 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-full border border-white/20 bg-stone-950/55 px-2.5 py-1.5 text-white shadow-sm backdrop-blur-md">
+      <span className="font-serif text-[11px] leading-tight text-white sm:text-xs">
         {t("categoriesOfTheDay")}
       </span>
       <span className="h-3 w-px shrink-0 bg-white/35" aria-hidden />
-      <span className="shrink-0 font-sans text-[10px] font-medium tabular-nums tracking-normal text-white/95 sm:text-[11px]">
+      <span className="shrink-0 font-sans text-[10px] font-medium tabular-nums text-white/95 sm:text-[11px]">
         {t("categoriesDayEndsTr", { hours: timeLeft.hours, minutes: timeLeft.minutes })}
       </span>
     </span>
@@ -93,13 +103,24 @@ export function HomeCategoriesCarousel({
   editorsChoice,
   categories,
   heading,
+  subtitle,
+  categoryOfTheDayLabel,
+  categoryOfTheDayName,
+  bestPriceGuaranteeLabel,
   viewAllLabel,
-  kicker,
+  locale,
 }: Props) {
   const t = useTranslations("layout.home");
   const railRef = useRef<HTMLUListElement>(null);
+  const categoryOfDayCardRef = useRef<HTMLLIElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [highlightCategoryOfDay, setHighlightCategoryOfDay] = useState(false);
+  const [sectionDateLabel, setSectionDateLabel] = useState("");
+
+  useEffect(() => {
+    setSectionDateLabel(formatBusinessLongDate(locale, new Date()));
+  }, [locale]);
 
   const syncScrollEdges = useCallback(() => {
     const rail = railRef.current;
@@ -128,19 +149,70 @@ export function HomeCategoriesCarousel({
     railRef.current?.scrollBy({ left: delta, behavior: "smooth" });
   };
 
+  const categoryOfTheDay = categories[HOME_CATEGORY_OF_THE_DAY_INDEX];
+  const categoriesAfterDay = categories.filter(
+    (_, index) => index !== HOME_CATEGORY_OF_THE_DAY_INDEX,
+  );
+
+  const focusCategoryOfDay = useCallback(() => {
+    if (!categoryOfTheDay) return;
+    categoryOfDayCardRef.current?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+    setHighlightCategoryOfDay(true);
+  }, [categoryOfTheDay]);
+
+  useEffect(() => {
+    if (!highlightCategoryOfDay) return;
+    const timeoutId = window.setTimeout(() => setHighlightCategoryOfDay(false), HIGHLIGHT_DURATION_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [highlightCategoryOfDay]);
+
   const villaCountBadge = (count: number) => t("categoriesVillaCount", { count });
 
   return (
     <>
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-10">
-        <div>
-          <p className="mb-2 font-sans text-[10px] tracking-[0.22em] text-stone-400 uppercase">{kicker}</p>
-          <h2 className="font-serif text-3xl font-normal tracking-tight text-stone-900 md:text-4xl">{heading}</h2>
+        <div className="block max-w-3xl">
+          <p
+            className="mb-2 min-h-[1.25rem] font-sans text-[11px] tracking-[0.18em] text-stone-400 uppercase sm:min-h-[1.375rem] sm:text-xs"
+            suppressHydrationWarning
+          >
+            {sectionDateLabel}
+          </p>
+          <h2 className="font-serif text-4xl font-normal tracking-tight text-white md:text-5xl">{heading}</h2>
+          <p className="mt-2 text-pretty font-sans text-sm leading-relaxed text-stone-300">{subtitle}</p>
+          {categoryOfTheDay ? (
+            <button
+              type="button"
+              onClick={focusCategoryOfDay}
+              className="mt-3 inline-flex w-fit max-w-full flex-wrap items-center gap-x-1.5 rounded-full border border-stone-600/90 bg-stone-900/40 px-3 py-1.5 text-left font-sans text-[10px] font-medium tracking-wide text-stone-200 transition hover:border-stone-500 hover:bg-stone-900/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500"
+              aria-label={`${categoryOfTheDayLabel} ${categoryOfTheDayName}`}
+            >
+              <span className="uppercase">{categoryOfTheDayLabel}</span>
+              {categoryOfTheDayName ? (
+                <>
+                  <span className="text-stone-500" aria-hidden>
+                    ·
+                  </span>
+                  <span className="font-serif text-sm font-bold normal-case text-white">
+                    {categoryOfTheDayName}
+                  </span>
+                </>
+              ) : null}
+              <span className="font-light text-stone-500" aria-hidden>
+                |
+              </span>
+              <span className="uppercase">{bestPriceGuaranteeLabel}</span>
+            </button>
+          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           <Link
             href="/villas"
-            className="font-sans text-sm text-stone-500 underline-offset-4 hover:text-stone-900 hover:underline"
+            className="font-serif text-base text-stone-300 underline-offset-4 transition-colors hover:text-white hover:underline md:text-lg"
           >
             {viewAllLabel} →
           </Link>
@@ -162,7 +234,7 @@ export function HomeCategoriesCarousel({
       </header>
       <ul
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-6 overflow-x-auto overscroll-x-contain scroll-smooth pb-2"
+        className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-8 overflow-x-auto overscroll-x-contain scroll-smooth pt-4 pb-[18px]"
         aria-label={heading}
       >
         <li className="flex shrink-0 snap-start">
@@ -173,10 +245,23 @@ export function HomeCategoriesCarousel({
             countLabel={villaCountBadge(editorsChoice.villaCount)}
             priceFormatted={editorsChoice.priceFormatted}
             isGoodDeal={editorsChoice.isGoodDeal}
-            kicker={kicker}
           />
         </li>
-        {categories.map((category, index) => (
+        {categoryOfTheDay ? (
+          <li key={categoryOfTheDay.slug} ref={categoryOfDayCardRef} className="flex shrink-0 snap-start">
+            <CategoryCarouselCard
+              href={{ pathname: "/villas", query: { category: categoryOfTheDay.slug } }}
+              label={categoryOfTheDay.label}
+              image={categoryOfTheDay.image}
+              countLabel={villaCountBadge(categoryOfTheDay.villaCount)}
+              priceFormatted={categoryOfTheDay.priceFormatted}
+              isGoodDeal={categoryOfTheDay.isGoodDeal}
+              showCategoryOfDayBadge
+              highlighted={highlightCategoryOfDay}
+            />
+          </li>
+        ) : null}
+        {categoriesAfterDay.map((category) => (
           <li key={category.slug} className="flex shrink-0 snap-start">
             <CategoryCarouselCard
               href={{ pathname: "/villas", query: { category: category.slug } }}
@@ -185,8 +270,6 @@ export function HomeCategoriesCarousel({
               countLabel={villaCountBadge(category.villaCount)}
               priceFormatted={category.priceFormatted}
               isGoodDeal={category.isGoodDeal}
-              kicker={kicker}
-              showCategoryOfDayBadge={index === 1}
             />
           </li>
         ))}
@@ -202,8 +285,8 @@ type CategoryCarouselCardProps = {
   countLabel: string;
   priceFormatted: string;
   isGoodDeal: boolean;
-  kicker: string;
   showCategoryOfDayBadge?: boolean;
+  highlighted?: boolean;
 };
 
 function CategoryCarouselCard({
@@ -213,140 +296,68 @@ function CategoryCarouselCard({
   countLabel,
   priceFormatted,
   isGoodDeal,
-  kicker,
   showCategoryOfDayBadge = false,
+  highlighted = false,
 }: CategoryCarouselCardProps) {
   const t = useTranslations("layout.home");
 
   const perNight = t("categoriesPerNight");
 
-  const promoLine = showCategoryOfDayBadge
-    ? t("categoriesNoFeeRental")
-    : isGoodDeal
-      ? t("categoriesPromotionsStack")
-      : null;
-
   return (
-    <Link href={href} className="group flex h-full w-[240px] flex-col sm:w-[272px]">
-      <div className="flex h-full w-full flex-col rounded-none border border-stone-200/80 bg-stone-50 px-3 pb-3 pt-0 sm:px-4 sm:pb-4">
-        <div className="relative -mx-3 aspect-[4/5] shrink-0 overflow-visible bg-stone-200 sm:-mx-4">
-          <div className="absolute inset-0 overflow-hidden">
-            <Image
-              src={image}
-              alt=""
-              fill
-              sizes="(max-width: 640px) 240px, 272px"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-            />
-          </div>
-          {showCategoryOfDayBadge ? (
-            <CategoryOfDayTopBadges />
-          ) : (
-            <span className="absolute top-2.5 left-2.5 z-10 inline-flex max-w-[calc(100%-1.25rem)] items-center rounded-full border border-white/30 bg-white/92 px-2 py-1 font-sans text-[9px] font-medium tracking-tight text-stone-800 uppercase backdrop-blur-md shadow-sm">
-              {countLabel}
-            </span>
-          )}
-          <div
-            className={`pointer-events-none absolute inset-0 z-[1] overflow-hidden bg-gradient-to-t via-transparent to-transparent transition-opacity duration-500 ${
-              showCategoryOfDayBadge
-                ? "from-stone-950/75 via-stone-900/15 opacity-100 group-hover:from-stone-950/85"
-                : "from-stone-900/30 opacity-80 group-hover:opacity-100"
-            }`}
-            aria-hidden
-          />
-          {showCategoryOfDayBadge ? <CategoryOfDayBadge /> : null}
-        </div>
-        <div className="flex flex-1 flex-col pt-4 text-left">
-          <h3 className="line-clamp-2 min-h-[2.375rem] font-serif text-xl leading-tight text-stone-900 sm:min-h-[2.875rem] sm:text-2xl">
-            {label}
-          </h3>
-          <div className="mt-0 flex flex-1 flex-col border-t border-stone-200/60 pt-3">
-            <p className="font-sans text-xs leading-snug text-stone-500">
-              <span>
-                {t.rich("categoriesStartingFrom", {
-                  amount: () => (
-                    <span
-                      className={
-                        isGoodDeal ? "font-semibold text-brand" : "font-medium text-stone-800"
-                      }
-                    >
-                      {priceFormatted}
-                    </span>
-                  ),
-                })}
-              </span>
-              <span className="text-stone-400">{perNight}</span>
-              <span className="mt-1.5 block min-h-[2.75rem] font-serif text-base leading-snug text-brand">
-                {promoLine ?? <span className="invisible select-none" aria-hidden>—</span>}
-              </span>
-            </p>
-            <p className="mt-0.5 font-sans text-[10px] tracking-[0.18em] text-stone-400 uppercase transition-colors group-hover:text-stone-600">
-              {kicker}
-            </p>
-          </div>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-const CATEGORY_OF_DAY_TOOLTIP =
-  "By booking direct, you skip the standard 20% agency commission. We pass this saving directly to you, guaranteeing the best price. Please note: This exclusive 20% direct booking discount cannot be combined with any other promotions or promo codes.";
-
-function CategoryOfDayBadge() {
-  const tooltipId = useId();
-  const labelId = `${tooltipId}-label`;
-
-  return (
-    <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 z-20 w-full overflow-visible"
-      aria-labelledby={labelId}
+    <Link
+      href={href}
+      className={`group flex h-full w-[210px] flex-col sm:w-[236px] ${highlighted ? "category-card-breathe" : ""}`}
     >
-      <div className="pointer-events-auto relative w-full border-t border-white/10 bg-stone-950/82 px-3 py-2.5 backdrop-blur-md sm:py-3">
-        <span
-          className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-brand/70 to-transparent"
-          aria-hidden
+      <div className="relative aspect-[3/5] w-full overflow-hidden rounded-[2.25rem] bg-stone-800">
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes="(max-width: 640px) 210px, 236px"
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
-        <span className="group/info pointer-events-auto absolute top-2 right-2 z-30">
+
+        {showCategoryOfDayBadge ? <CategoryOfDayTopBadges /> : null}
+
+        {!showCategoryOfDayBadge ? (
           <button
             type="button"
-            className="flex size-5 items-center justify-center rounded-full border border-stone-500/40 bg-white/95 p-0 text-stone-800 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            aria-label="How the direct booking discount works"
-            aria-describedby={tooltipId}
+            className="absolute top-3 right-3 z-20 flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white shadow-sm backdrop-blur-md transition hover:bg-white/25"
+            aria-label="Save category"
             onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
             }}
           >
-            <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
-              <circle cx="8" cy="8" r="6.25" stroke="currentColor" strokeWidth="1.5" />
-              <path
-                d="M8 7.25V11M8 5.5h.01"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
+            <Heart className="size-[18px]" strokeWidth={2} aria-hidden />
           </button>
-          <span
-            id={tooltipId}
-            role="tooltip"
-            className="absolute bottom-[calc(100%+0.4rem)] right-0 z-50 w-[13.5rem] rounded-lg border border-stone-700/50 bg-stone-900/95 px-3 py-2.5 text-left font-sans text-[11px] leading-snug font-normal tracking-normal text-stone-100 shadow-xl opacity-0 transition-opacity duration-200 pointer-events-none group-hover/info:opacity-100 group-focus-within/info:opacity-100"
-          >
-            {CATEGORY_OF_DAY_TOOLTIP}
-          </span>
-        </span>
-        <div className="relative px-6 text-center">
-          <p id={labelId} className="font-serif text-base leading-tight tracking-tight text-white">
-            <span className="text-brand">%20</span> Direct Booking Discount
-          </p>
-          <div className="mx-auto mt-1 h-px w-7 bg-white/20" aria-hidden />
-          <p className="mt-1 font-sans text-[8px] font-medium tracking-[0.18em] text-stone-300 uppercase">
-            Best price guarantee
-          </p>
+        ) : null}
+
+        <div className="absolute inset-x-0 bottom-0 z-10">
+          <div className="bg-gradient-to-t from-stone-950/92 via-stone-950/55 to-transparent px-3.5 pt-14 pb-3.5 sm:px-4 sm:pb-4">
+            <p className="font-serif text-lg font-semibold leading-tight text-white sm:text-xl">
+              {t.rich("categoriesStartingFrom", {
+                amount: () => (
+                  <span className={isGoodDeal ? "font-semibold text-white" : "font-medium text-stone-100"}>
+                    {priceFormatted}
+                  </span>
+                ),
+              })}
+              <span className="font-sans text-base font-normal text-stone-300 sm:text-lg">{perNight}</span>
+            </p>
+
+            <div className="mt-1.5 flex items-center gap-1.5 text-stone-200">
+              <Home className="size-3.5 shrink-0 text-stone-400" strokeWidth={2} aria-hidden />
+              <span className="font-sans text-xs font-medium leading-snug text-stone-300">{countLabel}</span>
+            </div>
+
+            <span className="mt-3 block w-full truncate rounded-full border border-white/60 bg-white px-4 py-2.5 text-center font-sans text-sm font-semibold text-stone-900 shadow-sm transition group-hover:border-white group-hover:bg-white">
+              {label}
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -367,7 +378,7 @@ function CarouselArrow({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex size-9 items-center justify-center rounded-full border border-stone-200/80 bg-white text-stone-700 transition hover:border-stone-300 hover:bg-stone-50 disabled:pointer-events-none disabled:opacity-35"
+      className="flex size-9 items-center justify-center rounded-full border border-stone-200/80 bg-white text-stone-700 transition hover:border-stone-300 hover:bg-white disabled:pointer-events-none disabled:opacity-35"
     >
       <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
         {direction === "left" ? (

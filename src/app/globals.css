@@ -47,6 +47,20 @@ body {
   }
 }
 
+@keyframes category-card-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.category-card-breathe {
+  animation: category-card-breathe 1.75s ease-in-out 1;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;

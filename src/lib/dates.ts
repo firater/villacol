@@ -1,3 +1,5 @@
+import { INTL_LOCALE_TAGS, type Locale } from "@/lib/locales";
+
 /**
  * Calendar dates are plain `YYYY-MM-DD` strings and all arithmetic runs in UTC,
  * so no DST transition can shift a night. A stay is the half-open interval
@@ -100,4 +102,21 @@ export function minDate(left: DateString, right: DateString): DateString {
 
 export function maxDate(left: DateString, right: DateString): DateString {
   return left >= right ? left : right;
+}
+
+export function formatBusinessWeekday(locale: Locale, now: Date = new Date()): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE_TAGS[locale], {
+    weekday: "long",
+    timeZone: BUSINESS_TIMEZONE,
+  }).format(now);
+}
+
+export function formatBusinessLongDate(locale: Locale, now: Date): string {
+  return new Intl.DateTimeFormat(INTL_LOCALE_TAGS[locale], {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: BUSINESS_TIMEZONE,
+  }).format(now);
 }

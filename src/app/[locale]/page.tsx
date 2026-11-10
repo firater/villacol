@@ -43,7 +43,9 @@ export default async function Home() {
         <HomeExitIntent />
         <HomeHero locale={locale} />
 
-        <section className={`${sectionShell} bg-stone-50`}>
+        <section
+          className={`${sectionShell} border-stone-800/60 bg-gradient-to-b from-stone-950 via-stone-900 to-stone-800`}
+        >
           <Suspense fallback={<HomeCategoriesFallback />}>
             <HomeCategoriesSection locale={locale} />
           </Suspense>
