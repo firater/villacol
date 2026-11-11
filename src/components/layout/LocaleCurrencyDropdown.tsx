@@ -50,7 +50,7 @@ export function LocaleCurrencyDropdown({ locale, currency }: Props) {
       <button
         ref={toggleRef}
         type="button"
-        className="inline-flex items-center gap-2.5 rounded-full border border-stone-200 bg-white px-4 py-2.5 font-sans text-sm tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80"
+        className="inline-flex items-center gap-2.5 border border-stone-200 bg-white px-4 py-2.5 font-sans text-sm tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}

@@ -13,6 +13,7 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { HomeSectionHeader } from "@/components/home/HomeSectionHeader";
 import { HomeVillaSection } from "@/components/home/HomeVillaSection";
 import { HomeVillaSectionFallback } from "@/components/home/HomeVillaSectionFallback";
+import { AccessPassBanner } from "@/components/home/AccessPassBanner";
 import { HomePromoOffersSection } from "@/components/home/HomePromoOffersSection";
 import { WhyUsSection } from "@/components/home/WhyUsSection";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -33,9 +34,6 @@ export default async function Home() {
 
   const t = await getTranslations("layout.home");
 
-  const sectionLinkClass =
-    "font-sans text-sm text-stone-500 underline-offset-4 hover:text-stone-900 hover:underline";
-
   return (
     <>
       <JsonLd data={generateWebsiteJsonLd(locale)} />
@@ -43,15 +41,15 @@ export default async function Home() {
         <HomeExitIntent />
         <HomeHero locale={locale} />
 
-        <section
-          className={`${sectionShell} border-stone-800/60 bg-gradient-to-b from-stone-950 via-stone-900 to-stone-800`}
-        >
+        <section className="w-full bg-white py-16 lg:py-20">
           <Suspense fallback={<HomeCategoriesFallback />}>
             <HomeCategoriesSection locale={locale} />
           </Suspense>
         </section>
 
-        <section className={`${sectionShell} bg-white`}>
+        <AccessPassBanner />
+
+        <section className="w-full bg-white py-16 lg:py-20">
           <div className={sectionInner}>
             <HomeSectionHeader
               layout="split"
@@ -61,9 +59,15 @@ export default async function Home() {
               action={
                 <Link
                   href="/villa-offers"
-                  className="font-serif text-base text-brand underline-offset-4 transition-colors hover:text-brand-dark hover:underline md:text-lg"
+                  className="group inline-flex shrink-0 items-center gap-2 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-900 underline-offset-4 transition hover:text-brand hover:underline"
                 >
-                  {t("viewAllOffers")} →
+                  {t("viewAllOffers")}
+                  <span
+                    aria-hidden
+                    className="text-xs font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
                 </Link>
               }
             />
@@ -75,15 +79,27 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className={`${sectionShell} bg-stone-50`}>
+        <AccessPassBanner />
+
+        <section className="w-full bg-white py-16 lg:py-20">
           <div className={sectionInner}>
             <HomeSectionHeader
+              layout="split"
               kicker={t("featuredKicker")}
               title={t("featuredHeading")}
               subtitle={t("featuredSubtitle")}
               action={
-                <Link href="/villas" className={sectionLinkClass}>
-                  {t("viewAllVillas")} →
+                <Link
+                  href="/villas"
+                  className="group inline-flex shrink-0 items-center gap-2 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-900 underline-offset-4 transition hover:text-brand hover:underline"
+                >
+                  {t("viewAllVillas")}
+                  <span
+                    aria-hidden
+                    className="text-xs font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
+                  >
+                    →
+                  </span>
                 </Link>
               }
             />

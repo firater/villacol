@@ -23,7 +23,7 @@ export function HomeVillaSectionFallback({ density = "default" }: Props) {
       {[1, 2, 3].map((key) => (
         <li key={key} className={itemClass}>
           <div
-            className={`w-full overflow-hidden rounded-2xl border border-stone-200/60 bg-stone-50 ${cardMinH} ${density === "promo" ? "sm:flex" : ""}`}
+            className={`w-full overflow-hidden border border-stone-200/60 bg-white ${cardMinH} ${density === "promo" ? "sm:flex" : ""}`}
           >
             <div
               className={`animate-pulse bg-zinc-200 ${density === "promo" ? "aspect-[4/3] sm:w-[42%] sm:max-w-[280px]" : "aspect-[4/3]"}`}

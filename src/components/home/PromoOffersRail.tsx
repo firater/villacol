@@ -64,7 +64,7 @@ export function PromoOffersRail({ items, carouselLabel, sectionEmptyLabel }: Pro
               key={tabKey}
               type="button"
               onClick={() => setActiveTab(tabKey)}
-              className={`shrink-0 rounded-full border px-4 py-2 font-sans text-[11px] tracking-[0.12em] uppercase transition-colors ${
+              className={`shrink-0 border px-4 py-2 font-sans text-[11px] tracking-[0.12em] uppercase transition-colors ${
                 isActive
                   ? "border-stone-900 bg-stone-900 text-white"
                   : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:text-stone-900"

@@ -24,7 +24,7 @@ export async function HeroAmenityPills({ amenities }: Props) {
               pathname: "/villas",
               query: { amenities: item.value },
             }}
-            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-all ${
+            className={`flex items-center gap-2 border px-4 py-2 text-xs font-medium transition-all ${
               index === 0
                 ? "border-brand bg-brand text-white shadow-md shadow-orange-200"
                 : "border-neutral-200 bg-white text-neutral-600"
@@ -35,7 +35,7 @@ export async function HeroAmenityPills({ amenities }: Props) {
         ))}
         <Link
           href="/villas"
-          className="relative flex items-center gap-2 rounded-full border border-transparent bg-neutral-100 px-4 py-2"
+          className="relative flex items-center gap-2 border border-transparent bg-neutral-100 px-4 py-2"
         >
           <span className="text-xs font-bold text-neutral-700">{t("more")}</span>
         </Link>

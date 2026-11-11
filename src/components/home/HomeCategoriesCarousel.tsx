@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, Home } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   useCallback,
@@ -47,57 +46,11 @@ type Props = {
 };
 
 const HIGHLIGHT_DURATION_MS = 2_800;
+/** Card width (256px) + gap-6. */
+const SCROLL_STEP_PX = 280;
 
-/** Card width + gap-8 (32px) at sm+. */
-const SCROLL_STEP_PX = 268;
-
-const ISTANBUL_TZ = "Europe/Istanbul";
-
-function getHoursMinutesUntilIstanbulMidnight(now = new Date()): { hours: number; minutes: number } {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: ISTANBUL_TZ,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).formatToParts(now);
-
-  const hour = Number(parts.find((part) => part.type === "hour")?.value ?? 0);
-  const minute = Number(parts.find((part) => part.type === "minute")?.value ?? 0);
-  const second = Number(parts.find((part) => part.type === "second")?.value ?? 0);
-
-  const secondsLeft = 24 * 3600 - (hour * 3600 + minute * 60 + second);
-  const clamped = Math.max(0, secondsLeft);
-
-  return {
-    hours: Math.floor(clamped / 3600),
-    minutes: Math.floor((clamped % 3600) / 60),
-  };
-}
-
-function CategoryOfDayTopBadges() {
-  const t = useTranslations("layout.home");
-  const [timeLeft, setTimeLeft] = useState(() => getHoursMinutesUntilIstanbulMidnight());
-
-  useEffect(() => {
-    const sync = () => setTimeLeft(getHoursMinutesUntilIstanbulMidnight());
-    sync();
-    const intervalId = window.setInterval(sync, 30_000);
-    return () => window.clearInterval(intervalId);
-  }, []);
-
-  return (
-    <span className="absolute top-3 left-3 z-10 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-2 rounded-full border border-white/20 bg-stone-950/55 px-2.5 py-1.5 text-white shadow-sm backdrop-blur-md">
-      <span className="font-serif text-[11px] leading-tight text-white sm:text-xs">
-        {t("categoriesOfTheDay")}
-      </span>
-      <span className="h-3 w-px shrink-0 bg-white/35" aria-hidden />
-      <span className="shrink-0 font-sans text-[10px] font-medium tabular-nums text-white/95 sm:text-[11px]">
-        {t("categoriesDayEndsTr", { hours: timeLeft.hours, minutes: timeLeft.minutes })}
-      </span>
-    </span>
-  );
-}
+const CARD_SHELL_CLASS = "w-[216px] sm:w-[256px]";
+const CARD_IMAGE_HEIGHT_CLASS = "h-[336px] sm:h-[376px]";
 
 export function HomeCategoriesCarousel({
   editorsChoice,
@@ -117,6 +70,7 @@ export function HomeCategoriesCarousel({
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [highlightCategoryOfDay, setHighlightCategoryOfDay] = useState(false);
   const [sectionDateLabel, setSectionDateLabel] = useState("");
+  const exploreLabel = t("categoriesCardExplore");
 
   useEffect(() => {
     setSectionDateLabel(formatBusinessLongDate(locale, new Date()));
@@ -134,6 +88,7 @@ export function HomeCategoriesCarousel({
     const rail = railRef.current;
     if (!rail) return;
 
+    rail.scrollLeft = 0;
     syncScrollEdges();
     rail.addEventListener("scroll", syncScrollEdges, { passive: true });
     const observer = new ResizeObserver(syncScrollEdges);
@@ -173,50 +128,23 @@ export function HomeCategoriesCarousel({
   const villaCountBadge = (count: number) => t("categoriesVillaCount", { count });
 
   return (
-    <>
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between md:mb-10">
-        <div className="block max-w-3xl">
-          <p
-            className="mb-2 min-h-[1.25rem] font-sans text-[11px] tracking-[0.18em] text-stone-400 uppercase sm:min-h-[1.375rem] sm:text-xs"
-            suppressHydrationWarning
-          >
-            {sectionDateLabel}
-          </p>
-          <h2 className="font-serif text-4xl font-normal tracking-tight text-white md:text-5xl">{heading}</h2>
-          <p className="mt-2 text-pretty font-sans text-sm leading-relaxed text-stone-300">{subtitle}</p>
-          {categoryOfTheDay ? (
-            <button
-              type="button"
-              onClick={focusCategoryOfDay}
-              className="mt-3 inline-flex w-fit max-w-full flex-wrap items-center gap-x-1.5 rounded-full border border-stone-600/90 bg-stone-900/40 px-3 py-1.5 text-left font-sans text-[10px] font-medium tracking-wide text-stone-200 transition hover:border-stone-500 hover:bg-stone-900/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-500"
-              aria-label={`${categoryOfTheDayLabel} ${categoryOfTheDayName}`}
+    <div>
+      <header className="mb-12 lg:mb-16">
+        <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
+          <div>
+            <p
+              className="mb-5 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-400"
+              suppressHydrationWarning
             >
-              <span className="uppercase">{categoryOfTheDayLabel}</span>
-              {categoryOfTheDayName ? (
-                <>
-                  <span className="text-stone-500" aria-hidden>
-                    ·
-                  </span>
-                  <span className="font-serif text-sm font-bold normal-case text-white">
-                    {categoryOfTheDayName}
-                  </span>
-                </>
-              ) : null}
-              <span className="font-light text-stone-500" aria-hidden>
-                |
-              </span>
-              <span className="uppercase">{bestPriceGuaranteeLabel}</span>
-            </button>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-          <Link
-            href="/villas"
-            className="font-serif text-base text-stone-300 underline-offset-4 transition-colors hover:text-white hover:underline md:text-lg"
-          >
-            {viewAllLabel} →
-          </Link>
-          <div className="hidden items-center gap-2 md:flex">
+              {sectionDateLabel}
+            </p>
+            <h2 className="font-serif text-[clamp(2.75rem,6.5vw,4.25rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900">
+              {heading}
+            </h2>
+            <p className="mt-5 max-w-md font-sans text-[15px] leading-[1.65] text-stone-600">{subtitle}</p>
+          </div>
+
+          <div className="flex items-center gap-3 lg:pb-1">
             <CarouselArrow
               label="Scroll categories left"
               direction="left"
@@ -231,10 +159,41 @@ export function HomeCategoriesCarousel({
             />
           </div>
         </div>
+
+        <div className="mt-10 flex flex-col gap-5 border-y border-stone-200/45 py-5 sm:flex-row sm:items-center sm:justify-between">
+          {categoryOfTheDay ? (
+            <button
+              type="button"
+              onClick={focusCategoryOfDay}
+              className="group flex flex-col gap-1 text-left sm:flex-row sm:items-center sm:gap-4"
+              aria-label={`${categoryOfTheDayLabel} ${categoryOfTheDayName}`}
+            >
+              <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-500">
+                {categoryOfTheDayLabel}
+              </span>
+              <span className="font-serif text-2xl text-stone-900 transition group-hover:text-brand">
+                {categoryOfTheDayName}
+              </span>
+              <span className="hidden h-4 w-px bg-stone-300 sm:block" aria-hidden />
+              <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-stone-500">
+                {bestPriceGuaranteeLabel}
+              </span>
+            </button>
+          ) : (
+            <span />
+          )}
+          <Link
+            href="/villas"
+            className="shrink-0 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-900 underline-offset-4 transition hover:text-brand hover:underline"
+          >
+            {viewAllLabel}
+          </Link>
+        </div>
       </header>
+
       <ul
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-8 overflow-x-auto overscroll-x-contain scroll-smooth pt-4 pb-[18px]"
+        className="no-scrollbar flex snap-x snap-mandatory items-stretch gap-5 overflow-x-auto overscroll-x-contain scroll-smooth scroll-pl-0 pb-1 sm:gap-6"
         aria-label={heading}
       >
         <li className="flex shrink-0 snap-start">
@@ -245,6 +204,8 @@ export function HomeCategoriesCarousel({
             countLabel={villaCountBadge(editorsChoice.villaCount)}
             priceFormatted={editorsChoice.priceFormatted}
             isGoodDeal={editorsChoice.isGoodDeal}
+            exploreLabel={exploreLabel}
+            variant="lead"
           />
         </li>
         {categoryOfTheDay ? (
@@ -256,7 +217,8 @@ export function HomeCategoriesCarousel({
               countLabel={villaCountBadge(categoryOfTheDay.villaCount)}
               priceFormatted={categoryOfTheDay.priceFormatted}
               isGoodDeal={categoryOfTheDay.isGoodDeal}
-              showCategoryOfDayBadge
+              exploreLabel={exploreLabel}
+              variant="day"
               highlighted={highlightCategoryOfDay}
             />
           </li>
@@ -270,11 +232,13 @@ export function HomeCategoriesCarousel({
               countLabel={villaCountBadge(category.villaCount)}
               priceFormatted={category.priceFormatted}
               isGoodDeal={category.isGoodDeal}
+              exploreLabel={exploreLabel}
+              variant="standard"
             />
           </li>
         ))}
       </ul>
-    </>
+    </div>
   );
 }
 
@@ -285,7 +249,8 @@ type CategoryCarouselCardProps = {
   countLabel: string;
   priceFormatted: string;
   isGoodDeal: boolean;
-  showCategoryOfDayBadge?: boolean;
+  exploreLabel: string;
+  variant: "lead" | "day" | "standard";
   highlighted?: boolean;
 };
 
@@ -296,67 +261,63 @@ function CategoryCarouselCard({
   countLabel,
   priceFormatted,
   isGoodDeal,
-  showCategoryOfDayBadge = false,
+  exploreLabel,
+  variant,
   highlighted = false,
 }: CategoryCarouselCardProps) {
   const t = useTranslations("layout.home");
-
   const perNight = t("categoriesPerNight");
+
+  const imageSizes = "(max-width: 640px) 216px, 256px";
 
   return (
     <Link
       href={href}
-      className={`group flex h-full w-[210px] flex-col sm:w-[236px] ${highlighted ? "category-card-breathe" : ""}`}
+      className={`group flex h-full ${CARD_SHELL_CLASS} flex-col ${highlighted ? "category-card-breathe" : ""}`}
     >
-      <div className="relative aspect-[3/5] w-full overflow-hidden rounded-[2.25rem] bg-stone-800">
-        <Image
-          src={image}
-          alt=""
-          fill
-          sizes="(max-width: 640px) 210px, 236px"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-        />
+      <article className="flex h-full flex-col">
+        <div className={`relative shrink-0 overflow-hidden bg-stone-100 ${CARD_IMAGE_HEIGHT_CLASS}`}>
+          <Image
+            src={image}
+            alt=""
+            fill
+            sizes={imageSizes}
+            className="object-cover transition duration-700 ease-out group-hover:scale-[1.04]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-950/35 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-        {showCategoryOfDayBadge ? <CategoryOfDayTopBadges /> : null}
-
-        {!showCategoryOfDayBadge ? (
-          <button
-            type="button"
-            className="absolute top-3 right-3 z-20 flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white shadow-sm backdrop-blur-md transition hover:bg-white/25"
-            aria-label="Save category"
-            onClick={(event) => {
-              event.preventDefault();
-              event.stopPropagation();
-            }}
-          >
-            <Heart className="size-[18px]" strokeWidth={2} aria-hidden />
-          </button>
-        ) : null}
-
-        <div className="absolute inset-x-0 bottom-0 z-10">
-          <div className="bg-gradient-to-t from-stone-950/92 via-stone-950/55 to-transparent px-3.5 pt-14 pb-3.5 sm:px-4 sm:pb-4">
-            <p className="font-serif text-lg font-semibold leading-tight text-white sm:text-xl">
-              {t.rich("categoriesStartingFrom", {
-                amount: () => (
-                  <span className={isGoodDeal ? "font-semibold text-white" : "font-medium text-stone-100"}>
-                    {priceFormatted}
-                  </span>
-                ),
-              })}
-              <span className="font-sans text-base font-normal text-stone-300 sm:text-lg">{perNight}</span>
-            </p>
-
-            <div className="mt-1.5 flex items-center gap-1.5 text-stone-200">
-              <Home className="size-3.5 shrink-0 text-stone-400" strokeWidth={2} aria-hidden />
-              <span className="font-sans text-xs font-medium leading-snug text-stone-300">{countLabel}</span>
-            </div>
-
-            <span className="mt-3 block w-full truncate rounded-full border border-white/60 bg-white px-4 py-2.5 text-center font-sans text-sm font-semibold text-stone-900 shadow-sm transition group-hover:border-white group-hover:bg-white">
-              {label}
-            </span>
-          </div>
+          <span className="absolute top-0 left-0 bg-white px-2.5 py-1.5 font-sans text-[10px] font-medium uppercase tracking-[0.16em] text-stone-600">
+            {countLabel}
+          </span>
         </div>
-      </div>
+
+        <div className="mt-4 flex min-h-[9.5rem] flex-1 flex-col space-y-2">
+          {variant === "day" ? (
+            <p className="font-sans text-[9px] font-bold uppercase tracking-[0.22em] text-brand">
+              {t("categoriesOfTheDay")}
+            </p>
+          ) : null}
+
+          <div className="flex items-baseline justify-between gap-3">
+            <h3 className="min-w-0 font-serif text-lg leading-tight text-stone-900 sm:text-xl">{label}</h3>
+          </div>
+
+          <p className="font-serif text-base text-stone-800 sm:text-lg">
+            {t.rich("categoriesStartingFrom", {
+              amount: () => (
+                <span className={isGoodDeal ? "font-semibold text-stone-900" : "font-medium"}>
+                  {priceFormatted}
+                </span>
+              ),
+            })}
+            <span className="font-sans text-xs text-stone-500">{perNight}</span>
+          </p>
+
+          <p className="pt-1 font-sans text-[10px] font-medium uppercase tracking-[0.2em] text-stone-400 transition group-hover:text-brand">
+            {exploreLabel}
+          </p>
+        </div>
+      </article>
     </Link>
   );
 }
@@ -378,15 +339,11 @@ function CarouselArrow({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="flex size-9 items-center justify-center rounded-full border border-stone-200/80 bg-white text-stone-700 transition hover:border-stone-300 hover:bg-white disabled:pointer-events-none disabled:opacity-35"
+      className="flex size-11 items-center justify-center border border-stone-900 text-stone-900 transition hover:bg-stone-900 hover:text-white disabled:pointer-events-none disabled:opacity-25"
     >
-      <svg className="size-4" viewBox="0 0 16 16" fill="none" aria-hidden>
-        {direction === "left" ? (
-          <path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-        ) : (
-          <path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-        )}
-      </svg>
+      <span className="font-serif text-xl leading-none" aria-hidden>
+        {direction === "left" ? "←" : "→"}
+      </span>
     </button>
   );
 }

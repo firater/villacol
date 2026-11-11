@@ -1,5 +1,10 @@
 {
   "layout": {
+    "announcementBar": {
+      "aria": "Объявление",
+      "message": "Subscribe",
+      "getApp": "Get the app"
+    },
     "nav": {
       "ariaMain": "Основная навигация",
       "home": "Главная",
@@ -69,6 +74,10 @@
       "amenityPills": {
         "aria": "Быстрые фильтры",
         "more": "Ещё фильтры"
+      },
+      "accessPassBanner": {
+        "title": "Shorter stays with extra last minute discounts",
+        "exploreCta": "Explore now"
       },
       "offersKicker": "Сезон",
       "featuredKicker": "Спецпредложения",

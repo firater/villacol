@@ -20,6 +20,8 @@ import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
 const FEATURED_IMAGE =
   "https://placehold.co/560x720/d6d3d1/44403c/png?text=+";
 
+const HEADER_COMPACT_SCROLL_Y = 50;
+
 type Props = {
   locale: Locale;
   currency: Currency;
@@ -35,6 +37,8 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(true);
   const menuRef = useRef<HTMLElement>(null);
   const menuToggleRef = useRef<HTMLButtonElement>(null);
+  const scrollRafRef = useRef<number | null>(null);
+  const [isCompact, setIsCompact] = useState(false);
 
   const closeMenu = useCallback(() => {
     setMenuOpen(false);
@@ -49,6 +53,28 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
       setMobileCategoriesOpen(true);
     }
   }, [menuOpen]);
+
+  useEffect(() => {
+    const syncCompact = () => {
+      setIsCompact(window.scrollY > HEADER_COMPACT_SCROLL_Y);
+      scrollRafRef.current = null;
+    };
+
+    const onScroll = () => {
+      if (scrollRafRef.current !== null) return;
+      scrollRafRef.current = window.requestAnimationFrame(syncCompact);
+    };
+
+    syncCompact();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (scrollRafRef.current !== null) {
+        window.cancelAnimationFrame(scrollRafRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -77,9 +103,19 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
   }, [menuOpen, closeMenu]);
 
   return (
-    <header className="relative z-40 w-full bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap items-center gap-y-4 border-b border-stone-200/90 py-6 lg:py-8">
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        isCompact
+          ? "bg-white/95 backdrop-blur-md"
+          : "bg-white/95 backdrop-blur-sm"
+      }`}
+    >
+      <div className="mx-auto max-w-7xl px-4 transition-all duration-300 sm:px-6 lg:px-8">
+        <div
+          className={`flex flex-wrap items-center gap-y-4 border-b border-stone-200/90 transition-all duration-300 ${
+            isCompact ? "py-3 lg:py-4" : "py-6 lg:py-8"
+          }`}
+        >
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 sm:gap-x-8 lg:gap-x-10">
             <Link href="/" className="inline-flex shrink-0 items-baseline gap-0.5">
               <span className="font-serif text-2xl tracking-tight text-orange-600 lg:text-[1.65rem]">.</span>
@@ -98,7 +134,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
             <button
               ref={menuToggleRef}
               type="button"
-              className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80"
+              className="inline-flex items-center gap-2 border border-stone-200 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80"
               aria-expanded={menuOpen}
               aria-controls={menuId}
               onClick={toggleMenu}
@@ -119,7 +155,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
 
             <Link
               href="/contact"
-              className="hidden items-center gap-2 rounded-full border border-stone-200 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80 xl:inline-flex"
+              className="hidden items-center gap-2 border border-stone-200 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80 xl:inline-flex"
             >
               <ChatIcon className="h-4 w-4 text-neutral-500" />
               {t("nav.contact")}

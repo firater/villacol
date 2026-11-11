@@ -1,5 +1,10 @@
 {
   "layout": {
+    "announcementBar": {
+      "aria": "Hinweisleiste",
+      "message": "Subscribe",
+      "getApp": "Get the app"
+    },
     "nav": {
       "ariaMain": "Hauptnavigation",
       "home": "Start",
@@ -69,6 +74,10 @@
       "amenityPills": {
         "aria": "Schnellfilter",
         "more": "Mehr Filter"
+      },
+      "accessPassBanner": {
+        "title": "Shorter stays with extra last minute discounts",
+        "exploreCta": "Explore now"
       },
       "offersKicker": "Saison",
       "featuredKicker": "Sonderangebote",

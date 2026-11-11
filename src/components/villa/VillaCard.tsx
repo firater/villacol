@@ -117,11 +117,11 @@ export function VillaCard({
     const promoLocation = location ?? "Kalkan";
 
     return (
-      <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200/70 bg-white shadow-sm transition-colors md:flex-row md:items-stretch md:rounded-[1.5rem] md:hover:border-stone-300">
-        <Link
-          href={{ pathname: "/villas/[slug]", params: { slug } }}
-          className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-t-2xl bg-neutral-100 md:aspect-auto md:w-[45%] md:max-w-[48%] md:min-h-0 md:self-stretch md:rounded-l-[1.25rem] md:rounded-tr-none"
-        >
+      <Link
+        href={{ pathname: "/villas/[slug]", params: { slug } }}
+        className="group relative flex flex-col overflow-hidden border border-stone-200/70 bg-white transition-colors md:flex-row md:items-stretch md:hover:border-stone-300"
+      >
+        <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-neutral-100 md:aspect-auto md:w-[45%] md:max-w-[48%] md:min-h-0 md:self-stretch">
           <Image
             src={imageUrl}
             alt={imageAlt}
@@ -134,7 +134,7 @@ export function VillaCard({
             <div
               className={`absolute left-3 z-20 ${showVillaOfTheDay ? "top-[3.35rem]" : "top-3"}`}
             >
-              <div className="flex max-w-[min(100%,14rem)] items-center gap-2 rounded-full border border-stone-200/60 bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur-sm">
+              <div className="flex max-w-[min(100%,14rem)] items-center gap-2 border border-stone-200/60 bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur-sm">
                 <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-hidden />
                 <span className="flex min-w-0 flex-col leading-none">
                   <span className="text-[9px] font-medium uppercase tracking-tighter text-stone-500">
@@ -147,10 +147,9 @@ export function VillaCard({
               </div>
             </div>
           ) : null}
-        </Link>
+        </div>
         <PromoCardBody
           title={title}
-          slug={slug}
           location={promoLocation}
           capacity={capacity}
           bedrooms={bedrooms}
@@ -165,16 +164,18 @@ export function VillaCard({
           priceMain={priceMain}
           stayLabel={stayLabel}
         />
-      </article>
+      </Link>
     );
   }
 
   if (layout === "recommended") {
     return (
-      <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-stone-200/60 bg-stone-50 hover:border-stone-300">
-        <Link
-          href={{ pathname: "/villas/[slug]", params: { slug } }}
-          className="relative aspect-[4/3] block overflow-hidden bg-neutral-100"
+      <Link
+        href={{ pathname: "/villas/[slug]", params: { slug } }}
+        className="group relative flex h-full flex-col overflow-hidden border border-stone-200/70 bg-white transition-colors hover:border-stone-300"
+      >
+        <div
+          className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-100"
           style={{ aspectRatio: "4 / 3" }}
         >
           <Image
@@ -182,15 +183,12 @@ export function VillaCard({
             alt={imageAlt}
             fill
             sizes="(max-width: 640px) 100vw, 33vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
-          {badgeLabel ? (
-            <PromoBadge text={badgeLabel} />
-          ) : null}
-        </Link>
+          {badgeLabel ? <PromoBadge text={badgeLabel} square /> : null}
+        </div>
         <RecommendedCardBody
           title={title}
-          slug={slug}
           location={location}
           capacity={capacity}
           bedrooms={bedrooms}
@@ -199,7 +197,7 @@ export function VillaCard({
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
         />
-      </article>
+      </Link>
     );
   }
 
@@ -244,10 +242,20 @@ export function VillaCard({
   );
 }
 
-function PromoBadge({ text, className = "left-3 top-3" }: { text: string; className?: string }) {
+function PromoBadge({
+  text,
+  className = "left-3 top-3",
+  square = false,
+}: {
+  text: string;
+  className?: string;
+  square?: boolean;
+}) {
   return (
     <span
-      className={`absolute z-20 rounded-full bg-orange-600 px-3 py-1.5 text-[9px] font-medium uppercase tracking-widest text-white ${className}`}
+      className={`absolute z-20 bg-orange-600 px-3 py-1.5 text-[9px] font-medium uppercase tracking-widest text-white ${
+        square ? "" : "rounded-full"
+      } ${className}`}
     >
       {text}
     </span>
@@ -342,7 +350,6 @@ function PromoStatIconItem({
 
 function PromoCardBody({
   title,
-  slug,
   location,
   capacity,
   bedrooms,
@@ -358,7 +365,6 @@ function PromoCardBody({
   promoRatingLabels,
 }: {
   title: string;
-  slug: string;
   location: string | null;
   capacity: number;
   bedrooms: number;
@@ -376,7 +382,7 @@ function PromoCardBody({
   return (
     <div className="flex min-w-0 flex-1 flex-col px-2 py-4 md:px-3.5 md:py-5 lg:px-4 lg:py-[22px]">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-        <PromoTitleRow title={title} slug={slug} location={location} />
+        <PromoTitleRow title={title} location={location} />
         <PromoPromotionPills badges={promotionBadges} />
       </div>
 
@@ -440,7 +446,6 @@ function PromoCardBody({
 
 function RecommendedCardBody({
   title,
-  slug,
   location,
   capacity,
   bedrooms,
@@ -450,7 +455,6 @@ function RecommendedCardBody({
   perNightLabel,
 }: {
   title: string;
-  slug: string;
   location: string | null;
   capacity: number;
   bedrooms: number;
@@ -460,24 +464,17 @@ function RecommendedCardBody({
   perNightLabel: string;
 }) {
   return (
-    <div className="flex flex-grow flex-col bg-white p-6">
-      <h3 className="mb-2 truncate font-serif text-xl leading-snug text-stone-900">
-        <Link href={{ pathname: "/villas/[slug]", params: { slug } }}>{title}</Link>
-      </h3>
+    <div className="flex flex-1 flex-col p-6">
+      <h3 className="mb-2 truncate font-serif text-xl leading-snug text-stone-900">{title}</h3>
       <p className="mb-3 text-sm text-stone-500">{location ?? "\u00A0"}</p>
       <p className="mb-4 font-serif text-2xl text-stone-900">
         {displayNightly}
         <span className="font-sans text-sm text-stone-500"> {perNightLabel}</span>
       </p>
       <RecommendedStats capacity={capacity} bedrooms={bedrooms} />
-      <div className="mt-6 flex items-center justify-between">
-        <p className="min-h-4 text-xs text-stone-500">{stayLabel ?? "\u00A0"}</p>
-        <Link
-          href={{ pathname: "/villas/[slug]", params: { slug } }}
-          className="rounded-full bg-stone-900 px-6 py-2.5 font-sans text-xs text-white"
-        >
-          {viewLabel}
-        </Link>
+      <div className="mt-6 flex items-center justify-between gap-4">
+        <p className="min-w-0 flex-1 text-xs text-stone-500">{stayLabel ?? "\u00A0"}</p>
+        <span className="shrink-0 bg-stone-900 px-6 py-2.5 font-sans text-xs text-white">{viewLabel}</span>
       </div>
     </div>
   );
@@ -485,21 +482,16 @@ function RecommendedCardBody({
 
 function PromoTitleRow({
   title,
-  slug,
   location,
 }: {
   title: string;
-  slug: string;
   location: string | null;
 }) {
   return (
     <h3 className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-      <Link
-        href={{ pathname: "/villas/[slug]", params: { slug } }}
-        className="min-w-0 truncate font-serif text-lg font-semibold leading-tight text-stone-900 md:text-xl"
-      >
+      <span className="min-w-0 truncate font-serif text-lg font-semibold leading-tight text-stone-900 md:text-xl">
         {title}
-      </Link>
+      </span>
       {location ? (
         <span className="shrink-0 text-xs font-normal text-stone-400">{location}</span>
       ) : null}
