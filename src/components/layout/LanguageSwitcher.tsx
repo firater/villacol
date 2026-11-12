@@ -27,7 +27,7 @@ type Props = {
   label: string;
   /** The active locale from the URL segment, from the server. */
   currentLocale: Locale;
-  variant?: "default" | "editorial";
+  variant?: "default" | "editorial" | "magazine";
 };
 
 /**
@@ -50,34 +50,49 @@ export function LanguageSwitcher({ label, currentLocale, variant = "default" }: 
     });
   }
 
-  if (variant === "editorial") {
+  if (variant === "editorial" || variant === "magazine") {
+  const isMagazine = variant === "magazine";
+
     return (
       <>
         <span className="sr-only">{label}</span>
-        <ul className="space-y-3" role="list">
-        {LOCALES.map((code) => {
-          const active = code === currentLocale;
-          return (
-            <li key={code}>
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => void choose(code)}
-                className={`flex w-full items-center gap-3 py-1 text-left text-base tracking-wide uppercase ${
-                  active ? "font-medium text-orange-600" : "text-neutral-700 hover:text-orange-500"
-                }`}
-                aria-pressed={active}
-                aria-label={`${label}: ${code}`}
-              >
-                <span
-                  className={`size-1.5 shrink-0 rounded-full ${active ? "bg-orange-500" : "bg-transparent"}`}
-                  aria-hidden
-                />
-                {code}
-              </button>
-            </li>
-          );
-        })}
+        <ul className={isMagazine ? "space-y-1.5" : "space-y-3"} role="list">
+          {LOCALES.map((code) => {
+            const active = code === currentLocale;
+            return (
+              <li key={code}>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => void choose(code)}
+                  className={
+                    isMagazine
+                      ? `flex w-full items-stretch gap-2.5 py-1 text-left font-serif text-lg font-normal tracking-tight uppercase transition-colors ${
+                          active ? "text-stone-900" : "text-stone-500 hover:text-orange-600"
+                        }`
+                      : `flex w-full items-center gap-3 py-1 text-left text-base tracking-wide uppercase ${
+                          active ? "font-medium text-orange-600" : "text-neutral-700 hover:text-orange-500"
+                        }`
+                  }
+                  aria-pressed={active}
+                  aria-label={`${label}: ${code}`}
+                >
+                  {isMagazine ? (
+                    <span
+                      aria-hidden
+                      className={`w-px shrink-0 ${active ? "bg-orange-500" : "bg-transparent"}`}
+                    />
+                  ) : (
+                    <span
+                      className={`size-1.5 shrink-0 rounded-full ${active ? "bg-orange-500" : "bg-transparent"}`}
+                      aria-hidden
+                    />
+                  )}
+                  {code}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </>
     );

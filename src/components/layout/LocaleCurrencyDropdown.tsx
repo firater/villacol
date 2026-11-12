@@ -50,45 +50,58 @@ export function LocaleCurrencyDropdown({ locale, currency }: Props) {
       <button
         ref={toggleRef}
         type="button"
-        className="inline-flex items-center gap-2.5 px-4 py-2.5 font-sans text-sm tracking-wide text-stone-900 transition-colors hover:text-stone-950"
+        className="inline-flex items-center gap-2 bg-white px-4 py-2.5 font-serif text-sm tracking-wide text-neutral-950 transition-colors hover:bg-stone-50/80 hover:text-stone-950"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
       >
-        <GlobeIcon className="size-4 text-stone-700" />
-        <span className="font-medium">{triggerLabel}</span>
-        <ChevronIcon className="size-3.5 text-stone-600" />
+        <span>{triggerLabel}</span>
+        <ChevronIcon className="size-3.5 text-neutral-700" />
       </button>
 
       {open ? (
         <div
           id={panelId}
-          className="absolute end-0 top-full z-50 mt-3 w-[min(90vw,17.5rem)] rounded-[2rem] border border-stone-200/90 bg-stone-50 p-6 shadow-2xl"
+          role="dialog"
+          aria-label={`${tCommon("language")} / ${tCommon("currency")}`}
+          className="absolute end-0 top-full z-50 mt-3 w-[min(90vw,16.5rem)] rounded-[2rem] border border-stone-200/90 bg-white p-6 shadow-2xl sm:p-7"
         >
-          <section>
-            <h3 className="font-serif text-2xl tracking-tight text-neutral-900">{tCommon("language")}</h3>
-            <div className="mt-4">
-              <LanguageSwitcher label={tCommon("language")} currentLocale={locale} variant="editorial" />
-            </div>
-          </section>
-          <section className="mt-8 border-t border-stone-200/80 pt-8">
-            <h3 className="font-serif text-2xl tracking-tight text-neutral-900">{tCommon("currency")}</h3>
-            <div className="mt-4">
-              <CurrencySwitcher label={tCommon("currency")} currentCurrency={currency} variant="editorial" />
-            </div>
-          </section>
+          <div>
+            <p className="font-sans text-[10px] font-medium uppercase tracking-[0.26em] text-stone-400">
+              {locale.toUpperCase()} · {currency}
+            </p>
+
+            <section className="mt-4">
+              <PremiumSectionLabel title={tCommon("language")} />
+              <div className="mt-2.5 [&_button]:gap-0 [&_button]:py-1.5 [&_button]:text-base [&_button_span[aria-hidden]]:hidden [&_ul]:space-y-0.5">
+                <LanguageSwitcher
+                  label={tCommon("language")}
+                  currentLocale={locale}
+                  variant="magazine"
+                />
+              </div>
+            </section>
+
+            <section className="mt-5">
+              <PremiumSectionLabel title={tCommon("currency")} />
+              <div className="mt-2.5 [&_button]:gap-0 [&_button]:py-1.5 [&_button]:text-base [&_button_span[aria-hidden]]:hidden [&_ul]:space-y-0.5">
+                <CurrencySwitcher
+                  label={tCommon("currency")}
+                  currentCurrency={currency}
+                  variant="magazine"
+                />
+              </div>
+            </section>
+          </div>
         </div>
       ) : null}
     </div>
   );
 }
 
-function GlobeIcon({ className }: { className?: string }) {
+function PremiumSectionLabel({ title }: { title: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
-    </svg>
+    <h3 className="font-serif text-xl font-normal tracking-[-0.02em] text-stone-900">{title}</h3>
   );
 }
 

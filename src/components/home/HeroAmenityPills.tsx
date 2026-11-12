@@ -10,7 +10,6 @@ const MAX_PILLS = 4;
 const PANEL_MAX_WIDTH_PX = 520;
 const VIEWPORT_MARGIN_PX = 16;
 const GAP_BELOW_BUTTON_PX = 10;
-const NEEDLE_SIZE_PX = 14;
 
 type PanelAnchor = {
   panelTop: number;
@@ -145,23 +144,15 @@ export function HeroAmenityPills({ amenities, selected, onToggle }: Props) {
                 top: anchor.panelTop,
                 left: anchor.panelCenterX,
                 transform: "translateX(-50%)",
+                ["--needle-offset" as string]: `${anchor.buttonCenterX - anchor.panelCenterX}px`,
               }}
             >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -top-[7px] z-20 -translate-x-1/2 rotate-45 border border-stone-200/90 bg-white shadow-[0_-1px_2px_rgba(28,25,23,0.06)]"
-                style={{
-                  left: `calc(50% + ${anchor.buttonCenterX - anchor.panelCenterX}px)`,
-                  width: NEEDLE_SIZE_PX,
-                  height: NEEDLE_SIZE_PX,
-                }}
-              />
               <div
                 ref={dialogRef}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={dialogTitleId}
-                className="relative rounded-2xl border border-stone-200/90 bg-white p-5 shadow-xl"
+                className="relative rounded-none border border-stone-200/90 bg-white p-5 shadow-xl before:pointer-events-none before:absolute before:top-0 before:z-[1] before:size-3.5 before:-translate-x-1/2 before:-translate-y-1/2 before:rotate-45 before:border before:border-stone-200/90 before:border-r-0 before:border-b-0 before:bg-white before:content-[''] before:[left:calc(50%+var(--needle-offset,0px))]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <h2

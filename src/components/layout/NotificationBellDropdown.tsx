@@ -12,12 +12,11 @@ import {
 import { Link } from "@/i18n/navigation";
 
 const DEAL_IMAGES = [
-  "https://placehold.co/960x480/e7e5e4/57534e/png?text=+",
-  "https://placehold.co/960x480/d6d3d1/44403c/png?text=+",
-  "https://placehold.co/960x480/fecaca/9f1239/png?text=+",
-  "https://placehold.co/960x480/cbd5e1/334155/png?text=+",
-  "https://placehold.co/960x480/fde68a/92400e/png?text=+",
-];
+  "/smr2.webp",
+  "/smr3.jpg",
+  "/smr4.webp",
+  "/best.png",
+] as const;
 
 type Props = {
   initialDeals: UnreadDeal[];
@@ -31,22 +30,40 @@ export function NotificationBellDropdown({
   const t = useTranslations("layout.notifications");
   const panelId = useId();
   const [open, setOpen] = useState(false);
-  const [deals, setDeals] = useState(initialDeals);
+  const [deals] = useState(initialDeals);
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const rootRef = useRef<HTMLDivElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
+  const markedOnOpenRef = useRef(false);
 
-  const refresh = useCallback(async () => {
+  const syncUnreadCount = useCallback(async () => {
     const result = await getUnreadDeals();
     if (!result.ok) return;
-    setDeals(result.data.deals);
     setUnreadCount(result.data.unreadCount);
   }, []);
 
   useEffect(() => {
-    if (!open) return;
-    void refresh();
-  }, [open, refresh]);
+    void syncUnreadCount();
+  }, [syncUnreadCount]);
+
+  useEffect(() => {
+    if (!open) {
+      markedOnOpenRef.current = false;
+      return;
+    }
+    if (markedOnOpenRef.current) return;
+    markedOnOpenRef.current = true;
+
+    const dealIds = deals.map((deal) => deal.id);
+    setUnreadCount(0);
+
+    void (async () => {
+      if (dealIds.length === 0) return;
+      const result = await markDealsRead({ dealIds });
+      if (!result.ok) {
+        await syncUnreadCount();
+      }
+    })();
+  }, [deals, open, syncUnreadCount]);
 
   useEffect(() => {
     if (!open) return;
@@ -59,7 +76,6 @@ export function NotificationBellDropdown({
       const target = event.target;
       if (!(target instanceof Node)) return;
       if (rootRef.current?.contains(target)) return;
-      if (toggleRef.current?.contains(target)) return;
       setOpen(false);
     };
 
@@ -72,26 +88,20 @@ export function NotificationBellDropdown({
     };
   }, [open]);
 
-  async function onDealActivate(dealId: number) {
-    const result = await markDealsRead({ dealIds: [dealId] });
-    if (!result.ok) return;
-    setDeals((prev) => prev.filter((deal) => deal.id !== dealId));
-    setUnreadCount((count) => Math.max(0, count - 1));
-  }
+  const showUnreadPulse = unreadCount > 0;
 
   return (
     <div ref={rootRef} className="relative">
       <button
-        ref={toggleRef}
         type="button"
-        className="relative inline-flex items-center justify-center px-4 py-2.5 text-stone-800 transition-colors hover:text-stone-950"
+        className="relative inline-flex items-center justify-center bg-white px-4 py-2.5 text-stone-900 transition-colors hover:bg-stone-50/80 hover:text-stone-950"
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={t("openMenu")}
         onClick={() => setOpen((value) => !value)}
       >
         <BellIcon className="h-5 w-5" />
-        {unreadCount > 0 ? (
+        {showUnreadPulse ? (
           <span className="absolute right-2 top-2 flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-orange-500" />
@@ -122,7 +132,6 @@ export function NotificationBellDropdown({
                   key={deal.id}
                   deal={deal}
                   imageSrc={DEAL_IMAGES[index % DEAL_IMAGES.length]}
-                  onActivate={() => void onDealActivate(deal.id)}
                 />
               ))}
             </div>
@@ -136,11 +145,9 @@ export function NotificationBellDropdown({
 function DealMagazineCard({
   deal,
   imageSrc,
-  onActivate,
 }: {
   deal: UnreadDeal;
   imageSrc: string;
-  onActivate: () => void;
 }) {
   const t = useTranslations("layout.notifications");
 
@@ -180,7 +187,6 @@ function DealMagazineCard({
           href={deal.link}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={onActivate}
           className={interactiveClass}
         >
           {cardBody}
@@ -189,23 +195,19 @@ function DealMagazineCard({
     }
     if (deal.link.startsWith("/")) {
       return (
-        <Link href={deal.link as "/"} onClick={onActivate} className={interactiveClass}>
+        <Link href={deal.link as "/"} className={interactiveClass}>
           {cardBody}
         </Link>
       );
     }
     return (
-      <a href={deal.link} onClick={onActivate} className={interactiveClass}>
+      <a href={deal.link} className={interactiveClass}>
         {cardBody}
       </a>
     );
   }
 
-  return (
-    <button type="button" onClick={onActivate} className={interactiveClass}>
-      {cardBody}
-    </button>
-  );
+  return <div className={interactiveClass}>{cardBody}</div>;
 }
 
 function EmptyMagazineState({ message }: { message: string }) {
@@ -241,7 +243,7 @@ function BellIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.75"
+      strokeWidth="1"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden

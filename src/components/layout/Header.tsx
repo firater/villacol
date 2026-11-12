@@ -17,8 +17,7 @@ import type { Currency, Locale } from "@/lib/locales";
 
 import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
 
-const FEATURED_IMAGE =
-  "https://placehold.co/560x720/d6d3d1/44403c/png?text=+";
+const MEGA_MENU_FEATURED_IMAGES = ["/smr2.webp", "/smr3.jpg", "/smr4.webp"] as const;
 
 /** Expanded navbar when scroll is above this. */
 const HEADER_EXPAND_SCROLL_Y = 20;
@@ -129,24 +128,26 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
           }`}
         >
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 sm:gap-x-8 lg:gap-x-10">
-            <Link href="/" className="inline-flex shrink-0 items-baseline gap-0.5">
-              <span className="font-serif text-2xl tracking-tight text-orange-600 lg:text-[1.65rem]">.</span>
-              <span className="font-serif text-2xl tracking-tight text-neutral-950 lg:text-[1.65rem]">
-                {tCommon("brand")}
-              </span>
-            </Link>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:gap-x-12 lg:gap-x-16">
+              <Link href="/" className="inline-flex shrink-0 items-baseline gap-0.5">
+                <span className="font-serif text-2xl tracking-tight text-orange-600 lg:text-[1.65rem]">.</span>
+                <span className="font-serif text-2xl tracking-tight text-neutral-950 lg:text-[1.65rem]">
+                  {tCommon("brand")}
+                </span>
+              </Link>
 
-            <Link
-              href="/find-villa"
-              className="hidden font-serif text-lg font-semibold tracking-wide text-stone-950 hover:text-stone-800 sm:inline-block"
-            >
-              {t("nav.findVilla")}
-            </Link>
+              <Link
+                href="/find-villa"
+                className="hidden font-serif text-lg font-semibold tracking-wide text-stone-950 transition-colors hover:text-orange-600 sm:inline-block"
+              >
+                {t("nav.findVilla")}
+              </Link>
+            </div>
 
             <button
               ref={menuToggleRef}
               type="button"
-              className="inline-flex items-center gap-2 border border-stone-900 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-stone-900 hover:bg-stone-50/80"
+              className="inline-flex items-center gap-2 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-stone-900 transition-colors hover:bg-stone-50/80 hover:text-stone-950"
               aria-expanded={menuOpen}
               aria-controls={menuId}
               onClick={toggleMenu}
@@ -160,16 +161,16 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
             </button>
           </div>
 
-          <div className="ms-auto flex flex-wrap items-center gap-x-6 gap-y-3 lg:gap-x-8">
+          <div className="ms-auto flex flex-wrap items-center gap-x-3 gap-y-3 lg:gap-x-4">
             <LocaleCurrencyDropdown locale={locale} currency={currency} />
 
             {notificationsSlot}
 
             <Link
               href="/contact"
-              className="hidden items-center gap-2 px-4 py-2.5 font-serif text-base tracking-wide text-stone-900 transition-colors hover:text-stone-950 xl:inline-flex"
+              className="hidden items-center gap-2 px-4 py-2.5 font-serif text-base tracking-wide text-stone-950 transition-colors hover:text-orange-600 xl:inline-flex"
             >
-              <ChatIcon className="h-4 w-4 text-stone-700" />
+              <ChatIcon className="h-4 w-4" />
               {t("nav.contact")}
             </Link>
           </div>
@@ -181,10 +182,14 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
           ref={menuRef}
           id={menuId}
           aria-label={t("nav.ariaMain")}
-          className="absolute left-0 top-full z-50 w-full border-b border-stone-200/80 bg-stone-50 shadow-2xl"
+          className="absolute left-0 top-full z-50 -mt-0.5 w-full border-b border-stone-200/90 bg-white text-stone-800 shadow-2xl"
         >
-          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-            <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1.4fr)] lg:gap-16">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-300/50 to-transparent"
+          />
+          <div className="mx-auto max-w-7xl px-4 pb-6 pt-12 sm:px-6 lg:px-8 lg:pb-7 lg:pt-[calc(1.75rem+24px)]">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)_minmax(0,1.05fr)] lg:gap-10 xl:gap-12">
               <MegaMenuHomeColumn onNavigate={closeMenu} />
               <MegaMenuCategoriesColumn
                 categories={categories}
@@ -205,9 +210,9 @@ function MegaMenuHomeColumn({ onNavigate }: { onNavigate: () => void }) {
   const t = useTranslations("layout");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <MegaMenuColumnHeading title={t("megaMenu.homeColumn")} />
-      <ul className="space-y-5">
+      <ul className="space-y-2.5">
         <MegaMenuLink href="/" onClick={onNavigate}>
           {t("nav.home")}
         </MegaMenuLink>
@@ -215,9 +220,9 @@ function MegaMenuHomeColumn({ onNavigate }: { onNavigate: () => void }) {
           {t("megaMenu.realEstate")}
         </MegaMenuLink>
       </ul>
-      <div className="border-t border-stone-200/80 pt-6">
+      <div className="pt-5">
         <MegaMenuColumnHeading title={t("megaMenu.moreLinks")} compact />
-        <ul className="mt-5 space-y-4">
+        <ul className="mt-3 space-y-2">
           <MegaMenuLink href="/villa-offers" onClick={onNavigate} subdued>
             {t("nav.offers")}
           </MegaMenuLink>
@@ -250,12 +255,12 @@ function MegaMenuCategoriesColumn({
   const t = useTranslations("layout");
 
   return (
-    <div className="space-y-8 border-t border-stone-200/80 pt-10 lg:border-t-0 lg:pt-0">
+    <div className="space-y-5 pt-2 lg:pt-0">
       <div className="flex items-end justify-between gap-4">
         <MegaMenuColumnHeading title={t("megaMenu.categoriesColumn")} />
         <button
           type="button"
-          className="rounded-full px-2 py-1 text-xs font-medium text-neutral-500 lg:hidden"
+          className="px-1 py-0.5 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-400 lg:hidden"
           aria-expanded={mobileOpen}
           onClick={onToggleMobile}
         >
@@ -263,9 +268,9 @@ function MegaMenuCategoriesColumn({
         </button>
       </div>
       <ul
-        className={`space-y-5 lg:block ${mobileOpen ? "block" : "hidden lg:block"}`}
+        className={`space-y-2 lg:block ${mobileOpen ? "block" : "hidden lg:block"}`}
       >
-        <MegaMenuLink href="/villas" onClick={onNavigate} className="text-orange-600">
+        <MegaMenuLink href="/villas" onClick={onNavigate} accent>
           {t("megaMenu.allCategories")}
         </MegaMenuLink>
         {categories.map((category) => (
@@ -276,7 +281,7 @@ function MegaMenuCategoriesColumn({
                 query: { category: category.value },
               }}
               onClick={onNavigate}
-              className="inline-block py-1.5 font-sans text-lg text-neutral-800 transition-[transform,color] hover:translate-x-1 hover:text-orange-500"
+              className="inline-block py-0.5 font-serif text-xl leading-snug text-stone-600 transition-colors hover:text-orange-600"
             >
               {category.label}
             </Link>
@@ -291,38 +296,39 @@ function MegaMenuFeaturedColumn({ onNavigate }: { onNavigate: () => void }) {
   const t = useTranslations("layout");
 
   return (
-    <div className="border-t border-stone-200/80 pt-8 lg:border-t-0 lg:pt-0">
+    <div className="pt-2 lg:pt-0">
       <Link
         href="/villas"
         onClick={onNavigate}
-        className="group block overflow-hidden rounded-[2rem] bg-stone-200 shadow-xl ring-1 ring-stone-200/90"
+        className="group block overflow-hidden border border-stone-200/90 bg-white"
       >
-        <div className="relative aspect-[3/4] w-full min-h-[400px]" style={{ aspectRatio: "3 / 4" }}>
-          <Image
-            src={FEATURED_IMAGE}
-            alt=""
-            fill
-            className="object-cover"
-            sizes="(max-width: 1024px) 100vw, 480px"
+        <div className="relative aspect-[5/4] w-full min-h-[9.5rem] overflow-hidden sm:min-h-[10.5rem] lg:min-h-[11rem]">
+          <div className="absolute inset-0 grid grid-cols-3 gap-px bg-stone-200/90">
+            {MEGA_MENU_FEATURED_IMAGES.map((src) => (
+              <div key={src} className="relative overflow-hidden bg-stone-100">
+                <Image
+                  src={src}
+                  alt=""
+                  fill
+                  className="object-cover transition duration-500 will-change-transform group-hover:scale-[1.03]"
+                  sizes="(max-width: 1024px) 33vw, 120px"
+                />
+              </div>
+            ))}
+          </div>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-20 bg-gradient-to-t from-white via-white/70 to-transparent sm:h-24"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/85 via-neutral-950/25 to-transparent" />
-          <div className="absolute inset-x-0 top-0 p-8 text-white">
-            <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-orange-300">
-              {t("megaMenu.featuredKicker")}
-            </p>
-            <p className="mt-3 font-serif text-3xl leading-tight tracking-tight lg:text-4xl">
-              {t("megaMenu.featuredEyebrow")}
-            </p>
-            <p className="mt-2 font-serif text-xl text-stone-100">{t("megaMenu.featuredPlace")}</p>
-          </div>
-          <div className="absolute inset-x-0 bottom-0 p-8">
-            <p className="font-serif text-2xl leading-tight tracking-tight text-white lg:text-3xl">
-              {t("megaMenu.featuredTitle")}
-            </p>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-stone-200">
-              {t("megaMenu.featuredBody")}
-            </p>
-          </div>
+        </div>
+        <div className="bg-white px-4 py-3 sm:px-5 sm:py-4">
+          <p className="font-serif text-[1.35rem] leading-snug tracking-tight text-stone-900">
+            {t("megaMenu.featuredTitle")}
+          </p>
+          <p className="mt-1.5 line-clamp-2 text-[0.9375rem] leading-relaxed text-stone-600">
+            {t("megaMenu.featuredBody")}
+          </p>
+          <p className="mt-2 font-serif text-lg italic text-stone-500">{t("megaMenu.featuredPlace")}</p>
         </div>
       </Link>
     </div>
@@ -337,13 +343,19 @@ function MegaMenuColumnHeading({
   compact?: boolean;
 }) {
   return (
-    <h3
-      className={`font-serif tracking-tight text-neutral-900 ${
-        compact ? "text-2xl" : "text-3xl lg:text-4xl"
-      }`}
-    >
-      {title}
-    </h3>
+    <div>
+      <h3
+        className={`font-serif font-normal tracking-[-0.02em] text-stone-900 ${
+          compact ? "text-xl" : "text-2xl lg:text-[2.125rem]"
+        }`}
+      >
+        {title}
+      </h3>
+      <div
+        aria-hidden
+        className={`bg-gradient-to-r from-stone-300/80 to-transparent ${compact ? "mt-2 h-px w-7" : "mt-2.5 h-px w-9"}`}
+      />
+    </div>
   );
 }
 
@@ -352,24 +364,28 @@ function MegaMenuLink({
   children,
   onClick,
   subdued,
+  accent,
   className,
 }: {
   href: Parameters<typeof Link>[0]["href"];
   children: ReactNode;
   onClick: () => void;
   subdued?: boolean;
+  accent?: boolean;
   className?: string;
 }) {
-  const baseLinkClass = subdued
-    ? "text-lg font-medium text-neutral-600"
-    : "text-lg font-medium text-neutral-900";
+  const baseLinkClass = accent
+    ? "text-xl text-orange-600"
+    : subdued
+      ? "text-lg text-stone-500"
+      : "text-xl text-stone-800";
 
   return (
     <li>
       <Link
         href={href}
         onClick={onClick}
-        className={`inline-block py-1.5 transition-[transform,color] hover:translate-x-1 hover:text-orange-500 ${baseLinkClass} ${className ?? ""}`}
+        className={`inline-block py-0.5 font-serif transition-colors hover:text-orange-600 ${baseLinkClass} ${className ?? ""}`}
       >
         {children}
       </Link>
