@@ -132,8 +132,10 @@
         "cta": "Meine Villa finden"
       },
       "help": {
+        "eyebrow": "Gästeservice",
         "title": "Hilfe bei der Planung?",
         "body": "Unser Team antwortet innerhalb eines Werktags, auf Deutsch, Englisch oder Russisch. Fragen Sie zu einer Villa, einem Langzeitaufenthalt oder allem, was im Inserat fehlt.",
+        "responseNote": "Antwort innerhalb eines Werktags",
         "cta": "Kontakt aufnehmen",
         "faqTitle": "Häufige Fragen",
         "questions": {
@@ -170,13 +172,15 @@
         }
       },
       "discountCta": {
-        "eyebrow": "Besserer Preis?",
-        "title": "Rabatt sichern",
-        "body": "Schreiben Sie uns auf WhatsApp mit Daten und Gästezahl — wir finden das beste Angebot.",
+        "eyebrow": "Bestpreis-Garantie",
+        "title": "Günstigeres Angebot gefunden?",
+        "body": "Senden Sie uns das Angebot einer anderen Agentur für dieselbe Villa, Zeitraum und Leistungen. Ist es günstiger, erstatten wir die Differenz — und versuchen, es zu unterbieten.",
+        "guarantee": "Der beste verfügbare Preis für jede Villa in unserer Kollektion, Sommer wie Winter — garantiert.",
         "whatsapp": "WhatsApp",
         "whatsappUrl": "https://wa.me/905551234567",
+        "whatsappCta": "Nachweis per WhatsApp",
         "phoneLabel": "Kontakt",
-        "contactCta": "Nachricht senden"
+        "contactCta": "Preisgarantie anfragen"
       },
       "footer": {
         "discoverTitle": "Entdecken",

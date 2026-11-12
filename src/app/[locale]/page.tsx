@@ -139,11 +139,11 @@ export default async function Home() {
           <WhyUsSection />
         </section>
 
-        <section className={`${sectionShell} bg-white`}>
+        <section className="w-full bg-white py-16 lg:py-20">
           <HomeDiscountCta />
         </section>
 
-        <section className={`${sectionShell} border-stone-200/50 bg-stone-50`}>
+        <section className="w-full bg-stone-50/80 py-16 lg:py-20">
           <HelpFaqSection />
         </section>
       </main>

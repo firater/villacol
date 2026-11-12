@@ -132,8 +132,10 @@
         "cta": "Find my villa"
       },
       "help": {
+        "eyebrow": "Guest services",
         "title": "Need help planning?",
         "body": "Our team answers within one working day, in English, German, or Russian. Ask about a specific villa, a long stay, or anything the listing does not cover.",
+        "responseNote": "Replies within one working day",
         "cta": "Contact us",
         "faqTitle": "Frequently asked",
         "questions": {
@@ -179,13 +181,15 @@
         }
       },
       "discountCta": {
-        "eyebrow": "Need a better rate?",
-        "title": "Get a discount",
-        "body": "Message us on WhatsApp with your dates and group size — we will match the best offer we can.",
+        "eyebrow": "Best price guarantee",
+        "title": "Found a better rate?",
+        "body": "Share the quote from another agency for the same villa, dates, and inclusions. If it is lower than ours, we reimburse the difference — and we will try to beat it when we can.",
+        "guarantee": "The best available price on any villa in our collection, summer or winter — guaranteed.",
         "whatsapp": "WhatsApp",
         "whatsappUrl": "https://wa.me/905551234567",
+        "whatsappCta": "Send proof on WhatsApp",
         "phoneLabel": "Contact us",
-        "contactCta": "Send a message"
+        "contactCta": "Claim price match"
       },
       "footer": {
         "discoverTitle": "Discover",
