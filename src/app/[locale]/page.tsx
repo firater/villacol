@@ -16,7 +16,6 @@ import { HomeVillaSectionFallback } from "@/components/home/HomeVillaSectionFall
 import { HomeBestValueFallback } from "@/components/home/HomeBestValueFallback";
 import { HomeBestValueSection } from "@/components/home/HomeBestValueSection";
 import { HomeFeaturedBestValueBridge } from "@/components/home/HomeFeaturedBestValueBridge";
-import { HomeCategoryDayToolbarSection } from "@/components/home/HomeCategoryDayToolbarSection";
 import { HomePromotionsElegantBridge } from "@/components/home/HomePromotionsElegantBridge";
 import { HomePromoOffersSection } from "@/components/home/HomePromoOffersSection";
 import { WhyUsSection } from "@/components/home/WhyUsSection";
@@ -45,18 +44,17 @@ export default async function Home() {
         <HomeExitIntent />
         <HomeHero locale={locale} />
 
-        <section className="w-full bg-white pb-16 pt-2 lg:pb-20 lg:pt-3">
+        <section className="w-full bg-white pb-8 pt-2 lg:pb-10 lg:pt-3">
           <Suspense fallback={<HomeCategoriesFallback />}>
             <HomeCategoriesSection locale={locale} />
           </Suspense>
         </section>
 
-        <HomeCategoryDayToolbarSection />
-
-        <section className="w-full bg-white py-16 lg:py-20">
+        <section className="w-full bg-white pb-16 pt-8 lg:pb-20 lg:pt-10">
           <div className={sectionInner}>
             <HomeSectionHeader
               layout="split"
+              leadingGradientRule
               kicker={t("offersKicker")}
               title={t("offersHeading")}
               subtitle={t("offersSubtitle")}
