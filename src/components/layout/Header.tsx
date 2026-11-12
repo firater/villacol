@@ -20,9 +20,10 @@ import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
 const FEATURED_IMAGE =
   "https://placehold.co/560x720/d6d3d1/44403c/png?text=+";
 
-const HEADER_COMPACT_SCROLL_Y = 50;
-/** Ignore sub-pixel / layout nudges so compact state does not oscillate. */
-const HEADER_SCROLL_DIRECTION_MIN_DELTA = 8;
+/** Expanded navbar when scroll is above this. */
+const HEADER_EXPAND_SCROLL_Y = 20;
+/** Compact navbar when scroll is below this. Between the two: keep current state. */
+const HEADER_COMPACT_SCROLL_Y = 100;
 
 type Props = {
   locale: Locale;
@@ -40,7 +41,6 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
   const menuRef = useRef<HTMLElement>(null);
   const menuToggleRef = useRef<HTMLButtonElement>(null);
   const scrollRafRef = useRef<number | null>(null);
-  const lastScrollYRef = useRef(0);
   const [isCompact, setIsCompact] = useState(false);
 
   const closeMenu = useCallback(() => {
@@ -58,29 +58,16 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
   }, [menuOpen]);
 
   useEffect(() => {
-    const applyScrollCompact = (options?: { initial?: boolean }) => {
+    const applyScrollCompact = () => {
       const scrollY = window.scrollY;
-      const previousScrollY = lastScrollYRef.current;
-      const scrollDelta = scrollY - previousScrollY;
-      lastScrollYRef.current = scrollY;
       scrollRafRef.current = null;
 
-      if (scrollY <= HEADER_COMPACT_SCROLL_Y) {
-        setIsCompact(false);
-        return;
-      }
-
-      if (options?.initial === true) {
+      if (scrollY > HEADER_COMPACT_SCROLL_Y) {
         setIsCompact(true);
         return;
       }
 
-      if (scrollDelta > HEADER_SCROLL_DIRECTION_MIN_DELTA) {
-        setIsCompact(true);
-        return;
-      }
-
-      if (scrollDelta < -HEADER_SCROLL_DIRECTION_MIN_DELTA) {
+      if (scrollY < HEADER_EXPAND_SCROLL_Y) {
         setIsCompact(false);
       }
     };
@@ -90,8 +77,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
       scrollRafRef.current = window.requestAnimationFrame(() => applyScrollCompact());
     };
 
-    lastScrollYRef.current = window.scrollY;
-    applyScrollCompact({ initial: true });
+    applyScrollCompact();
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {

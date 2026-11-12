@@ -6,11 +6,11 @@ export function HeroSearchBarFallback() {
           <div key={key} className="h-9 w-24 animate-pulse bg-zinc-200" />
         ))}
       </div>
-      <div className="grid gap-0 overflow-hidden rounded-2xl border border-stone-200/60 bg-white md:grid-cols-[1.35fr_1.85fr_0.95fr_auto] md:rounded-full">
+      <div className="grid gap-0 overflow-hidden rounded-2xl border border-stone-300/90 bg-white md:grid-cols-[1.35fr_1.85fr_0.95fr_auto] md:rounded-full">
         {[1, 2, 3].map((key) => (
           <div
             key={key}
-            className="min-h-[4.5rem] border-b border-zinc-100 px-4 py-3 md:border-b-0 md:border-r"
+            className="min-h-[4.5rem] border-b border-stone-200/90 px-4 py-3 md:border-b-0 md:border-r md:border-stone-200/90"
           >
             <div className="h-3 w-16 animate-pulse rounded bg-zinc-200" />
             <div className="mt-2 h-4 w-28 animate-pulse rounded bg-zinc-100" />

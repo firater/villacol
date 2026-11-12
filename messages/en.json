@@ -73,7 +73,10 @@
       },
       "amenityPills": {
         "aria": "Quick amenities",
-        "more": "More filters"
+        "more": "More filters",
+        "modalTitle": "Amenities",
+        "modalHint": "Tap to include or remove — your picks apply when you search.",
+        "modalDone": "Done"
       },
       "accessPassBanner": {
         "title": "Shorter stays with extra last minute discounts",
@@ -188,13 +191,15 @@
       "discountCta": {
         "eyebrow": "Best price guarantee",
         "title": "Found a better rate?",
-        "body": "Share the quote from another agency for the same villa, dates, and inclusions. If it is lower than ours, we reimburse the difference — and we will try to beat it when we can.",
+        "bodyLead": "Send us a quote from another agency for the same villa, dates, and inclusions.",
+        "bodyReimburseLine": "If their price is lower than ours, we will reimburse the difference.",
+        "bodyBeatLine": "When we can, we will try to beat the competitor's price.",
         "guarantee": "The best available price on any villa in our collection, summer or winter — guaranteed.",
         "whatsapp": "WhatsApp",
         "whatsappUrl": "https://wa.me/905551234567",
-        "whatsappCta": "Send proof on WhatsApp",
+        "whatsappCta": "Send your proof on WhatsApp",
         "phoneLabel": "Contact us",
-        "contactCta": "Claim price match"
+        "contactCta": "Claim your price match"
       },
       "footer": {
         "discoverTitle": "Discover",

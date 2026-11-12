@@ -33,9 +33,14 @@ export async function HomeFeaturedBestValueBridge({
   const t = await getTranslations(`layout.home.${preset.messageKey}`);
   const titleId = `home-section-bridge-title-${instanceId}`;
 
+  const ctaClassName =
+    preset.messageKey === "findMyVillaBridge"
+      ? "group inline-flex items-center gap-2 border border-orange-500 px-5 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-orange-600 transition hover:border-orange-600 hover:bg-orange-500 hover:text-white"
+      : "group inline-flex items-center gap-2 border border-stone-900 px-5 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-900 transition hover:bg-stone-900 hover:text-white";
+
   const shellClassName = embedded
     ? "relative border-y border-stone-200/90 py-6 lg:py-7"
-    : "relative border-y border-stone-200/90 py-7 lg:py-8";
+    : "relative border-t border-stone-200/90 py-7 lg:py-8";
 
   const inner = (
     <div className={shellClassName}>
@@ -94,7 +99,7 @@ export async function HomeFeaturedBestValueBridge({
               />
               <Link
                 href={preset.href}
-                className="group inline-flex items-center gap-2 border border-stone-900 px-5 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-900 transition hover:bg-stone-900 hover:text-white"
+                className={ctaClassName}
               >
                 {t("cta")}
                 <span

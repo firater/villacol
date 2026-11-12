@@ -31,7 +31,7 @@ export async function HelpFaqSection() {
           </p>
         </aside>
 
-        <div className="mt-12 min-w-0 lg:mt-0">
+        <div className="mt-12 min-w-0 lg:mt-0 lg:pt-5 xl:pt-6">
           <p className="mb-6 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-400">
             {t("faqTitle")}
           </p>

@@ -29,6 +29,7 @@ type Props = {
   locations: FilterFacetOption[];
   minDate: string;
   maxGuests: number;
+  selectedAmenities?: string[];
 };
 
 const VALUE_CLASS =
@@ -44,7 +45,12 @@ function formatHeroDateRange(
   return `${fmt.format(range.from)} – ${fmt.format(range.to)}`;
 }
 
-export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
+export function HeroSearchBar({
+  locations,
+  minDate,
+  maxGuests,
+  selectedAmenities = [],
+}: Props) {
   const t = useTranslations("layout.home.search");
   const locale = useLocale();
   const router = useRouter();
@@ -165,6 +171,8 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
       check_in: checkIn === "" ? undefined : checkIn,
       check_out: checkOut === "" ? undefined : checkOut,
       guests: guests === "" ? undefined : guests,
+      amenities:
+        selectedAmenities.length > 0 ? selectedAmenities : undefined,
     });
     const query = Object.fromEntries(buildVillaFilterQuery(filters).entries());
 
@@ -184,7 +192,7 @@ export function HeroSearchBar({ locations, minDate, maxGuests }: Props) {
       <form
         onSubmit={handleSubmit}
         aria-label={t("title")}
-        className="hero-search-bar flex w-full flex-col gap-0 overflow-visible rounded-2xl border border-stone-200/60 bg-white md:flex-row md:items-stretch md:rounded-full md:p-2"
+        className="hero-search-bar flex w-full flex-col gap-0 overflow-visible rounded-2xl border border-stone-300/90 bg-white md:flex-row md:items-stretch md:rounded-full md:p-2"
       >
         <Field
           ref={locationRef}
@@ -410,7 +418,7 @@ const Field = forwardRef<
       }
       role={asButton ? "button" : undefined}
       tabIndex={isActivatable ? 0 : undefined}
-      className={`flex min-h-[4.5rem] flex-col justify-center border-b border-neutral-100 px-4 py-3 transition-colors md:min-h-0 md:border-b-0 md:border-r md:border-neutral-100 md:px-6 md:py-4 ${
+      className={`flex min-h-[4.5rem] flex-col justify-center border-b border-stone-200/90 px-4 py-3 transition-colors md:min-h-0 md:border-b-0 md:border-r md:border-stone-200/90 md:px-6 md:py-4 ${
         interactive ? "cursor-pointer hover:bg-stone-50/90" : ""
       } ${className ?? "min-w-0 flex-1"}`}
       {...a11y}

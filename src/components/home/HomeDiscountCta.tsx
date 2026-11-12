@@ -1,3 +1,4 @@
+import { Image as ImageIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
@@ -12,40 +13,36 @@ export async function HomeDiscountCta() {
           {t("eyebrow")}
         </p>
 
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end lg:gap-16">
-          <div className="min-w-0 max-w-3xl">
-            <h2 className="font-serif text-[clamp(2.35rem,5.8vw,4rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900">
-              {t("title")}
-            </h2>
-            <p className="mt-5 max-w-xl font-sans text-[15px] leading-[1.7] text-stone-600">
-              {t("body")}
-            </p>
-            <p className="mt-4 max-w-xl font-serif text-[clamp(1.05rem,2vw,1.25rem)] font-normal italic leading-snug text-stone-800">
-              {t("guarantee")}
-            </p>
-          </div>
-
-          <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-end">
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center bg-stone-900 px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-stone-800"
-            >
-              {t("contactCta")}
-            </Link>
+        <div className="min-w-0 max-w-3xl">
+          <h2 className="font-serif text-[clamp(2.35rem,5.8vw,4rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900">
+            {t("title")}
+          </h2>
+            <div className="mt-5 max-w-xl space-y-0 font-serif tracking-[-0.02em] text-stone-700">
+              <p className="text-[clamp(1rem,1.85vw,1.2rem)] font-normal leading-[1.65]">
+                {t("bodyLead")}
+              </p>
+              <p className="mt-5 text-[clamp(1.1rem,2.25vw,1.42rem)] font-normal leading-[1.65] lg:mt-6">
+                {t("bodyReimburseLine")}
+                <br />
+                {t("bodyBeatLine")}
+              </p>
+            </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <a
               href={t("whatsappUrl")}
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-2 border border-stone-900 px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-900 transition hover:bg-stone-900 hover:text-white"
+              className="group inline-flex w-full items-center justify-center gap-2 border border-stone-900 px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-900 transition hover:bg-stone-900 hover:text-white sm:w-auto"
             >
               {t("whatsappCta")}
-              <span
-                aria-hidden
-                className="text-xs font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
-              >
-                →
-              </span>
+              <ImageIcon className="size-3.5 shrink-0" aria-hidden strokeWidth={1.75} />
             </a>
+            <Link
+              href="/contact"
+              className="inline-flex w-full items-center justify-center bg-orange-500 px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-orange-600 sm:w-auto"
+            >
+              {t("contactCta")}
+            </Link>
           </div>
         </div>
       </div>

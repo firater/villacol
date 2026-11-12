@@ -129,11 +129,11 @@ export default async function Home() {
           <WhyUsSection />
         </section>
 
-        <section className="w-full bg-white py-16 lg:py-20">
+        <section className="w-full bg-white pb-14 pt-16 lg:pb-16 lg:pt-20">
           <HomeDiscountCta />
         </section>
 
-        <section className="w-full bg-stone-50/80 py-16 lg:py-20">
+        <section className="w-full bg-white pb-16 pt-12 lg:pb-20 lg:pt-14">
           <HelpFaqSection />
         </section>
 

@@ -74,14 +74,14 @@ export async function WhyUsSection() {
         })}
       </ul>
 
-      <div className="mt-14 flex flex-col items-center gap-3 text-center lg:mt-16">
+      <div className="mx-auto mt-14 max-w-xl border border-orange-300/85 bg-orange-50/35 px-8 py-8 text-center shadow-[inset_0_1px_0_0_rgba(251,146,60,0.12)] lg:mt-16 lg:px-10 lg:py-9">
         <p className="font-serif text-[clamp(1.25rem,2.5vw,1.5rem)] font-normal text-stone-900">
           {t("trustPillTitle")}
         </p>
-        <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-500">
+        <p className="mt-2 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-600">
           {t("trustPillSubtitle")}
         </p>
-        <p className="mx-auto mt-4 max-w-xl font-sans text-sm leading-relaxed text-stone-600">
+        <p className="mx-auto mt-4 font-sans text-sm leading-relaxed text-stone-600">
           {t("trustBadge")}
         </p>
       </div>
