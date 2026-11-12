@@ -21,6 +21,8 @@ const FEATURED_IMAGE =
   "https://placehold.co/560x720/d6d3d1/44403c/png?text=+";
 
 const HEADER_COMPACT_SCROLL_Y = 50;
+/** Ignore sub-pixel / layout nudges so compact state does not oscillate. */
+const HEADER_SCROLL_DIRECTION_MIN_DELTA = 8;
 
 type Props = {
   locale: Locale;
@@ -38,6 +40,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
   const menuRef = useRef<HTMLElement>(null);
   const menuToggleRef = useRef<HTMLButtonElement>(null);
   const scrollRafRef = useRef<number | null>(null);
+  const lastScrollYRef = useRef(0);
   const [isCompact, setIsCompact] = useState(false);
 
   const closeMenu = useCallback(() => {
@@ -55,17 +58,40 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
   }, [menuOpen]);
 
   useEffect(() => {
-    const syncCompact = () => {
-      setIsCompact(window.scrollY > HEADER_COMPACT_SCROLL_Y);
+    const applyScrollCompact = (options?: { initial?: boolean }) => {
+      const scrollY = window.scrollY;
+      const previousScrollY = lastScrollYRef.current;
+      const scrollDelta = scrollY - previousScrollY;
+      lastScrollYRef.current = scrollY;
       scrollRafRef.current = null;
+
+      if (scrollY <= HEADER_COMPACT_SCROLL_Y) {
+        setIsCompact(false);
+        return;
+      }
+
+      if (options?.initial === true) {
+        setIsCompact(true);
+        return;
+      }
+
+      if (scrollDelta > HEADER_SCROLL_DIRECTION_MIN_DELTA) {
+        setIsCompact(true);
+        return;
+      }
+
+      if (scrollDelta < -HEADER_SCROLL_DIRECTION_MIN_DELTA) {
+        setIsCompact(false);
+      }
     };
 
     const onScroll = () => {
       if (scrollRafRef.current !== null) return;
-      scrollRafRef.current = window.requestAnimationFrame(syncCompact);
+      scrollRafRef.current = window.requestAnimationFrame(() => applyScrollCompact());
     };
 
-    syncCompact();
+    lastScrollYRef.current = window.scrollY;
+    applyScrollCompact({ initial: true });
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
@@ -126,7 +152,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
 
             <Link
               href="/find-villa"
-              className="hidden font-serif text-lg tracking-wide text-neutral-800 hover:text-orange-500 sm:inline-block"
+              className="hidden font-serif text-lg font-semibold tracking-wide text-stone-950 hover:text-stone-800 sm:inline-block"
             >
               {t("nav.findVilla")}
             </Link>
@@ -134,15 +160,15 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
             <button
               ref={menuToggleRef}
               type="button"
-              className="inline-flex items-center gap-2 border border-stone-200 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80"
+              className="inline-flex items-center gap-2 border border-stone-900 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-stone-900 hover:bg-stone-50/80"
               aria-expanded={menuOpen}
               aria-controls={menuId}
               onClick={toggleMenu}
             >
               {menuOpen ? (
-                <CloseMenuIcon className="h-4 w-4 text-neutral-600" />
+                <CloseMenuIcon className="h-4 w-4 text-stone-700" />
               ) : (
-                <HamburgerIcon className="h-4 w-4 text-neutral-600" />
+                <HamburgerIcon className="h-4 w-4 text-stone-700" />
               )}
               <span>{t("megaMenu.label")}</span>
             </button>
@@ -155,9 +181,9 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
 
             <Link
               href="/contact"
-              className="hidden items-center gap-2 border border-stone-200 bg-white px-4 py-2.5 font-serif text-base tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80 xl:inline-flex"
+              className="hidden items-center gap-2 px-4 py-2.5 font-serif text-base tracking-wide text-stone-900 transition-colors hover:text-stone-950 xl:inline-flex"
             >
-              <ChatIcon className="h-4 w-4 text-neutral-500" />
+              <ChatIcon className="h-4 w-4 text-stone-700" />
               {t("nav.contact")}
             </Link>
           </div>

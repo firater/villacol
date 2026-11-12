@@ -192,6 +192,9 @@ export function VillaCard({
           location={location}
           capacity={capacity}
           bedrooms={bedrooms}
+          bathrooms={bathrooms}
+          promoStatLabels={promoStatLabels}
+          priceMain={priceMain}
           stayLabel={stayLabel}
           viewLabel={viewLabel}
           displayNightly={displayNightly}
@@ -449,6 +452,9 @@ function RecommendedCardBody({
   location,
   capacity,
   bedrooms,
+  bathrooms,
+  promoStatLabels,
+  priceMain,
   stayLabel,
   viewLabel,
   displayNightly,
@@ -458,6 +464,9 @@ function RecommendedCardBody({
   location: string | null;
   capacity: number;
   bedrooms: number;
+  bathrooms: number;
+  promoStatLabels?: VillaCardProps["promoStatLabels"];
+  priceMain: string;
   stayLabel: string | null;
   viewLabel: string;
   displayNightly: string;
@@ -471,9 +480,25 @@ function RecommendedCardBody({
         {displayNightly}
         <span className="font-sans text-sm text-stone-500"> {perNightLabel}</span>
       </p>
-      <RecommendedStats capacity={capacity} bedrooms={bedrooms} />
+      <RecommendedStats
+        capacity={capacity}
+        bedrooms={bedrooms}
+        bathrooms={bathrooms}
+        promoStatLabels={promoStatLabels}
+      />
       <div className="mt-6 flex items-center justify-between gap-4">
-        <p className="min-w-0 flex-1 text-xs text-stone-500">{stayLabel ?? "\u00A0"}</p>
+        <p className="min-w-0 flex-1 text-xs leading-snug text-stone-500">
+          {stayLabel ? (
+            <span className="inline-flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+              {priceMain !== "—" ? (
+                <span className="font-sans text-sm font-semibold text-stone-900">{priceMain}</span>
+              ) : null}
+              <span>{stayLabel}</span>
+            </span>
+          ) : (
+            "\u00A0"
+          )}
+        </p>
         <span className="shrink-0 bg-stone-900 px-6 py-2.5 font-sans text-xs text-white">{viewLabel}</span>
       </div>
     </div>
@@ -499,11 +524,66 @@ function PromoTitleRow({
   );
 }
 
-function RecommendedStats({ capacity, bedrooms }: { capacity: number; bedrooms: number }) {
+function RecommendedStats({
+  capacity,
+  bedrooms,
+  bathrooms,
+  promoStatLabels,
+}: {
+  capacity: number;
+  bedrooms: number;
+  bathrooms: number;
+  promoStatLabels?: VillaCardProps["promoStatLabels"];
+}) {
+  if (promoStatLabels) {
+    return (
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 border-y border-neutral-100 py-3">
+        <RecommendedStatItem
+          icon={Users}
+          value={capacity}
+          label={promoStatLabels.guests}
+          ariaLabel={`${capacity} ${promoStatLabels.guests}`}
+        />
+        <RecommendedStatItem
+          icon={BedDouble}
+          value={bedrooms}
+          label={promoStatLabels.bedrooms}
+          ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
+        />
+        <RecommendedStatItem
+          icon={Bath}
+          value={bathrooms}
+          label={promoStatLabels.bathrooms}
+          ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 gap-4 border-y border-neutral-100 py-3 text-xs font-black">
       <span>{capacity}</span>
       <span>{bedrooms}</span>
+    </div>
+  );
+}
+
+function RecommendedStatItem({
+  icon: Icon,
+  value,
+  label,
+  ariaLabel,
+}: {
+  icon: LucideIcon;
+  value: number;
+  label: string;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="flex items-center gap-1.5" aria-label={ariaLabel}>
+      <Icon className="size-3.5 shrink-0 text-stone-400" strokeWidth={1.75} aria-hidden />
+      <span className="text-sm font-semibold tabular-nums text-stone-800">{value}</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-stone-500">{label}</span>
     </div>
   );
 }

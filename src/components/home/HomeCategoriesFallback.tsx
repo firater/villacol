@@ -1,6 +1,10 @@
 export function HomeCategoriesFallback() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden>
+      <div className="mb-10 flex justify-between border-y border-solid border-stone-300/80 py-5 lg:mb-12">
+        <div className="h-8 w-56 animate-pulse bg-stone-200/80" />
+        <div className="h-4 w-28 animate-pulse bg-stone-200/60" />
+      </div>
       <header className="mb-12 lg:mb-16">
         <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="space-y-4">
@@ -12,10 +16,6 @@ export function HomeCategoriesFallback() {
             <div className="size-11 animate-pulse border border-stone-300 bg-stone-100" />
             <div className="size-11 animate-pulse border border-stone-300 bg-stone-100" />
           </div>
-        </div>
-        <div className="mt-10 flex justify-between border-y border-stone-200/45 py-5">
-          <div className="h-8 w-56 animate-pulse bg-stone-200/80" />
-          <div className="h-4 w-28 animate-pulse bg-stone-200/60" />
         </div>
       </header>
       <ul className="no-scrollbar flex gap-5 overflow-hidden sm:gap-6">

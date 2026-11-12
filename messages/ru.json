@@ -46,7 +46,7 @@
       "exclusiveSeal": "Эксклюзив",
       "categoriesHeading": "Категории",
       "categoriesSubtitle": "Бронируйте без комиссии в категории дня.",
-      "categoriesBestPriceGuarantee": "Гарантия лучшей цены",
+      "categoriesBestPriceGuarantee": "Без комиссии агентства",
       "categoriesBrowse": "Смотреть",
       "categoriesCardExplore": "Смотреть",
       "categoriesEditorsChoice": "Выбор редакции",
@@ -77,6 +77,7 @@
       },
       "accessPassBanner": {
         "title": "Shorter stays with extra last minute discounts",
+        "promotionsTitle": "All stackable promotions and coupon codes.",
         "exploreCta": "Explore now"
       },
       "offersKicker": "Сезон",
@@ -102,6 +103,23 @@
       "offersHeading": "Акции",
       "offersSubtitle": "Скидки уже в цене. Без промокодов.",
       "offersEmpty": "Сейчас активных предложений нет. Новые скидки появляются каждый сезон.",
+      "featuredBestValueBridge": {
+        "kicker": "Между разделами",
+        "title": "Когда акция закончится, выгода останется.",
+        "body": "Спецтарифы сменяются. Виллы best value сохраняют простор, бассейн и вид — изо дня в день.",
+        "cta": "Смотреть виллы"
+      },
+      "findMyVillaBridge": {
+        "kicker": "Личный консьерж",
+        "title": "Не уверены, какая вилла ваша?",
+        "body": "Четыре коротких вопроса — кто едет, какое настроение и бюджет — и мы предложим три подходящие виллы.",
+        "cta": "Подобрать виллу"
+      },
+      "promotionsElegantBridge": {
+        "kicker": "Ваше окно",
+        "title": "Сезонные цены — на карточках вилл ниже.",
+        "cta": "Все предложения"
+      },
       "bestValueHeading": "Лучшая цена",
       "bestValueSubtitle": "Максимум простора, бассейна и вида за стоимость ночи.",
       "bestValueEmpty": "Подборка пока не опубликована.",
@@ -140,7 +158,8 @@
       "whyUs": {
         "eyebrow": "Наши преимущества",
         "title": "Почему Villa Collection?",
-        "subtitle": "Отдых не обязан быть дорогим — мы это гарантируем.",
+        "subtitle": "Что видите — то и получаете!",
+        "chatCta": "Напишите нам в чат прямо сейчас",
         "trustPillTitle": "Проверенная коллекция",
         "trustPillSubtitle": "Виллы с проверкой · Цены в EUR",
         "trustBadge": "Эксперты по виллам · Честные цены в вашей валюте",

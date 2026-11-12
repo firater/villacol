@@ -50,14 +50,14 @@ export function LocaleCurrencyDropdown({ locale, currency }: Props) {
       <button
         ref={toggleRef}
         type="button"
-        className="inline-flex items-center gap-2.5 border border-stone-200 bg-white px-4 py-2.5 font-sans text-sm tracking-wide text-neutral-800 hover:border-stone-300 hover:bg-stone-50/80"
+        className="inline-flex items-center gap-2.5 px-4 py-2.5 font-sans text-sm tracking-wide text-stone-900 transition-colors hover:text-stone-950"
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
       >
-        <GlobeIcon className="size-4 text-neutral-500" />
+        <GlobeIcon className="size-4 text-stone-700" />
         <span className="font-medium">{triggerLabel}</span>
-        <ChevronIcon className="size-3.5 text-neutral-400" />
+        <ChevronIcon className="size-3.5 text-stone-600" />
       </button>
 
       {open ? (

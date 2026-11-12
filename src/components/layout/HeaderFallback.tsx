@@ -9,11 +9,11 @@ export function HeaderFallback() {
           <div className="flex items-center gap-6">
             <div className="h-8 w-36 animate-pulse rounded bg-neutral-200" />
             <div className="hidden h-6 w-28 animate-pulse rounded bg-neutral-100 sm:block" />
-            <div className="h-10 w-24 animate-pulse border border-neutral-200 bg-neutral-50" />
+            <div className="h-10 w-24 animate-pulse border border-stone-900 bg-neutral-50" />
           </div>
           <div className="ms-auto flex gap-6">
-            <div className="h-10 w-[7.5rem] animate-pulse border border-neutral-200 bg-neutral-50" />
-            <div className="size-10 animate-pulse border border-neutral-200 bg-neutral-50" />
+            <div className="h-10 w-[7.5rem] animate-pulse bg-neutral-100" />
+            <div className="h-10 w-24 animate-pulse bg-neutral-100" />
           </div>
         </div>
       </div>

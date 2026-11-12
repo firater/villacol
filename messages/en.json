@@ -46,7 +46,7 @@
       "exclusiveSeal": "Exclusive offers",
       "categoriesHeading": "Categories",
       "categoriesSubtitle": "Book completely commission-free at the category of the day.",
-      "categoriesBestPriceGuarantee": "Best price guarantee",
+      "categoriesBestPriceGuarantee": "Zero agency commission guarantee",
       "categoriesBrowse": "Explore",
       "categoriesCardExplore": "Explore",
       "categoriesEditorsChoice": "Editor's choice villas",
@@ -77,6 +77,7 @@
       },
       "accessPassBanner": {
         "title": "Shorter stays with extra last minute discounts",
+        "promotionsTitle": "All stackable promotions and coupon codes.",
         "exploreCta": "Explore now"
       },
       "offersKicker": "Seasonal",
@@ -102,6 +103,23 @@
       "offersHeading": "Promotions",
       "offersSubtitle": "Live discounts applied. No codes needed.",
       "offersEmpty": "No offers are running right now. New discounts are published every season.",
+      "featuredBestValueBridge": {
+        "kicker": "Between chapters",
+        "title": "When the offer ends, the value stays.",
+        "body": "Special rates come and go. Best-value villas keep the generous space, pool, and view — night after night.",
+        "cta": "Explore villas"
+      },
+      "findMyVillaBridge": {
+        "kicker": "Personal concierge",
+        "title": "Not sure which villa is yours?",
+        "body": "Answer four short questions — who is travelling, the mood you want, and your budget — and we will suggest three villas that fit.",
+        "cta": "Find my villa"
+      },
+      "promotionsElegantBridge": {
+        "kicker": "Your window",
+        "title": "Seasonal rates, live on every villa card below.",
+        "cta": "All offers"
+      },
       "bestValueHeading": "Best value",
       "bestValueSubtitle": "The most generous space, pool, and view for the nightly rate.",
       "bestValueEmpty": "No best-value picks are published yet.",
@@ -140,7 +158,8 @@
       "whyUs": {
         "eyebrow": "Our advantages",
         "title": "Why Villa Collection?",
-        "subtitle": "A great holiday does not have to be overpriced — we stand by that.",
+        "subtitle": "What you see is what you get!",
+        "chatCta": "Connect and chat live now",
         "trustPillTitle": "Verified collection",
         "trustPillSubtitle": "Hand-checked villas · Clear EUR pricing",
         "trustBadge": "Trusted villa experts · Clear pricing in your currency",

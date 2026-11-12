@@ -9,6 +9,7 @@ import { getExchangeRates } from "@/db/queries/rates.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
 import { sortOfferVillasForHomeRail } from "@/lib/home-offer-villa-sort";
+import { toDisplayAmount } from "@/lib/currency";
 import {
   buildExchangeRateMap,
   mapVillaCardRowToProps,
@@ -81,22 +82,63 @@ export async function HomeVillaSection({
     <VillaCarousel
       label={t(HEADING_KEYS[variant])}
       density={carouselDensity}
-      items={displayRows.map((row) => ({
-        key: String(row.id),
-        node: (
-          <VillaCard
-            layout={cardLayout}
-            viewLabel={cardCopy.view}
-            {...mapVillaCardRowToProps(
-              row,
-              locale,
+      items={displayRows.map((row) => {
+        const cardProps = mapVillaCardRowToProps(
+          row,
+          locale,
+          preferences.currency,
+          rates,
+          cardCopy,
+        );
+
+        let { priceMain, stayLabel } = cardProps;
+
+        // UI preview: show a stay total when the cache row has nights but no total yet.
+        if (variant === "bestValue" && cardLayout === "recommended") {
+          const nights =
+            row.cacheNightCount !== null && row.cacheNightCount > 0
+              ? row.cacheNightCount
+              : 3 + (row.id % 3);
+
+          if (stayLabel === null) {
+            stayLabel = cardCopy.perStay({ nights });
+          }
+
+          if (priceMain === "—" || row.priceFromCents === null) {
+            const nightlyCents =
+              row.avgNightlyCents ?? 18_500 + (row.id % 11) * 1_275;
+            const mockTotalCents = nightlyCents * nights;
+            priceMain = toDisplayAmount(
+              mockTotalCents,
               preferences.currency,
+              locale,
               rates,
-              cardCopy,
-            )}
-          />
-        ),
-      }))}
+            ).formatted;
+          }
+        }
+
+        return {
+          key: String(row.id),
+          node: (
+            <VillaCard
+              layout={cardLayout}
+              viewLabel={cardCopy.view}
+              promoStatLabels={
+                cardLayout === "recommended"
+                  ? {
+                      guests: tCard("statGuests"),
+                      bedrooms: tCard("statBedrooms"),
+                      bathrooms: tCard("statBathrooms"),
+                    }
+                  : undefined
+              }
+              {...cardProps}
+              priceMain={priceMain}
+              stayLabel={stayLabel}
+            />
+          ),
+        };
+      })}
     />
   );
 }

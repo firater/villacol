@@ -14,6 +14,9 @@ import { HomeSectionHeader } from "@/components/home/HomeSectionHeader";
 import { HomeVillaSection } from "@/components/home/HomeVillaSection";
 import { HomeVillaSectionFallback } from "@/components/home/HomeVillaSectionFallback";
 import { AccessPassBanner } from "@/components/home/AccessPassBanner";
+import { HomeFeaturedBestValueBridge } from "@/components/home/HomeFeaturedBestValueBridge";
+import { HomeCategoryDayToolbarSection } from "@/components/home/HomeCategoryDayToolbarSection";
+import { HomePromotionsElegantBridge } from "@/components/home/HomePromotionsElegantBridge";
 import { HomePromoOffersSection } from "@/components/home/HomePromoOffersSection";
 import { WhyUsSection } from "@/components/home/WhyUsSection";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -41,13 +44,13 @@ export default async function Home() {
         <HomeExitIntent />
         <HomeHero locale={locale} />
 
-        <section className="w-full bg-white py-16 lg:py-20">
+        <section className="w-full bg-white pb-16 pt-2 lg:pb-20 lg:pt-3">
           <Suspense fallback={<HomeCategoriesFallback />}>
             <HomeCategoriesSection locale={locale} />
           </Suspense>
         </section>
 
-        <AccessPassBanner />
+        <HomeCategoryDayToolbarSection />
 
         <section className="w-full bg-white py-16 lg:py-20">
           <div className={sectionInner}>
@@ -79,7 +82,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <AccessPassBanner />
+        <HomePromotionsElegantBridge />
 
         <section className="w-full bg-white py-16 lg:py-20">
           <div className={sectionInner}>
@@ -115,7 +118,9 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className={`${sectionShell} bg-white`}>
+        <AccessPassBanner />
+
+        <section className="w-full bg-white py-16 lg:py-20">
           <div className={sectionInner}>
             <HomeSectionHeader
               kicker={t("bestValueKicker")}
@@ -128,7 +133,9 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className={`${sectionShell} bg-stone-50`} aria-labelledby="home-advantages-title">
+        <HomeFeaturedBestValueBridge instanceId="featured-best-value" />
+
+        <section className="w-full bg-white py-16 lg:py-20" aria-labelledby="home-advantages-title">
           <WhyUsSection />
         </section>
 

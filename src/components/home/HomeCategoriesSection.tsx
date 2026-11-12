@@ -6,12 +6,9 @@ import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
 import { buildExchangeRateMap } from "@/lib/villa-listing-cards";
 
+import { HomeFeaturedBestValueBridge } from "./HomeFeaturedBestValueBridge";
 import { HomeCategoriesCarousel } from "./HomeCategoriesCarousel";
-import {
-  HOME_CATEGORIES_MOCK,
-  HOME_CATEGORY_OF_THE_DAY_INDEX,
-  HOME_EDITORS_CHOICE_LEAD,
-} from "./homeCategoriesMock";
+import { HOME_CATEGORIES_MOCK, HOME_EDITORS_CHOICE_LEAD } from "./homeCategoriesMock";
 
 type Props = {
   locale: Locale;
@@ -49,15 +46,15 @@ export async function HomeCategoriesSection({ locale }: Props) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mb-8 lg:mb-10">
+        <HomeFeaturedBestValueBridge instanceId="categories" embedded />
+      </div>
+
       <HomeCategoriesCarousel
         editorsChoice={editorsChoice}
         categories={categories}
         heading={t("categoriesHeading")}
         subtitle={t("categoriesSubtitle")}
-        categoryOfTheDayLabel={t("categoriesOfTheDay")}
-        categoryOfTheDayName={categories[HOME_CATEGORY_OF_THE_DAY_INDEX]?.label ?? ""}
-        bestPriceGuaranteeLabel={t("categoriesBestPriceGuarantee")}
-        viewAllLabel={t("viewAllVillas")}
         locale={locale}
       />
     </div>

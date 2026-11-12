@@ -38,14 +38,9 @@ type Props = {
   categories: readonly HomeCategoryCarouselItem[];
   heading: string;
   subtitle: string;
-  categoryOfTheDayLabel: string;
-  categoryOfTheDayName: string;
-  bestPriceGuaranteeLabel: string;
-  viewAllLabel: string;
   locale: Locale;
 };
 
-const HIGHLIGHT_DURATION_MS = 2_800;
 /** Card width (256px) + gap-6. */
 const SCROLL_STEP_PX = 280;
 
@@ -57,18 +52,12 @@ export function HomeCategoriesCarousel({
   categories,
   heading,
   subtitle,
-  categoryOfTheDayLabel,
-  categoryOfTheDayName,
-  bestPriceGuaranteeLabel,
-  viewAllLabel,
   locale,
 }: Props) {
   const t = useTranslations("layout.home");
   const railRef = useRef<HTMLUListElement>(null);
-  const categoryOfDayCardRef = useRef<HTMLLIElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
-  const [highlightCategoryOfDay, setHighlightCategoryOfDay] = useState(false);
   const [sectionDateLabel, setSectionDateLabel] = useState("");
   const exploreLabel = t("categoriesCardExplore");
 
@@ -109,27 +98,11 @@ export function HomeCategoriesCarousel({
     (_, index) => index !== HOME_CATEGORY_OF_THE_DAY_INDEX,
   );
 
-  const focusCategoryOfDay = useCallback(() => {
-    if (!categoryOfTheDay) return;
-    categoryOfDayCardRef.current?.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest",
-    });
-    setHighlightCategoryOfDay(true);
-  }, [categoryOfTheDay]);
-
-  useEffect(() => {
-    if (!highlightCategoryOfDay) return;
-    const timeoutId = window.setTimeout(() => setHighlightCategoryOfDay(false), HIGHLIGHT_DURATION_MS);
-    return () => window.clearTimeout(timeoutId);
-  }, [highlightCategoryOfDay]);
-
   const villaCountBadge = (count: number) => t("categoriesVillaCount", { count });
 
   return (
     <div>
-      <header className="mb-12 lg:mb-16">
+      <header className="mb-8 lg:mb-10">
         <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
           <div>
             <p
@@ -159,36 +132,6 @@ export function HomeCategoriesCarousel({
             />
           </div>
         </div>
-
-        <div className="mt-10 flex flex-col gap-5 border-y border-stone-200/45 py-5 sm:flex-row sm:items-center sm:justify-between">
-          {categoryOfTheDay ? (
-            <button
-              type="button"
-              onClick={focusCategoryOfDay}
-              className="group flex flex-col gap-1 text-left sm:flex-row sm:items-center sm:gap-4"
-              aria-label={`${categoryOfTheDayLabel} ${categoryOfTheDayName}`}
-            >
-              <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-500">
-                {categoryOfTheDayLabel}
-              </span>
-              <span className="font-serif text-2xl text-stone-900 transition group-hover:text-brand">
-                {categoryOfTheDayName}
-              </span>
-              <span className="hidden h-4 w-px bg-stone-300 sm:block" aria-hidden />
-              <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-stone-500">
-                {bestPriceGuaranteeLabel}
-              </span>
-            </button>
-          ) : (
-            <span />
-          )}
-          <Link
-            href="/villas"
-            className="shrink-0 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-900 underline-offset-4 transition hover:text-brand hover:underline"
-          >
-            {viewAllLabel}
-          </Link>
-        </div>
       </header>
 
       <ul
@@ -209,7 +152,7 @@ export function HomeCategoriesCarousel({
           />
         </li>
         {categoryOfTheDay ? (
-          <li key={categoryOfTheDay.slug} ref={categoryOfDayCardRef} className="flex shrink-0 snap-start">
+          <li key={categoryOfTheDay.slug} className="flex shrink-0 snap-start">
             <CategoryCarouselCard
               href={{ pathname: "/villas", query: { category: categoryOfTheDay.slug } }}
               label={categoryOfTheDay.label}
@@ -219,7 +162,6 @@ export function HomeCategoriesCarousel({
               isGoodDeal={categoryOfTheDay.isGoodDeal}
               exploreLabel={exploreLabel}
               variant="day"
-              highlighted={highlightCategoryOfDay}
             />
           </li>
         ) : null}

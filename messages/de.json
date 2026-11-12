@@ -46,7 +46,7 @@
       "exclusiveSeal": "Exklusive Angebote",
       "categoriesHeading": "Kategorien",
       "categoriesSubtitle": "Buchen Sie provisionsfrei bei der Kategorie des Tages.",
-      "categoriesBestPriceGuarantee": "Bestpreisgarantie",
+      "categoriesBestPriceGuarantee": "Keine Maklerprovision",
       "categoriesBrowse": "Entdecken",
       "categoriesCardExplore": "Entdecken",
       "categoriesEditorsChoice": "Villen der Redaktion",
@@ -77,6 +77,7 @@
       },
       "accessPassBanner": {
         "title": "Shorter stays with extra last minute discounts",
+        "promotionsTitle": "All stackable promotions and coupon codes.",
         "exploreCta": "Explore now"
       },
       "offersKicker": "Saison",
@@ -102,6 +103,23 @@
       "offersHeading": "Aktionen",
       "offersSubtitle": "Live-Rabatte inklusive. Keine Codes nötig.",
       "offersEmpty": "Derzeit laufen keine Angebote. Neue Rabatte erscheinen jede Saison.",
+      "featuredBestValueBridge": {
+        "kicker": "Zwischen den Kapiteln",
+        "title": "Wenn das Angebot endet, bleibt der Wert.",
+        "body": "Sondertarife wechseln. Best-Value-Villen behalten großzügigen Raum, Pool und Aussicht — Nacht für Nacht.",
+        "cta": "Villen entdecken"
+      },
+      "findMyVillaBridge": {
+        "kicker": "Persönlicher Concierge",
+        "title": "Noch unsicher, welche Villa zu Ihnen passt?",
+        "body": "Vier kurze Fragen — wer reist mit, welche Stimmung Sie suchen und Ihr Budget — und wir schlagen drei passende Villen vor.",
+        "cta": "Villa finden"
+      },
+      "promotionsElegantBridge": {
+        "kicker": "Ihr Zeitfenster",
+        "title": "Saisonale Preise — live auf jeder Villa unten.",
+        "cta": "Alle Angebote"
+      },
       "bestValueHeading": "Bestes Preis-Leistungs-Verhältnis",
       "bestValueSubtitle": "Am meisten Platz, Pool und Aussicht für den Nächtigungspreis.",
       "bestValueEmpty": "Noch keine Empfehlungen veröffentlicht.",
@@ -140,7 +158,8 @@
       "whyUs": {
         "eyebrow": "Unsere Vorteile",
         "title": "Warum Villa Collection?",
-        "subtitle": "Guter Urlaub muss nicht teuer sein — das garantieren wir.",
+        "subtitle": "Was Sie sehen, ist was Sie bekommen!",
+        "chatCta": "Jetzt verbinden und live chatten",
         "trustPillTitle": "Geprüfte Kollektion",
         "trustPillSubtitle": "Vor-Ort-Check · Klare EUR-Preise",
         "trustBadge": "Verlässliche Villa-Experten · Klare Preise in Ihrer Währung",

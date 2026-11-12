@@ -17,7 +17,7 @@ export async function HomeDailyPromo() {
           aria-hidden
         />
         <div className="absolute inset-0 flex max-w-[70%] flex-col justify-center p-8">
-          <p className="font-serif text-xl text-white">{t("title")}</p>
+          <p className="font-sans text-xl font-medium text-white">{t("title")}</p>
           <p className="mt-1 font-sans text-xs leading-relaxed text-white/85">{t("body")}</p>
         </div>
         <span className="absolute top-2/6 right-0 z-10 flex -translate-y-1/2 items-center gap-2 bg-white px-6 py-4 font-sans text-[10px] font-bold tracking-wide text-stone-900 uppercase">
