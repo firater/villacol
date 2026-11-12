@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import type { Locale } from "@/lib/locales";
 
 import { HomeHeroBackdrop } from "./HomeHeroBackdrop";
+import { HeroImageFrame } from "./HeroImageFrame";
 import { HeroSearchBarFallback } from "./HeroSearchBarFallback";
 import { HeroSearchGate } from "./HeroSearchGate";
 
@@ -25,12 +26,15 @@ export async function HomeHero({ locale }: Props) {
   const t = await getTranslations("layout.home");
 
   return (
-    <section className="relative flex w-full flex-col pb-20 pt-12 sm:pt-14 sm:pb-28 lg:pb-36 lg:pt-16">
+    <section className="relative flex w-full flex-col pb-12 pt-12 sm:pt-14 lg:pt-16">
       <HomeHeroBackdrop />
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col overflow-visible px-4 sm:px-6 lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-x-10 lg:px-8 xl:gap-x-12">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col overflow-visible px-4 sm:px-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-10 lg:px-8 xl:gap-x-12">
         <div className="relative z-10 flex w-full min-w-0 flex-col items-start pb-4 lg:pe-2 xl:pe-4">
-          <header className="w-full max-w-3xl pr-[30px] text-left lg:max-w-none lg:pr-10">
+          <header
+            id="home-hero-header"
+            className="w-full max-w-3xl pr-[30px] text-left lg:max-w-none lg:pr-10"
+          >
             <h1 className="text-pretty font-serif text-[clamp(3.25rem,7.75vw,5.125rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900">
               {t("heroTitleLine1")}
               <br />
@@ -59,12 +63,12 @@ export async function HomeHero({ locale }: Props) {
           </div>
         </div>
 
-        <div className="relative z-[1] hidden mt-6 w-4/5 sm:ms-auto sm:block lg:mt-0 lg:min-h-0 lg:w-full lg:max-w-full lg:self-stretch">
-          <div className="relative w-full max-w-full lg:h-full lg:min-h-[17.5rem]">
-            <div
-              className="relative ms-auto aspect-[5/5] w-full max-w-full overflow-hidden bg-stone-100 sm:w-[92%] lg:absolute lg:inset-x-0 lg:top-0 lg:bottom-[5.25rem] lg:ms-0 lg:aspect-auto lg:h-auto lg:w-full"
-              style={{ aspectRatio: "5 / 5" }}
-            >
+        <div className="relative z-[1] hidden mt-6 w-4/5 sm:ms-auto sm:block lg:mt-0 lg:w-full lg:max-w-full">
+          <HeroImageFrame
+            extraHeightPx={180}
+            className="relative ms-auto aspect-[5/5] w-full max-w-full min-h-[17.5rem] overflow-visible bg-transparent sm:w-[92%] lg:ms-0 lg:aspect-auto lg:min-h-0 lg:w-full"
+          >
+            <div className="absolute inset-0 overflow-hidden bg-stone-100">
               <Image
                 src={HERO_MAIN}
                 alt=""
@@ -73,35 +77,35 @@ export async function HomeHero({ locale }: Props) {
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              <div className="absolute right-5 top-[46%] z-10">
-                <div
-                  className="relative overflow-hidden border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]"
-                  style={{ width: "10.2rem", height: "8.5rem" }}
-                >
-                  <Image src={HERO_SIDE_A} alt="" fill className="object-cover" sizes="170px" />
-                </div>
-              </div>
-              <div className="absolute -right-6 -top-4 z-10">
-                <div className="relative h-[6.8rem] w-[6.8rem] border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]">
-                  <Image
-                    src={HERO_BADGE}
-                    alt=""
-                    fill
-                    className="object-contain"
-                    sizes="110px"
-                  />
-                </div>
-              </div>
-              <div className="absolute -left-14 top-10 z-10 hidden lg:block">
-                <div
-                  className="relative overflow-hidden border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]"
-                  style={{ width: "11.05rem", height: "11.9rem" }}
-                >
-                  <Image src={HERO_SIDE_B} alt="" fill className="object-cover" sizes="190px" />
-                </div>
+            </div>
+            <div className="absolute right-5 top-[46%] z-10">
+              <div
+                className="relative overflow-hidden border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]"
+                style={{ width: "10.2rem", height: "8.5rem" }}
+              >
+                <Image src={HERO_SIDE_A} alt="" fill className="object-cover" sizes="170px" />
               </div>
             </div>
-          </div>
+            <div className="absolute -right-6 -top-4 z-10">
+              <div className="relative h-[6.8rem] w-[6.8rem] border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]">
+                <Image
+                  src={HERO_BADGE}
+                  alt=""
+                  fill
+                  className="object-contain"
+                  sizes="110px"
+                />
+              </div>
+            </div>
+            <div className="absolute -left-14 top-10 z-10 hidden lg:block">
+              <div
+                className="relative overflow-hidden border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]"
+                style={{ width: "11.05rem", height: "11.9rem" }}
+              >
+                <Image src={HERO_SIDE_B} alt="" fill className="object-cover" sizes="190px" />
+              </div>
+            </div>
+          </HeroImageFrame>
         </div>
 
       </div>
