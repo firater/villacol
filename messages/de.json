@@ -120,6 +120,11 @@
         "title": "Saisonale Preise — live auf jeder Villa unten.",
         "cta": "Alle Angebote"
       },
+      "bestValueStaysBanner": {
+        "title": "Best-Value-Aufenthalte",
+        "scrollLeft": "Best-Value-Villen nach links",
+        "scrollRight": "Best-Value-Villen nach rechts"
+      },
       "bestValueHeading": "Bestes Preis-Leistungs-Verhältnis",
       "bestValueSubtitle": "Am meisten Platz, Pool und Aussicht für den Nächtigungspreis.",
       "bestValueEmpty": "Noch keine Empfehlungen veröffentlicht.",

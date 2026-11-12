@@ -120,6 +120,11 @@
         "title": "Seasonal rates, live on every villa card below.",
         "cta": "All offers"
       },
+      "bestValueStaysBanner": {
+        "title": "Best value stays",
+        "scrollLeft": "Scroll best value villas left",
+        "scrollRight": "Scroll best value villas right"
+      },
       "bestValueHeading": "Best value",
       "bestValueSubtitle": "The most generous space, pool, and view for the nightly rate.",
       "bestValueEmpty": "No best-value picks are published yet.",

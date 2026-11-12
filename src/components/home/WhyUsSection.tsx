@@ -18,16 +18,22 @@ export async function WhyUsSection() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <header className="pb-12 lg:pb-14">
-        <p className="mb-5 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-400">
-          {t("eyebrow")}
-        </p>
         <div className="max-w-3xl">
-          <h2
-            id="home-advantages-title"
-            className="font-serif text-[clamp(2.35rem,5.8vw,4rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900"
-          >
-            {t("title")}
-          </h2>
+          <div className="inline-block max-w-full">
+            <div
+              aria-hidden
+              className="mb-14 h-px w-full bg-gradient-to-r from-stone-300/85 from-0% via-stone-300/45 via-55% to-transparent to-100% lg:mb-16"
+            />
+            <p className="mb-5 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-400">
+              {t("eyebrow")}
+            </p>
+            <h2
+              id="home-advantages-title"
+              className="font-serif text-[clamp(2.35rem,5.8vw,4rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900"
+            >
+              {t("title")}
+            </h2>
+          </div>
           <p className="mt-5 font-serif text-[clamp(1.15rem,2.4vw,1.5rem)] font-normal italic leading-snug text-stone-700">
             {t("subtitle")}
           </p>

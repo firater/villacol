@@ -13,7 +13,8 @@ import { HomeHero } from "@/components/home/HomeHero";
 import { HomeSectionHeader } from "@/components/home/HomeSectionHeader";
 import { HomeVillaSection } from "@/components/home/HomeVillaSection";
 import { HomeVillaSectionFallback } from "@/components/home/HomeVillaSectionFallback";
-import { AccessPassBanner } from "@/components/home/AccessPassBanner";
+import { HomeBestValueFallback } from "@/components/home/HomeBestValueFallback";
+import { HomeBestValueSection } from "@/components/home/HomeBestValueSection";
 import { HomeFeaturedBestValueBridge } from "@/components/home/HomeFeaturedBestValueBridge";
 import { HomeCategoryDayToolbarSection } from "@/components/home/HomeCategoryDayToolbarSection";
 import { HomePromotionsElegantBridge } from "@/components/home/HomePromotionsElegantBridge";
@@ -118,22 +119,13 @@ export default async function Home() {
           </div>
         </section>
 
-        <AccessPassBanner />
-
-        <section className="w-full bg-white py-16 lg:py-20">
+        <section className="w-full bg-white pb-16 pt-10 lg:pb-20 lg:pt-12">
           <div className={sectionInner}>
-            <HomeSectionHeader
-              kicker={t("bestValueKicker")}
-              title={t("bestValueHeading")}
-              subtitle={t("bestValueSubtitle")}
-            />
-            <Suspense fallback={<HomeVillaSectionFallback />}>
-              <HomeVillaSection locale={locale} variant="bestValue" cardLayout="recommended" />
+            <Suspense fallback={<HomeBestValueFallback />}>
+              <HomeBestValueSection locale={locale} />
             </Suspense>
           </div>
         </section>
-
-        <HomeFeaturedBestValueBridge instanceId="featured-best-value" />
 
         <section className="w-full bg-white py-16 lg:py-20" aria-labelledby="home-advantages-title">
           <WhyUsSection />
@@ -146,6 +138,8 @@ export default async function Home() {
         <section className="w-full bg-stone-50/80 py-16 lg:py-20">
           <HelpFaqSection />
         </section>
+
+        <HomeFeaturedBestValueBridge instanceId="featured-best-value" />
       </main>
     </>
   );

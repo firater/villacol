@@ -14,6 +14,7 @@ import { Link } from "@/i18n/navigation";
 import { formatBusinessLongDate } from "@/lib/dates";
 import type { Locale } from "@/lib/locales";
 
+import { CarouselArrow } from "./CarouselArrow";
 import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoriesMock";
 
 export type HomeCategoryCarouselItem = {
@@ -264,28 +265,3 @@ function CategoryCarouselCard({
   );
 }
 
-function CarouselArrow({
-  direction,
-  disabled,
-  onClick,
-  label,
-}: {
-  direction: "left" | "right";
-  disabled: boolean;
-  onClick: () => void;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      disabled={disabled}
-      onClick={onClick}
-      className="flex size-11 items-center justify-center border border-stone-900 text-stone-900 transition hover:bg-stone-900 hover:text-white disabled:pointer-events-none disabled:opacity-25"
-    >
-      <span className="font-serif text-xl leading-none" aria-hidden>
-        {direction === "left" ? "←" : "→"}
-      </span>
-    </button>
-  );
-}
