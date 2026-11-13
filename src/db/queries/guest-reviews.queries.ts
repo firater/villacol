@@ -16,6 +16,7 @@ export type PublishedGuestReviewRow = {
   guestCount: number;
   rating: number;
   reviewText: string;
+  publishedAt: string | null;
 };
 
 export async function getPublishedGuestReviewsForVilla(
@@ -34,6 +35,7 @@ export async function getPublishedGuestReviewsForVilla(
       guestCount: guestReviews.guestCount,
       rating: guestReviews.rating,
       reviewText: guestReviews.reviewText,
+      publishedAt: guestReviews.publishedAt,
     })
     .from(guestReviews)
     .where(
@@ -49,5 +51,9 @@ export async function getPublishedGuestReviewsForVilla(
     guestCount: row.guestCount,
     rating: row.rating,
     reviewText: row.reviewText,
+    publishedAt:
+      row.publishedAt !== null && row.publishedAt !== undefined
+        ? row.publishedAt.toISOString()
+        : null,
   }));
 }

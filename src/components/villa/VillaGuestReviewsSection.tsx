@@ -7,7 +7,7 @@ type ReviewCopy = {
   eyebrow: string;
   heading: string;
   empty: string;
-  ratingAria: string;
+  formatRatingAria: (rating: number) => string;
 };
 
 type Props = {
@@ -110,10 +110,7 @@ export function VillaGuestReviewsSection({
                   </div>
                   <StarRating
                     rating={review.rating}
-                    ariaLabel={copy.ratingAria.replace(
-                      "{rating}",
-                      String(review.rating),
-                    )}
+                    ariaLabel={copy.formatRatingAria(review.rating)}
                   />
                 </div>
                 <p className="mt-5 font-sans text-[15px] leading-[1.85] text-stone-700 dark:text-stone-300">

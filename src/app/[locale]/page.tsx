@@ -17,13 +17,12 @@ import { HomeBestValueFallback } from "@/components/home/HomeBestValueFallback";
 import { HomeBestValueSection } from "@/components/home/HomeBestValueSection";
 import { HomeFeaturedBestValueBridge } from "@/components/home/HomeFeaturedBestValueBridge";
 import { HomePromotionsElegantBridge } from "@/components/home/HomePromotionsElegantBridge";
+import { HomePageVillaItemListJsonLd } from "@/components/home/HomePageVillaItemListJsonLd";
 import { HomePromoOffersSection } from "@/components/home/HomePromoOffersSection";
 import { WhyUsSection } from "@/components/home/WhyUsSection";
-import { JsonLd } from "@/components/seo/JsonLd";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/lib/locales";
-import { generateWebsiteJsonLd } from "@/lib/seo/json-ld";
 
 const sectionShell = "w-full border-t border-stone-200/50 py-16 lg:py-20";
 const sectionInner = "mx-auto max-w-7xl px-4 sm:px-6 lg:px-8";
@@ -39,7 +38,9 @@ export default async function Home() {
 
   return (
     <>
-      <JsonLd data={generateWebsiteJsonLd(locale)} />
+      <Suspense fallback={null}>
+        <HomePageVillaItemListJsonLd locale={locale} />
+      </Suspense>
       <main className="relative flex flex-1 flex-col overflow-x-clip bg-white">
         <HomeExitIntent />
         <HomeHero locale={locale} />

@@ -486,6 +486,7 @@ export type VillaDetailBundle = {
     checkIn: string;
     checkOut: string;
     nightCount: number;
+    baseTotalCents: number;
     discountedTotalCents: number;
     avgNightlyCents: number;
     hasActiveDiscount: boolean;
@@ -682,6 +683,7 @@ export async function getVillaDetailBundle(
             checkIn: String(priceRow.checkIn),
             checkOut: String(priceRow.checkOut),
             nightCount: priceRow.nightCount,
+            baseTotalCents: priceRow.baseTotalCents,
             discountedTotalCents: priceRow.discountedTotalCents,
             avgNightlyCents: priceRow.avgNightlyCents,
             hasActiveDiscount: priceRow.hasActiveDiscount,

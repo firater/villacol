@@ -61,6 +61,7 @@ export async function VillaDetailView({ villaId, locale }: Props) {
     bundle.priceCache,
     preferences.currency,
     buildExchangeRateMap(ratesRows),
+    guestReviews,
   );
 
   return (
@@ -211,7 +212,8 @@ export async function VillaDetailView({ villaId, locale }: Props) {
                 eyebrow: t("reviews.eyebrow"),
                 heading: t("reviews.heading"),
                 empty: t("reviews.empty"),
-                ratingAria: t("reviews.ratingAria"),
+                formatRatingAria: (rating) =>
+                  t("reviews.ratingAria", { rating }),
               }}
             />
           </div>

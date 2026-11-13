@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import type { Locale } from "@/lib/locales";
+import { isLocale } from "@/lib/locales";
+import { buildRootMetadata } from "@/lib/seo/site-metadata";
+import { SiteRootJsonLd } from "@/components/seo/SiteRootJsonLd";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { notFound } from "next/navigation";
 import { locale as localeParam } from "next/root-params";
@@ -13,8 +17,6 @@ import {
   PublicSiteHeader,
 } from "@/components/layout/PublicSiteChrome";
 import { routing } from "@/i18n/routing";
-import type { Locale } from "@/lib/locales";
-
 import "../globals.css";
 
 /**
@@ -33,10 +35,18 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Villa Collection",
-  description: "Luxury villa rentals",
+type LayoutProps = {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({
+  params,
+}: Pick<LayoutProps, "params">): Promise<Metadata> {
+  const { locale: localeRaw } = await params;
+  if (!isLocale(localeRaw)) return {};
+  return buildRootMetadata(localeRaw);
+}
 
 /**
  * Required by Cache Components: every root parameter must have at least one
@@ -66,6 +76,9 @@ export default async function LocaleLayout({ children }: { children: ReactNode }
       lang={locale}
       className={`${inter.variable} ${cormorant.variable} h-full antialiased`}
     >
+      <head>
+        <SiteRootJsonLd locale={locale} />
+      </head>
       <body className="font-sans min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Istanbul">
           <Suspense fallback={<HeaderFallback />}>
