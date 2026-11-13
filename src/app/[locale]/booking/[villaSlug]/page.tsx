@@ -120,6 +120,7 @@ async function BookingCheckoutContent({
           checkIn={checkIn}
           checkOut={checkOut}
           guestCount={Math.min(guestCount, villa.capacity)}
+          guestPolicy={villa.guestPolicy}
           quote={quote.data}
         />
       </div>

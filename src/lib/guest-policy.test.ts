@@ -46,40 +46,18 @@ describe("validateGuestPolicy", () => {
   });
 
   describe("families_only", () => {
-    it("accepts a declared family", () => {
+    it("accepts any party size without child metadata", () => {
       expect(
-        check({ policy: "families_only", guestCount: 4, partyType: "family" })
+        check({ policy: "families_only", guestCount: 4, partyType: "friends" })
           .valid,
       ).toBe(true);
-    });
-
-    it("accepts an undeclared party travelling with a child", () => {
       expect(
         check({
           policy: "families_only",
-          guestCount: 4,
-          extraGuests: [{ name: "Mia", age: 7 }],
+          guestCount: 3,
+          extraGuests: [{ name: "Unknown" }],
         }).valid,
       ).toBe(true);
-    });
-
-    it("rejects adults only", () => {
-      const result = check({
-        policy: "families_only",
-        guestCount: 4,
-        partyType: "friends",
-        extraGuests: [{ name: "Ada", age: 31 }],
-      });
-      expect(result.violation?.code).toBe("families_only_no_children");
-    });
-
-    it("treats an extra guest with no age as an adult", () => {
-      const result = check({
-        policy: "families_only",
-        guestCount: 3,
-        extraGuests: [{ name: "Unknown" }],
-      });
-      expect(result.valid).toBe(false);
     });
   });
 

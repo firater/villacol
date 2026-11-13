@@ -9,9 +9,6 @@
  */
 import type { GuestPolicy, PartyType } from "@/db/tables/enums";
 
-/** Anyone under this is a child for `families_only`. */
-export const MINOR_AGE_THRESHOLD = 18;
-
 /** Max guests on a villa that only accepts couples. */
 export const COUPLE_MAX_GUESTS = 2;
 
@@ -31,7 +28,6 @@ export type GuestPolicyInput = {
 export type GuestPolicyViolationCode =
   | "couples_only_too_many_guests"
   | "couples_only_party_mismatch"
-  | "families_only_no_children"
   | "friend_groups_not_allowed";
 
 export type GuestPolicyViolation = {
@@ -52,21 +48,12 @@ function reject(
   return { valid: false, violation: { code, message } };
 }
 
-function hasDeclaredChild(
-  extraGuests: readonly GuestPolicyPartyGuest[],
-): boolean {
-  return extraGuests.some(
-    (guest) => guest.age !== undefined && guest.age < MINOR_AGE_THRESHOLD,
-  );
-}
-
 /**
  * Never throws: a policy violation is an expected outcome of a valid request,
  * so the caller turns the returned message into a field error.
  */
 export function validateGuestPolicy(input: GuestPolicyInput): GuestPolicyResult {
   const { policy, guestCount, partyType } = input;
-  const extraGuests = input.extraGuests ?? [];
 
   switch (policy) {
     case "everyone":
@@ -89,18 +76,10 @@ export function validateGuestPolicy(input: GuestPolicyInput): GuestPolicyResult 
       return VALID;
     }
 
-    case "families_only": {
-      // Either an explicit declaration or a child among the extra guests
-      // qualifies, so a family that skipped the party-type field is not
-      // rejected for a missing form value.
-      if (partyType === "family" || hasDeclaredChild(extraGuests)) {
-        return VALID;
-      }
-      return reject(
-        "families_only_no_children",
-        "This villa is let to families only. Add the children travelling with you, or pick a villa without this restriction.",
-      );
-    }
+    case "families_only":
+      // Inquiry collects a UI attestation instead of child ages; do not reject
+      // here for missing party metadata.
+      return VALID;
 
     case "no_friend_groups": {
       if (partyType === "friends") {

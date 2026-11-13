@@ -22,7 +22,10 @@ type StaticPathname =
   | "/contact"
   | "/about"
   | "/terms"
-  | "/privacy";
+  | "/privacy"
+  | "/journal"
+  | "/journal/best-beaches"
+  | "/journal/travel-safety-guide";
 
 type Props = {
   label: string;

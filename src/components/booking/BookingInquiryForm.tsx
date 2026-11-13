@@ -12,6 +12,8 @@ import {
   PHONE_DIAL_OPTIONS,
 } from "@/lib/phone-dial-codes";
 import type { QuoteDisplay } from "@/actions/public/quote.actions";
+import type { GuestPolicy } from "@/db/tables/enums";
+import { requiresGuestPolicyAttestation } from "@/lib/guest-policy-ui";
 
 import { QuotePriceBreakdown } from "./QuotePriceBreakdown";
 
@@ -20,6 +22,7 @@ type Props = {
   checkIn: string;
   checkOut: string;
   guestCount: number;
+  guestPolicy: GuestPolicy;
   quote: QuoteDisplay;
 };
 
@@ -28,6 +31,7 @@ export function BookingInquiryForm({
   checkIn,
   checkOut,
   guestCount,
+  guestPolicy,
   quote,
 }: Props) {
   const t = useTranslations("booking.checkout");
@@ -46,13 +50,23 @@ export function BookingInquiryForm({
   const [guestNote, setGuestNote] = useState("");
   const [partySize, setPartySize] = useState(guestCount);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [confirmGuestPolicy, setConfirmGuestPolicy] = useState(false);
 
-  const canSubmit = acceptTerms && !pending;
+  const needsGuestPolicyConfirm = requiresGuestPolicyAttestation(guestPolicy);
+  const canSubmit =
+    acceptTerms &&
+    (!needsGuestPolicyConfirm || confirmGuestPolicy) &&
+    !pending;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setFieldErrors({});
+
+    if (needsGuestPolicyConfirm && !confirmGuestPolicy) {
+      setFieldErrors({ guestPolicyConfirm: [t("guestPolicyConfirmRequired")] });
+      return;
+    }
 
     if (!acceptTerms) {
       setFieldErrors({ acceptTerms: [t("termsRequired")] });
@@ -215,6 +229,32 @@ export function BookingInquiryForm({
           className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
         />
       </label>
+
+      {needsGuestPolicyConfirm ? (
+        <label className="flex items-start gap-2 text-sm text-zinc-800 dark:text-zinc-200">
+          <input
+            type="checkbox"
+            checked={confirmGuestPolicy}
+            onChange={(e) => {
+              setConfirmGuestPolicy(e.target.checked);
+              if (e.target.checked) {
+                setFieldErrors((prev) => {
+                  const next = { ...prev };
+                  delete next.guestPolicyConfirm;
+                  return next;
+                });
+              }
+            }}
+            className="mt-0.5 rounded border-zinc-300"
+          />
+          <span>{t("guestPolicyConfirm")}</span>
+        </label>
+      ) : null}
+      {fieldErrors.guestPolicyConfirm?.[0] ? (
+        <p className="-mt-3 text-xs text-red-600">
+          {fieldErrors.guestPolicyConfirm[0]}
+        </p>
+      ) : null}
 
       <label className="flex items-start gap-2 text-sm text-zinc-800 dark:text-zinc-200">
         <input

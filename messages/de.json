@@ -38,6 +38,7 @@
       "faq": "Häufige Fragen",
       "browse": "Entdecken",
       "legal": "Rechtliches",
+      "journalTitle": "Journal",
       "terms": "AGB",
       "privacy": "Datenschutz",
       "copyright": "© {year} {brand}. Alle Rechte vorbehalten.",
@@ -543,6 +544,8 @@
       "guestPhone": "Telefon",
       "guestCount": "Gäste",
       "guestNote": "Nachricht (optional)",
+      "guestPolicyConfirm": "Ich bestätige, dass wir als Familie, als Paar oder als Paargruppe reisen.",
+      "guestPolicyConfirmRequired": "Bitte bestätigen Sie, dass Ihre Reisegruppe zur Gästerichtlinie dieser Villa passt.",
       "acceptTermsPrefix": "Ich akzeptiere die",
       "termsLink": "AGB",
       "termsRequired": "Bitte akzeptieren Sie die AGB.",
@@ -584,6 +587,216 @@
         "cancelled": "Storniert",
         "completed": "Abgeschlossen"
       }
+    }
+  },
+  "journal": {
+    "hub": {
+      "metaTitle": "Reisejournal — Villa Collection",
+      "metaDescription": "Redaktionelle Guides zu Kalkan, der lykischen Küste und sicheren Villenurlaub.",
+      "eyebrow": "Reisejournal",
+      "title": "Notizen von der Küste",
+      "intro": "Strandtipps und Praxiswissen unseres Teams — von Kaputaş bis zu versteckten Buchten.",
+      "articles": {
+        "bestBeaches": {
+          "title": "Die besten Strände bei Kalkan",
+          "excerpt": "Kaputaş, Patara und kleine Buchten — wann hingehen und was aus der Villa mitnehmen.",
+          "readCta": "Guide lesen",
+          "imageAlt": "Türkisfarbene Bucht an der lykischen Küste bei Kalkan"
+        },
+        "travelSafety": {
+          "title": "Sicher reisen an der lykischen Küste",
+          "excerpt": "Gesundheit, Straßen, Sonne und lokale Gepflogenheiten — Checkliste vor dem Flug.",
+          "readCta": "Guide lesen",
+          "imageAlt": "Küstenstraße über dem Mittelmeer bei Kalkan"
+        }
+      }
+    },
+    "bestBeaches": {
+      "metaTitle": "Die besten Strände in Kalkan — Reisejournal",
+      "metaDescription": "Lieblingsstrände unserer Redaktion bei Kalkan: Kaputaş, Patara und Buchten — mit Tipps für Villa-Gäste.",
+      "eyebrow": "Küstenguide",
+      "title": "Die besten Strände bei Kalkan",
+      "intro": "Kalkan liegt am Hang mit Blick aufs Meer; die Strände sind kurze Fahrten entfernt — jeder mit eigenem Charakter.",
+      "heroImageAlt": "Blick auf den Strand von Kaputaş von der Küstenstraße",
+      "sections": [
+        {
+          "heading": "Kaputaş",
+          "body": "Die Ikone: eine Schlucht öffnet sich zu türkisem Wasser, erreichbar über viele Stufen von der D400. Vor 10 Uhr in Hochsaison ankommen, feste Schuhe mitnehmen."
+        },
+        {
+          "heading": "Patara",
+          "body": "Elf Kilometer Sand, Dünen und antike Ruinen. Flaches Wasser für Familien; Sonnenuntergang unbedingt mitnehmen."
+        },
+        {
+          "heading": "Kleine Buchten",
+          "body": "Kiesbuchten östlich von Kalkan lohnen sich mit Mietwagen. Reef-Schuhe, Wasser und Schatten einpacken — wenig Infrastruktur, viel Ruhe."
+        },
+        {
+          "heading": "Planung von der Villa",
+          "body": "Frühstück mitnehmen, entspannt zurückfahren. Unser Concierge organisiert Kühler, Sonnenschirm oder Bootstransfers."
+        }
+      ]
+    },
+    "travelSafety": {
+      "metaTitle": "Sicher reisen — Kalkan & lykische Küste",
+      "metaDescription": "Sicherheitstipps für Villenurlaub in der Türkei: Gesundheit, Fahren, Sonne, Etikette.",
+      "eyebrow": "Gut vorbereitet",
+      "title": "Sicher reisen an der lykischen Küste",
+      "intro": "Die Region ist gastfreundlich — mit etwas Vorbereitung wird der Villenurlaub unkompliziert.",
+      "heroImageAlt": "Sonniger Hafen am türkischen Mittelmeer",
+      "sections": [
+        {
+          "heading": "Gesundheit",
+          "body": "Apotheken und eine Praxis in Kalkan; Krankenhäuser in Kaş und Fethiye. Reisemedikamente und Versicherungsnachweis mitführen."
+        },
+        {
+          "heading": "Straßen",
+          "body": "Kurvige Küstenstraßen. Automatik-Mietwagen, wenn Sie mit Steigungen ungeübt sind; abends oft Taxi nach Kalkan."
+        },
+        {
+          "heading": "Sonne & Meer",
+          "body": "Starke UV-Strahlung Mai bis Oktober. Reef-Schuhe an Kiesstränden; Flaggen zeigen bewachte Zonen."
+        },
+        {
+          "heading": "Lokale Gepflogenheiten",
+          "body": "Locker in Resorts, zurückhaltender in Dörfern. Ein freundliches „Merhaba“ wird geschätzt."
+        }
+      ]
+    }
+  },
+  "contactPage": {
+    "metaTitle": "Kontakt — Villa Collection",
+    "metaDescription": "Concierge-Team für Villen, Buchungen und Sonderwünsche.",
+    "eyebrow": "Concierge",
+    "title": "Kontakt",
+    "intro": "Schildern Sie Ihre Planung — Daten, Gästezahl oder eine Villa. Wir antworten auf Deutsch, Englisch oder Russisch.",
+    "formSectionLabel": "Nachricht senden",
+    "form": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "optional": "optional",
+      "subject": "Betreff",
+      "subjectPlaceholder": "Thema wählen",
+      "message": "Nachricht",
+      "submit": "Nachricht senden",
+      "submitting": "Wird gesendet…",
+      "subjectLine": "Betreff: {subject}",
+      "successTitle": "Vielen Dank",
+      "successBody": "Wir melden uns in Kürze — in der Regel innerhalb eines Werktags.",
+      "subjects": {
+        "general": "Allgemeine Anfrage",
+        "booking": "Villa buchen",
+        "longStay": "Langaufenthalt",
+        "concierge": "Concierge-Service",
+        "other": "Sonstiges"
+      },
+      "errors": {
+        "name": "Bitte geben Sie Ihren Namen ein.",
+        "email": "Bitte geben Sie eine gültige E-Mail ein.",
+        "phone": "Bitte geben Sie eine gültige Telefonnummer ein.",
+        "subject": "Bitte wählen Sie einen Betreff.",
+        "message": "Die Nachricht sollte mindestens 10 Zeichen haben."
+      }
+    },
+    "info": {
+      "eyebrow": "Direkter Draht",
+      "headline": "Unser Concierge-Team hilft gerne",
+      "body": "Von der ersten Idee bis zur Anreise: Villa, Verfügbarkeit und Extras wie Transfers oder Koch.",
+      "emailLabel": "E-Mail",
+      "emailValue": "concierge@villacollection.com",
+      "phoneLabel": "Telefon",
+      "phoneDisplay": "+90 242 844 00 12",
+      "phoneTel": "+902428440012",
+      "whatsappLabel": "WhatsApp",
+      "whatsappCta": "Per WhatsApp schreiben",
+      "hoursLabel": "Erreichbarkeit",
+      "hoursValue": "Unser Concierge-Team ist rund um die Uhr für Sie da.",
+      "footnote": "Für Preisangebote bitte Reisedaten und Gästezahl angeben.",
+      "findVillaCta": "Villa unsicher? Zum Quiz"
+    }
+  },
+  "staticPages": {
+    "about": {
+      "metaTitle": "Über uns — Villa Collection",
+      "metaDescription": "Wie Villa Collection Luxusvillen an der türkischen Mittelmeerküste kuratiert.",
+      "eyebrow": "Unsere Geschichte",
+      "title": "Über Villa Collection",
+      "intro": "Wir sind eine unabhängige Villa-Agentur mit Fokus auf kuratierte Mittelmeer-Aufenthalte. Jedes Haus in unserer Sammlung wird besichtigt, transparent bepreist und nach demselben redaktionellen Standard geführt, den Sie auf diesen Seiten sehen.",
+      "sections": [
+        {
+          "heading": "Kuratiert, nicht überladen",
+          "body": "Wir führen ein fokussiertes Portfolio statt eines endlosen Katalogs. Jede Villa wird wegen Lage, Service und Beständigkeit ausgewählt — Eigenschaften, die einen guten Urlaub unvergesslich machen."
+        },
+        {
+          "heading": "Transparente Preise",
+          "body": "Die Preise auf unserer Website zeigen, was Sie erwarten können: Unterkunft pro Nacht, ausgewiesene Angebote und Gebühren vor Ihrer Anfrage. Unser Team bestätigt Verfügbarkeit und finale Bedingungen per E-Mail."
+        },
+        {
+          "heading": "Lokale Expertise",
+          "body": "Unser Concierge-Team arbeitet an der Küste. Es koordiniert Anreise, Reinigung und Sonderwünsche auf Deutsch, Englisch oder Russisch — damit Sie von überall sicher planen können."
+        }
+      ]
+    },
+    "privacy": {
+      "metaTitle": "Datenschutz — Villa Collection",
+      "metaDescription": "Wie Villa Collection personenbezogene Daten beim Surfen und Buchen verarbeitet.",
+      "eyebrow": "Rechtliches",
+      "title": "Datenschutzerklärung",
+      "intro": "Diese Erklärung beschreibt, welche Daten wir bei der Nutzung unserer Website erheben, wie wir sie verwenden und welche Wahlmöglichkeiten Sie haben.",
+      "updatedLabel": "Stand: November 2025",
+      "sections": [
+        {
+          "heading": "Welche Daten wir erheben",
+          "body": "Beim Besuch können technische Daten wie IP-Adresse, Browsertyp und aufgerufene Seiten anfallen. Bei einer Anfrage erfassen wir die von Ihnen angegebenen Kontakt- und Reisedaten."
+        },
+        {
+          "heading": "Verwendung Ihrer Daten",
+          "body": "Wir nutzen Ihre Angaben, um Anfragen zu beantworten, Buchungen zu bearbeiten, Service-E-Mails zu senden und gesetzliche Pflichten zu erfüllen. Wir verkaufen keine personenbezogenen Daten."
+        },
+        {
+          "heading": "Weitergabe an Partner",
+          "body": "Zur Durchführung eines Aufenthalts können wir notwendige Details an Eigentümer, lokale Verwalter oder Zahlungsdienstleister weitergeben — nur zum Zweck der Leistungserbringung."
+        },
+        {
+          "heading": "Cookies und Einstellungen",
+          "body": "Cookies speichern Sprache, Währung und sichere Buchungszugänge. Sie können Cookies im Browser einschränken; einzelne Funktionen können dann ausfallen."
+        },
+        {
+          "heading": "Ihre Rechte",
+          "body": "Je nach Wohnsitz können Sie Auskunft, Berichtigung oder Löschung verlangen. Kontaktieren Sie uns über die Angaben auf der Kontaktseite."
+        }
+      ]
+    },
+    "terms": {
+      "metaTitle": "AGB — Villa Collection",
+      "metaDescription": "Buchungsbedingungen für Villa-Anfragen über Villa Collection.",
+      "eyebrow": "Rechtliches",
+      "title": "Allgemeine Geschäftsbedingungen",
+      "intro": "Diese Bedingungen gelten für Anfragen und Buchungen über Villa Collection. Villa-spezifische Stornoregeln werden schriftlich bestätigt.",
+      "updatedLabel": "Stand: November 2025",
+      "sections": [
+        {
+          "heading": "Anfragen und Reservierungen",
+          "body": "Eine Anfrage garantiert keine Verfügbarkeit. Bestätigt ist ein Aufenthalt erst mit unserer schriftlichen Bestätigung und ggf. erhaltener Anzahlung. Angezeigte Preise sind Schätzungen bis zur Bestätigung."
+        },
+        {
+          "heading": "Pflichten der Gäste",
+          "body": "Sie geben korrekte Angaben an, beachten Gästerichtlinie und Hausregeln und behandeln die Villa pfleglich. Für übernormale Schäden haften Sie mit Ihrer Reisegruppe."
+        },
+        {
+          "heading": "Zahlungen und Gebühren",
+          "body": "Sofern nicht anders angegeben, in Euro. Reinigung oder Kaution werden vor Bestätigung offengelegt. Zahlungspläne stehen in der Buchungsbestätigung."
+        },
+        {
+          "heading": "Stornierung",
+          "body": "Stornobedingungen variieren je Villa und Saison und werden auf der Villenseite sowie in der Bestätigung genannt."
+        },
+        {
+          "heading": "Haftung",
+          "body": "Villa Collection tritt als Vermittler auf. Für höhere Gewalt oder Leistungen Dritter haften wir nur im gesetzlich zulässigen Umfang."
+        }
+      ]
     }
   }
 }

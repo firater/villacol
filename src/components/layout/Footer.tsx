@@ -30,6 +30,9 @@ type FooterHref =
   | "/about"
   | "/terms"
   | "/privacy"
+  | "/journal"
+  | "/journal/best-beaches"
+  | "/journal/travel-safety-guide"
   | { pathname: "/"; hash: string };
 
 export function Footer() {
@@ -37,6 +40,8 @@ export function Footer() {
   const tNav = useTranslations("layout.nav");
   const tCommon = useTranslations("common");
   const tHomeFooter = useTranslations("layout.home.footer");
+  const tJournal = useTranslations("journal.hub");
+  const tJournalArticles = useTranslations("journal.hub.articles");
 
   return (
     <footer className="relative mt-auto w-full bg-[#0a0a0a] font-sans text-stone-300 antialiased">
@@ -76,6 +81,15 @@ export function Footer() {
               <FooterLink href="/terms">{t("terms")}</FooterLink>
               <FooterLink href="/privacy">{t("privacy")}</FooterLink>
               <FooterLink href="/about">{tNav("about")}</FooterLink>
+            </FooterColumn>
+            <FooterColumn title={t("journalTitle")}>
+              <FooterLink href="/journal">{tJournal("title")}</FooterLink>
+              <FooterLink href="/journal/best-beaches">
+                {tJournalArticles("bestBeaches.title")}
+              </FooterLink>
+              <FooterLink href="/journal/travel-safety-guide">
+                {tJournalArticles("travelSafety.title")}
+              </FooterLink>
             </FooterColumn>
           </div>
         </div>

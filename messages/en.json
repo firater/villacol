@@ -38,6 +38,7 @@
       "faq": "Frequently asked questions",
       "browse": "Browse",
       "legal": "Legal",
+      "journalTitle": "Journal",
       "terms": "Terms",
       "privacy": "Privacy",
       "copyright": "© {year} {brand}. All rights reserved.",
@@ -556,6 +557,8 @@
       "guestPhone": "Phone",
       "guestCount": "Guests",
       "guestNote": "Message (optional)",
+      "guestPolicyConfirm": "I confirm that we are traveling as a family or a couple or couple group.",
+      "guestPolicyConfirmRequired": "Please confirm your party matches this villa's guest policy.",
       "acceptTermsPrefix": "I accept the",
       "termsLink": "Terms & Conditions",
       "termsRequired": "You must accept the terms to continue.",
@@ -597,6 +600,216 @@
         "cancelled": "Cancelled",
         "completed": "Completed"
       }
+    }
+  },
+  "journal": {
+    "hub": {
+      "metaTitle": "Travel journal — Villa Collection",
+      "metaDescription": "Editorial guides to Kalkan, the Lycian coast, and planning a safe, memorable villa holiday.",
+      "eyebrow": "Travel journal",
+      "title": "Notes from the coast",
+      "intro": "Field guides and practical advice from our team — beaches worth the drive, and how to travel well on the Turkish Riviera.",
+      "articles": {
+        "bestBeaches": {
+          "title": "Best beaches near Kalkan",
+          "excerpt": "From Kaputaş to İslamlar coves — where to swim, when to go, and what to bring from the villa.",
+          "readCta": "Read the guide",
+          "imageAlt": "Turquoise bay on the Lycian coast near Kalkan"
+        },
+        "travelSafety": {
+          "title": "Safe travel on the Lycian coast",
+          "excerpt": "Health, roads, water, and local customs — a concise checklist before you fly.",
+          "readCta": "Read the guide",
+          "imageAlt": "Coastal road above the Mediterranean near Kalkan"
+        }
+      }
+    },
+    "bestBeaches": {
+      "metaTitle": "Best Beaches in Kalkan — Travel Journal",
+      "metaDescription": "Our editors' favourite beaches near Kalkan: Kaputaş, Patara, and hidden coves — with tips for villa guests.",
+      "eyebrow": "Coast guide",
+      "title": "The best beaches near Kalkan",
+      "intro": "Kalkan is a hill town that looks down on the sea; the beaches are a short drive away, each with its own mood. Here is where we send guests first.",
+      "heroImageAlt": "View of Kaputaş beach from the coastal road",
+      "sections": [
+        {
+          "heading": "Kaputaş",
+          "body": "The classic postcard: a narrow gorge opening onto turquoise water, reached by a long staircase from the D400. Arrive before 10 a.m. in July and August, bring shoes for the steps, and plan an early lunch back in Kalkan — parking fills quickly."
+        },
+        {
+          "heading": "Patara",
+          "body": "Eleven kilometres of sand backed by dunes and ancient ruins. Gentle shallows make it ideal for families; stay for sunset. Combine with a morning visit to the archaeological site, then return to your villa pool in the late afternoon."
+        },
+        {
+          "heading": "İnönü & local coves",
+          "body": "Smaller stone-shingle bays east of Kalkan reward those with a hire car. Pack reef shoes, water, and shade — facilities are minimal by design. Ask our concierge for the week's calmest cove if you are travelling with children."
+        },
+        {
+          "heading": "Planning from your villa",
+          "body": "Beach days work best with a packed breakfast and a late checkout mindset. We can arrange umbrellas, cool boxes, and a skipper for days when you prefer to arrive by boat instead of road."
+        }
+      ]
+    },
+    "travelSafety": {
+      "metaTitle": "Safe Travel Guide — Kalkan & Lycian Coast",
+      "metaDescription": "Practical safety tips for villa holidays in Turkey: healthcare, driving, sun, and local etiquette.",
+      "eyebrow": "Travel well",
+      "title": "A safe travel guide for the Lycian coast",
+      "intro": "The region is welcoming and well set up for visitors; a little preparation makes villa holidays effortless.",
+      "heroImageAlt": "Sunlit harbour on the Turkish Mediterranean",
+      "sections": [
+        {
+          "heading": "Healthcare",
+          "body": "Kalkan has pharmacies and a clinic; hospitals are in Kaş and Fethiye. Bring prescription medicines in original packaging and EU GHIC or travel insurance details. Our concierge records your villa address for emergency services."
+        },
+        {
+          "heading": "Roads and transfers",
+          "body": "Coastal roads are scenic but winding. If you hire a car, choose automatic transmission if you are unused to gradients. For evening meals in town, many guests prefer a taxi rather than parking on the harbour road."
+        },
+        {
+          "heading": "Sun and sea",
+          "body": "UV is strong from May to October. Reef shoes help on pebble beaches; flags on busier beaches indicate lifeguard coverage. Drinking water at villas is typically from bottles or filtered supplies — we confirm in your pre-arrival notes."
+        },
+        {
+          "heading": "Local customs",
+          "body": "Dress is relaxed in resorts but modest in villages and mosques. Ramadan dates vary; restaurants remain open in tourist areas. A polite greeting in Turkish — merhaba — is always appreciated."
+        }
+      ]
+    }
+  },
+  "contactPage": {
+    "metaTitle": "Contact — Villa Collection",
+    "metaDescription": "Reach our concierge team about villas, bookings, and special requests.",
+    "eyebrow": "Concierge",
+    "title": "Contact us",
+    "intro": "Tell us what you are planning — dates, party size, or a villa you have in mind. We reply in English, German, or Russian.",
+    "formSectionLabel": "Send a message",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "optional": "optional",
+      "subject": "Subject",
+      "subjectPlaceholder": "Choose a topic",
+      "message": "Message",
+      "submit": "Send message",
+      "submitting": "Sending…",
+      "subjectLine": "Subject: {subject}",
+      "successTitle": "Thank you",
+      "successBody": "Our team will get back to you shortly — usually within one working day.",
+      "subjects": {
+        "general": "General enquiry",
+        "booking": "Booking a villa",
+        "longStay": "Long stay",
+        "concierge": "Concierge services",
+        "other": "Something else"
+      },
+      "errors": {
+        "name": "Please enter your name.",
+        "email": "Please enter a valid email.",
+        "phone": "Please enter a valid phone number.",
+        "subject": "Please choose a subject.",
+        "message": "Your message should be at least 10 characters."
+      }
+    },
+    "info": {
+      "eyebrow": "Direct line",
+      "headline": "Our concierge team is here to help",
+      "body": "From first idea to arrival day, we assist with villa choice, availability, and extras — transfers, chefs, and special requests.",
+      "emailLabel": "Email",
+      "emailValue": "concierge@villacollection.com",
+      "phoneLabel": "Telephone",
+      "phoneDisplay": "+90 242 844 00 12",
+      "phoneTel": "+902428440012",
+      "whatsappLabel": "WhatsApp",
+      "whatsappCta": "Message on WhatsApp",
+      "hoursLabel": "Availability",
+      "hoursValue": "Our concierge team is available around the clock to assist you.",
+      "footnote": "For booking quotes, include your travel dates and number of guests so we can respond with accurate availability.",
+      "findVillaCta": "Not sure which villa? Take the quiz"
+    }
+  },
+  "staticPages": {
+    "about": {
+      "metaTitle": "About us — Villa Collection",
+      "metaDescription": "Learn how Villa Collection curates luxury villas on the Turkish Mediterranean coast.",
+      "eyebrow": "Our story",
+      "title": "About Villa Collection",
+      "intro": "We are an independent villa agency specialising in curated Mediterranean retreats. Every home in our collection is visited, priced transparently, and held to the same editorial standard you see on these pages.",
+      "sections": [
+        {
+          "heading": "Curated, not crowded",
+          "body": "We list a focused portfolio of villas rather than an endless catalogue. Each property is chosen for setting, service, and consistency — the qualities that turn a good holiday into a memorable one."
+        },
+        {
+          "heading": "Transparent pricing",
+          "body": "Rates on our site reflect what you can expect to pay: nightly accommodation, listed offers, and fees shown before you enquire. Our team confirms availability and final terms by email — no surprises at check-in."
+        },
+        {
+          "heading": "Local expertise",
+          "body": "Our concierge team lives and works on the coast. They coordinate arrivals, housekeeping, and special requests in English, German, or Russian, so you can plan with confidence from abroad."
+        }
+      ]
+    },
+    "privacy": {
+      "metaTitle": "Privacy policy — Villa Collection",
+      "metaDescription": "How Villa Collection collects, uses, and protects your personal data when you browse or book.",
+      "eyebrow": "Legal",
+      "title": "Privacy policy",
+      "intro": "This policy explains what information we collect when you use our website, how we use it, and the choices you have. By using our services, you agree to the practices described here.",
+      "updatedLabel": "Last updated: November 2025",
+      "sections": [
+        {
+          "heading": "Information we collect",
+          "body": "When you browse our site we may collect technical data such as your IP address, browser type, and pages viewed. When you submit an enquiry or booking request, we collect the contact details and stay information you provide, including name, email, phone number, travel dates, and party size."
+        },
+        {
+          "heading": "How we use your data",
+          "body": "We use your information to respond to enquiries, process booking requests, send service-related emails (including one-time access codes), improve our website, and comply with legal obligations. We do not sell your personal data to third parties."
+        },
+        {
+          "heading": "Sharing with partners",
+          "body": "To fulfil a stay we may share necessary details — such as guest names and dates — with the villa owner, local manager, or payment processor. These parties are required to handle data only for the purpose of providing the service."
+        },
+        {
+          "heading": "Cookies and preferences",
+          "body": "We use cookies to remember your language and currency preferences and to keep you signed in to secure booking pages. You can control cookies through your browser settings; some features may not work if cookies are disabled."
+        },
+        {
+          "heading": "Your rights",
+          "body": "Depending on where you live, you may have the right to access, correct, or delete personal data we hold about you, or to object to certain processing. Contact us at the address on our contact page to exercise these rights."
+        }
+      ]
+    },
+    "terms": {
+      "metaTitle": "Terms & conditions — Villa Collection",
+      "metaDescription": "Booking terms for villa enquiries and reservations through Villa Collection.",
+      "eyebrow": "Legal",
+      "title": "Terms & conditions",
+      "intro": "These terms apply when you enquire about or book a villa through Villa Collection. Villa-specific cancellation rules are confirmed in writing for each booking.",
+      "updatedLabel": "Last updated: November 2025",
+      "sections": [
+        {
+          "heading": "Enquiries and reservations",
+          "body": "Submitting an enquiry does not guarantee availability. A stay is confirmed only when we send written confirmation and, where applicable, receive any required deposit or payment. Displayed prices are estimates until confirmed by our team."
+        },
+        {
+          "heading": "Guest responsibilities",
+          "body": "You agree to provide accurate contact and travel information, respect the villa's guest policy and house rules, and treat the property with care. You are liable for damage caused by you or members of your party beyond normal wear and tear."
+        },
+        {
+          "heading": "Payments and charges",
+          "body": "Unless otherwise stated, prices are quoted in euros. Additional fees such as cleaning or security deposits will be disclosed before confirmation. Payment schedules and methods are set out in your booking confirmation."
+        },
+        {
+          "heading": "Cancellation",
+          "body": "Cancellation terms vary by villa and season. The applicable policy is shown on the villa page and restated in your confirmation email. If you cancel outside the permitted window, charges may apply as stated in that policy."
+        },
+        {
+          "heading": "Liability",
+          "body": "Villa Collection acts as agent between you and the property owner. We are not liable for events outside our reasonable control, including weather, utilities, or third-party services. Our liability is limited to the extent permitted by applicable law."
+        }
+      ]
     }
   }
 }

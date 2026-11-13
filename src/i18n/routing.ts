@@ -111,6 +111,23 @@ export const pathnames = {
     ru: "/konfidencialnost",
   },
 
+  // Travel journal.
+  "/journal": {
+    en: "/journal",
+    de: "/reisejournal",
+    ru: "/zhurnal",
+  },
+  "/journal/best-beaches": {
+    en: "/journal/best-beaches",
+    de: "/journal/die-besten-straende",
+    ru: "/journal/luchshie-plyazhi",
+  },
+  "/journal/travel-safety-guide": {
+    en: "/journal/travel-safety-guide",
+    de: "/journal/sicher-reisen",
+    ru: "/journal/bezopasnoe-puteshestvie",
+  },
+
   // Admin (same visible path in every locale; editor UI is English-centric).
   "/admin": "/admin",
   "/admin/villas": "/admin/villas",
