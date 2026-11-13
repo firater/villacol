@@ -571,6 +571,12 @@
       "body": "Check your inbox for a secure link to track this booking. You will need a one-time code from the same email to open it.",
       "backToVillas": "Browse more villas"
     },
+    "paymentSuccess": {
+      "title": "Payment received",
+      "body": "Thank you — your payment was processed securely by Stripe. We will email you with any final stay details.",
+      "confirmedHint": "Your booking is now confirmed.",
+      "backToVillas": "Browse more villas"
+    },
     "status": {
       "title": "Your booking",
       "invalidLink": "This tracking link is not valid.",

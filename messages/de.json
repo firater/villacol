@@ -558,6 +558,12 @@
       "body": "Prüfen Sie Ihr Postfach für den sicheren Link. Zum Öffnen benötigen Sie den Einmalcode aus derselben E-Mail.",
       "backToVillas": "Weitere Villen ansehen"
     },
+    "paymentSuccess": {
+      "title": "Zahlung eingegangen",
+      "body": "Vielen Dank — Ihre Zahlung wurde sicher über Stripe verarbeitet. Weitere Details zum Aufenthalt senden wir per E-Mail.",
+      "confirmedHint": "Ihre Buchung ist jetzt bestätigt.",
+      "backToVillas": "Weitere Villen ansehen"
+    },
     "status": {
       "title": "Ihre Buchung",
       "invalidLink": "Dieser Link ist ungültig.",

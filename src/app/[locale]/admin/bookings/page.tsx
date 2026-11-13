@@ -58,7 +58,7 @@ async function AdminBookingsPageContent() {
               </tr>
             ) : (
               rows.map((row) => (
-                <AdminBookingRow key={row.id} row={row} />
+                <AdminBookingRow key={row.id} row={row} locale={locale} />
               ))
             )}
           </tbody>

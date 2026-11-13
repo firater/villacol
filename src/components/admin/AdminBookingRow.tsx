@@ -6,6 +6,7 @@ import { updateBookingStatus } from "@/actions/admin/booking.actions";
 import type { AdminBookingListRow } from "@/db/queries/admin.bookings.queries";
 import type { BookingStatus } from "@/db/tables/enums";
 import { useRouter } from "@/i18n/navigation";
+import type { Locale } from "@/lib/locales";
 import {
   ADMIN_BOOKING_QUICK_LABELS,
   ADMIN_BOOKING_QUICK_STATUSES,
@@ -14,11 +15,14 @@ import {
 } from "@/lib/admin-booking-status";
 import { formatEurFromCents } from "@/lib/money";
 
+import { AdminBookingPaymentLink } from "./AdminBookingPaymentLink";
+
 type Props = {
   row: AdminBookingListRow;
+  locale: Locale;
 };
 
-export function AdminBookingRow({ row }: Props) {
+export function AdminBookingRow({ row, locale }: Props) {
   const router = useRouter();
   const [status, setStatus] = useState(row.status as BookingStatus);
   const [error, setError] = useState<string | null>(null);
@@ -93,6 +97,9 @@ export function AdminBookingRow({ row }: Props) {
           <p className="mt-2 text-xs text-red-600 dark:text-red-400" role="alert">
             {error}
           </p>
+        ) : null}
+        {status === "awaiting_payment" ? (
+          <AdminBookingPaymentLink bookingId={row.id} locale={locale} />
         ) : null}
       </td>
     </tr>
