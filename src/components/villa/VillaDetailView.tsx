@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getExchangeRates } from "@/db/queries/rates.queries";
+import { getPublishedGuestReviewsForVilla } from "@/db/queries/guest-reviews.queries";
 import { getVillaPublicCalendarSnapshot } from "@/db/queries/public.calendar.queries";
 import { getVillaDetailBundle } from "@/db/queries/villas.queries";
 import { Link } from "@/i18n/navigation";
@@ -16,7 +17,10 @@ import { CalendarProvider } from "./calendar/CalendarContext";
 import { VillaCalendar } from "./calendar/VillaCalendar";
 import { VillaCalendarLegend } from "./calendar/VillaCalendarLegend";
 import { VillaDetailGallery } from "./VillaDetailGallery";
+import { VillaEditorScore } from "./VillaEditorScore";
+import { VillaGuestReviewsSection } from "./VillaGuestReviewsSection";
 import { VillaPricingSidebar } from "./VillaPricingSidebar";
+import { VillaStayPoliciesSection } from "./VillaStayPoliciesSection";
 
 type Props = {
   villaId: number;
@@ -24,13 +28,15 @@ type Props = {
 };
 
 export async function VillaDetailView({ villaId, locale }: Props) {
-  const [bundle, calendarSnapshot, preferences, ratesRows, t, common] =
+  const [bundle, calendarSnapshot, guestReviews, preferences, ratesRows, t, tCard, common] =
     await Promise.all([
       getVillaDetailBundle(villaId, locale),
       getVillaPublicCalendarSnapshot(villaId),
+      getPublishedGuestReviewsForVilla(villaId),
       resolvePreferences(),
       getExchangeRates(),
       getTranslations("villaDetail"),
+      getTranslations("layout.villaCard"),
       getTranslations("common"),
     ]);
 
@@ -72,9 +78,17 @@ export async function VillaDetailView({ villaId, locale }: Props) {
             <VillaDetailGallery title={villa.title} images={images} />
 
             <header className="min-h-[8rem] space-y-3">
-              <h1 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
-                {villa.title}
-              </h1>
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+                <h1 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
+                  {villa.title}
+                </h1>
+                {villa.editorRating !== null ? (
+                  <VillaEditorScore
+                    rating={villa.editorRating}
+                    label={tCard("editorScoreLabel")}
+                  />
+                ) : null}
+              </div>
               {villa.locationName !== null && villa.locationSlug !== null ? (
                 <p className="text-base text-zinc-600 dark:text-zinc-400">
                   <Link
@@ -113,6 +127,35 @@ export async function VillaDetailView({ villaId, locale }: Props) {
                 {villa.summary}
               </p>
             ) : null}
+
+            {villa.description ? (
+              <div className="max-w-3xl font-sans text-sm leading-[1.85] text-stone-700 dark:text-stone-300">
+                {villa.description.split("\n").map((paragraph, index) =>
+                  paragraph.trim() === "" ? null : (
+                    <p key={index} className={index > 0 ? "mt-4" : undefined}>
+                      {paragraph}
+                    </p>
+                  ),
+                )}
+              </div>
+            ) : null}
+
+            <VillaStayPoliciesSection
+              guestPolicy={villa.guestPolicy}
+              cancellationPolicy={villa.cancellationPolicy}
+              copy={{
+                eyebrow: t("policies.eyebrow"),
+                heading: t("policies.heading"),
+                guestPolicyTitle: t("policies.guestPolicyTitle"),
+                cancellationTitle: t("policies.cancellationTitle"),
+                guestPolicy: {
+                  everyone: t("policies.guestPolicyEveryone"),
+                  couples_only: t("policies.guestPolicyCouplesOnly"),
+                  families_only: t("policies.guestPolicyFamiliesOnly"),
+                  no_friend_groups: t("policies.guestPolicyNoFriendGroups"),
+                },
+              }}
+            />
 
             <section aria-labelledby="amenities-heading" className="min-h-[6rem]">
               <h2
@@ -154,6 +197,20 @@ export async function VillaDetailView({ villaId, locale }: Props) {
               />
               <VillaCalendarLegend />
             </section>
+
+            <VillaGuestReviewsSection
+              reviews={guestReviews}
+              locale={locale}
+              formatReviewMeta={(stay, guests) =>
+                t("reviews.meta", { stay, guests })
+              }
+              copy={{
+                eyebrow: t("reviews.eyebrow"),
+                heading: t("reviews.heading"),
+                empty: t("reviews.empty"),
+                ratingAria: t("reviews.ratingAria"),
+              }}
+            />
           </div>
 
           <div className="min-h-[32rem] lg:min-h-0">

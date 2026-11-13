@@ -33,7 +33,8 @@ import {
   villas,
   villaTranslations,
 } from "@/db/schema";
-import { localize, type Locale } from "@/lib/locales";
+import type { GuestPolicy } from "@/db/tables/enums";
+import { localize, type Locale, type LocalizedText } from "@/lib/locales";
 
 /** Sort keys aligned with the universal English `sort` query param (Phase 8). */
 export type VillaListingSort =
@@ -120,6 +121,9 @@ export type VillaDetailRow = {
   longitude: number | null;
   locationName: string | null;
   locationSlug: string | null;
+  guestPolicy: GuestPolicy;
+  editorRating: number | null;
+  cancellationPolicy: string | null;
 };
 
 async function resolveLocationId(
@@ -160,6 +164,15 @@ async function resolveCategoryId(
   return rows[0]?.id ?? null;
 }
 
+function resolveCancellationPolicy(
+  raw: LocalizedText | null | undefined,
+  locale: Locale,
+): string | null {
+  if (raw === null || raw === undefined) return null;
+  const text = localize(raw, locale).trim();
+  return text === "" ? null : text;
+}
+
 export async function getVillaBySlug(
   slug: string,
   locale: Locale,
@@ -186,6 +199,9 @@ export async function getVillaBySlug(
       longitude: villas.longitude,
       locationName: locationTranslations.name,
       locationSlug: locationTranslations.slug,
+      guestPolicy: villas.guestPolicy,
+      editorRating: villas.editorRating,
+      cancellationPolicyI18n: villas.cancellationPolicyI18n,
     })
     .from(villas)
     .innerJoin(
@@ -211,7 +227,30 @@ export async function getVillaBySlug(
   if (row === undefined) return null;
 
   cacheTag(`villa-${row.id}`);
-  return row;
+  return {
+    id: row.id,
+    slug: row.slug,
+    refCode: row.refCode,
+    title: row.title,
+    summary: row.summary,
+    description: row.description,
+    bedrooms: row.bedrooms,
+    bathrooms: row.bathrooms,
+    capacity: row.capacity,
+    defaultMinStay: row.defaultMinStay,
+    checkInTime: row.checkInTime,
+    checkOutTime: row.checkOutTime,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    locationName: row.locationName,
+    locationSlug: row.locationSlug,
+    guestPolicy: row.guestPolicy,
+    editorRating: row.editorRating,
+    cancellationPolicy: resolveCancellationPolicy(
+      row.cancellationPolicyI18n as LocalizedText | null,
+      locale,
+    ),
+  };
 }
 
 export async function getVillaListing(
@@ -479,6 +518,9 @@ export async function getVillaDetailBundle(
       longitude: villas.longitude,
       locationName: locationTranslations.name,
       locationSlug: locationTranslations.slug,
+      guestPolicy: villas.guestPolicy,
+      editorRating: villas.editorRating,
+      cancellationPolicyI18n: villas.cancellationPolicyI18n,
     })
     .from(villas)
     .innerJoin(
@@ -499,8 +541,33 @@ export async function getVillaDetailBundle(
     .where(and(eq(villas.id, villaId), eq(villas.isActive, true)))
     .limit(1);
 
-  const villa = villaRows[0];
-  if (villa === undefined) return null;
+  const rawVilla = villaRows[0];
+  if (rawVilla === undefined) return null;
+
+  const villa: VillaDetailRow = {
+    id: rawVilla.id,
+    slug: rawVilla.slug,
+    refCode: rawVilla.refCode,
+    title: rawVilla.title,
+    summary: rawVilla.summary,
+    description: rawVilla.description,
+    bedrooms: rawVilla.bedrooms,
+    bathrooms: rawVilla.bathrooms,
+    capacity: rawVilla.capacity,
+    defaultMinStay: rawVilla.defaultMinStay,
+    checkInTime: rawVilla.checkInTime,
+    checkOutTime: rawVilla.checkOutTime,
+    latitude: rawVilla.latitude,
+    longitude: rawVilla.longitude,
+    locationName: rawVilla.locationName,
+    locationSlug: rawVilla.locationSlug,
+    guestPolicy: rawVilla.guestPolicy,
+    editorRating: rawVilla.editorRating,
+    cancellationPolicy: resolveCancellationPolicy(
+      rawVilla.cancellationPolicyI18n as LocalizedText | null,
+      locale,
+    ),
+  };
 
   const [images, categoryRows, amenityRows, featureRows, rulesResolved, cacheRow] =
     await Promise.all([

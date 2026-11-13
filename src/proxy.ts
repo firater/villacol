@@ -23,7 +23,7 @@
  * constants and `NextRequest`/`NextResponse` and shares no module state.
  */
 import createMiddleware from "next-intl/middleware";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
 import {
@@ -36,7 +36,12 @@ import { DEFAULT_CURRENCY, isCurrency } from "@/lib/locales";
 const handleI18nRouting = createMiddleware(routing);
 
 export function proxy(request: NextRequest) {
-  const response = handleI18nRouting(request);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+
+  const response = handleI18nRouting(
+    new NextRequest(request.url, { headers: requestHeaders }),
+  );
 
   // `handleI18nRouting` may return a redirect. Cookies set on a redirect are
   // still delivered, and the follow-up request will carry them, so there is no

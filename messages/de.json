@@ -428,6 +428,23 @@
     "bedrooms": "Schlafzimmer",
     "bathrooms": "Badezimmer",
     "amenitiesHeading": "Ausstattung",
+    "policies": {
+      "eyebrow": "Vor der Buchung",
+      "heading": "Gästeregeln & Stornierung",
+      "guestPolicyTitle": "Wer buchen darf",
+      "cancellationTitle": "Stornierung",
+      "guestPolicyEveryone": "Für alle Gäste",
+      "guestPolicyCouplesOnly": "Nur Paare",
+      "guestPolicyFamiliesOnly": "Nur Familien",
+      "guestPolicyNoFriendGroups": "Keine Freundesgruppen"
+    },
+    "reviews": {
+      "eyebrow": "Von unseren Gästen",
+      "heading": "Gästebewertungen",
+      "empty": "Noch keine Bewertungen",
+      "ratingAria": "{rating} von 5 Sternen",
+      "meta": "{stay} · {guests, plural, one {# Gast} other {# Gäste}}"
+    },
     "calendarHeading": "Verfügbarkeit",
     "calendarHint": "Wählen Sie Ihren Aufenthalt — die Preise in der Seitenleiste aktualisieren sich sofort.",
     "calendarLegendHoliday": "Feiertag",

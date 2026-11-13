@@ -1,4 +1,5 @@
 export * from "./villas.queries";
+export * from "./guest-reviews.queries";
 export * from "./admin.villas.queries";
 export * from "./admin.promotions.queries";
 export * from "./admin.calendar.queries";

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { locale as localeParam } from "next/root-params";
 import { hasLocale } from "next-intl";
+import { Suspense } from "react";
 
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -12,7 +13,15 @@ function fmt(d: Date | null) {
   return d.toISOString().slice(0, 16).replace("T", " ");
 }
 
-export default async function AdminDealsPage() {
+export default function AdminDealsPage() {
+  return (
+    <Suspense fallback={<AdminDealsPageFallback />}>
+      <AdminDealsPageContent />
+    </Suspense>
+  );
+}
+
+async function AdminDealsPageContent() {
   const localeRaw = await localeParam();
   if (!hasLocale(routing.locales, localeRaw)) {
     notFound();
@@ -97,6 +106,29 @@ export default async function AdminDealsPage() {
             )}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+function AdminDealsPageFallback() {
+  return (
+    <div className="mx-auto max-w-5xl space-y-6" aria-busy="true">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="h-8 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+          <div className="mt-2 h-4 w-48 animate-pulse rounded bg-zinc-100 dark:bg-zinc-900" />
+        </div>
+        <div className="h-9 w-24 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
+      </div>
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="h-11 animate-pulse border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950" />
+        {Array.from({ length: 5 }, (_, i) => (
+          <div
+            key={i}
+            className="h-12 animate-pulse border-b border-zinc-100 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-950/30"
+          />
+        ))}
       </div>
     </div>
   );

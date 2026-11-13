@@ -104,6 +104,7 @@ export function VillaAdminForm(props: Props) {
     "details" | "promotions" | "media"
   >("details");
   const [tab, setTab] = useState<Locale>("en");
+  const [policyLocale, setPolicyLocale] = useState<Locale>("en");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -613,8 +614,12 @@ export function VillaAdminForm(props: Props) {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
             Policies &amp; editorial
           </h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <label className="block">
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+            Shown on the public villa page. English cancellation copy is required
+            before other locales.
+          </p>
+          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+            <label className="block sm:col-span-2">
               <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                 Guest policy
               </span>
@@ -650,8 +655,53 @@ export function VillaAdminForm(props: Props) {
                 className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               />
               <span className="mt-1 block text-xs text-zinc-500">
-                Internal editorial score. Shown on the villa card when set.
+                Shown on listing cards and the villa detail page when set.
               </span>
+            </label>
+            <div className="block rounded-lg border border-dashed border-zinc-200 bg-zinc-50/80 px-4 py-3 text-xs leading-relaxed text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950/50 dark:text-zinc-400">
+              Booking inquiries that violate the guest policy are rejected on the
+              server with a clear error — no extra admin step required.
+            </div>
+          </div>
+
+          <div className="mt-8 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+            <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+              Cancellation policy (per locale)
+            </span>
+            <div className="mt-3 flex gap-1 border-b border-zinc-200 dark:border-zinc-700">
+              {LOCALES.map((loc) => (
+                <button
+                  key={loc}
+                  type="button"
+                  onClick={() => setPolicyLocale(loc)}
+                  className={`px-3 py-2 text-sm font-medium ${
+                    policyLocale === loc
+                      ? "border-b-2 border-zinc-900 text-zinc-900 dark:border-zinc-100 dark:text-zinc-50"
+                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                  }`}
+                >
+                  {TAB_LABEL[loc]}
+                </button>
+              ))}
+            </div>
+            <label className="mt-4 block">
+              <span className="sr-only">Cancellation policy ({policyLocale})</span>
+              <textarea
+                rows={5}
+                value={cancellationPolicy[policyLocale]}
+                onChange={(e) =>
+                  setCancellationPolicy((prev) => ({
+                    ...prev,
+                    [policyLocale]: e.target.value,
+                  }))
+                }
+                placeholder={
+                  policyLocale === "en"
+                    ? "Free cancellation up to 30 days before check-in…"
+                    : "Leave empty to fall back to English on the site."
+                }
+                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm leading-relaxed dark:border-zinc-700 dark:bg-zinc-950"
+              />
             </label>
           </div>
         </section>
@@ -718,23 +768,6 @@ export function VillaAdminForm(props: Props) {
                 rows={8}
                 value={current.description}
                 onChange={(e) => updateCurrent({ description: e.target.value })}
-                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                Cancellation policy
-              </span>
-              <textarea
-                rows={4}
-                value={cancellationPolicy[tab]}
-                onChange={(e) =>
-                  setCancellationPolicy((prev) => ({
-                    ...prev,
-                    [tab]: e.target.value,
-                  }))
-                }
-                placeholder="Free cancellation up to 30 days before check-in…"
                 className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               />
             </label>

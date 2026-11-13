@@ -7,11 +7,11 @@ import { setRequestLocale } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { Suspense, type ReactNode } from "react";
 
-import { Footer } from "@/components/layout/Footer";
 import { HeaderFallback } from "@/components/layout/HeaderFallback";
-import { HeaderWithPreferences } from "@/components/layout/HeaderWithPreferences";
-import { PublicNavGate } from "@/components/layout/PublicNavGate";
-import { TopAnnouncementBar } from "@/components/layout/TopAnnouncementBar";
+import {
+  PublicSiteFooter,
+  PublicSiteHeader,
+} from "@/components/layout/PublicSiteChrome";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/lib/locales";
 
@@ -68,16 +68,13 @@ export default async function LocaleLayout({ children }: { children: ReactNode }
     >
       <body className="font-sans min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Istanbul">
-          <PublicNavGate>
-            <TopAnnouncementBar />
-            <Suspense fallback={<HeaderFallback />}>
-              <HeaderWithPreferences locale={locale} />
-            </Suspense>
-          </PublicNavGate>
+          <Suspense fallback={<HeaderFallback />}>
+            <PublicSiteHeader locale={locale} />
+          </Suspense>
           <div className="flex flex-1 flex-col">{children}</div>
-          <PublicNavGate>
-            <Footer />
-          </PublicNavGate>
+          <Suspense fallback={null}>
+            <PublicSiteFooter />
+          </Suspense>
         </NextIntlClientProvider>
       </body>
     </html>

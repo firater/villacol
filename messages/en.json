@@ -441,6 +441,23 @@
     "bedrooms": "Bedrooms",
     "bathrooms": "Bathrooms",
     "amenitiesHeading": "Amenities",
+    "policies": {
+      "eyebrow": "Before you book",
+      "heading": "Guest rules & cancellation",
+      "guestPolicyTitle": "Who may stay",
+      "cancellationTitle": "Cancellation",
+      "guestPolicyEveryone": "Open to all guests",
+      "guestPolicyCouplesOnly": "Couples only",
+      "guestPolicyFamiliesOnly": "Families only",
+      "guestPolicyNoFriendGroups": "No friend groups"
+    },
+    "reviews": {
+      "eyebrow": "From our guests",
+      "heading": "Guest reviews",
+      "empty": "No reviews yet",
+      "ratingAria": "{rating} out of 5 stars",
+      "meta": "{stay} · {guests, plural, one {# guest} other {# guests}}"
+    },
     "calendarHeading": "Availability",
     "calendarHint": "Select your stay — the sidebar updates with your price instantly.",
     "calendarLegendHoliday": "Public holiday",

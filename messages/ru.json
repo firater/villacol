@@ -428,6 +428,23 @@
     "bedrooms": "Спальни",
     "bathrooms": "Ванные",
     "amenitiesHeading": "Удобства",
+    "policies": {
+      "eyebrow": "Перед бронированием",
+      "heading": "Правила для гостей и отмена",
+      "guestPolicyTitle": "Кому подходит",
+      "cancellationTitle": "Отмена",
+      "guestPolicyEveryone": "Для всех гостей",
+      "guestPolicyCouplesOnly": "Только для пар",
+      "guestPolicyFamiliesOnly": "Только для семей",
+      "guestPolicyNoFriendGroups": "Без компаний друзей"
+    },
+    "reviews": {
+      "eyebrow": "От наших гостей",
+      "heading": "Отзывы гостей",
+      "empty": "Пока нет отзывов",
+      "ratingAria": "{rating} из 5 звёзд",
+      "meta": "{stay} · {guests, plural, one {# гость} few {# гостя} many {# гостей} other {# гостя}}"
+    },
     "calendarHeading": "Доступность",
     "calendarHint": "Выберите даты — цена в боковой панели обновится сразу.",
     "calendarLegendHoliday": "Праздник",
