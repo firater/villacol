@@ -11,6 +11,7 @@ import {
   villas,
 } from "@/db/schema";
 import { diffInNights, getBusinessToday, type DateString } from "@/lib/dates";
+import type { BookingStatus } from "@/db/tables/enums";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/locales";
 
 const REVENUE_STATUSES = ["confirmed", "completed"] as const;
@@ -29,7 +30,7 @@ export type RecentBookingRow = {
   checkIn: string;
   checkOut: string;
   grandTotalCents: number;
-  status: string;
+  status: BookingStatus;
 };
 
 export type DashboardMetrics = {

@@ -436,6 +436,47 @@
     "timerLabel": "Special discount",
     "timerAria": "Re-open your exclusive offer and view the countdown"
   },
+  "promotionsHub": {
+    "eyebrow": "Offers",
+    "title": "Promotions hub",
+    "subtitle": "Every offer in one place — from booking direct and skipping our {waiverPercent} agency commission to last-minute escapes and private codes.",
+    "allDiscountedCta": "View all discounted villas",
+    "jumpNavAria": "Jump to offer category",
+    "tiersHeading": "Discount tiers",
+    "villasCount": "{count, plural, one {# villa} other {# villas}}",
+    "sections": {
+      "direct-booking": {
+        "nav": "Direct booking",
+        "title": "Direct booking & no commission",
+        "body": "When you reserve with us directly, we waive our agency commission — typically {waiverPercent} — so the saving stays with you instead of a middleman.",
+        "cta": "See direct-booking villas"
+      },
+      "long-stay": {
+        "nav": "Long stay",
+        "title": "Long stay & free nights",
+        "body": "Stay a little longer and let the villa reward you — for example, book seven nights and the seventh is on us on selected properties.",
+        "cta": "Browse long-stay offers"
+      },
+      "early-bird": {
+        "nav": "Early bird",
+        "title": "Early bird savings",
+        "body": "Plan ahead and unlock our deepest rates. Villas with generous lead-time windows reward guests who commit early.",
+        "cta": "Shop early-bird deals"
+      },
+      "last-minute": {
+        "nav": "Last minute",
+        "title": "Last minute deals",
+        "body": "Spontaneous week ahead? These villas drop their price when your arrival is only days away.",
+        "cta": "Last-minute villas"
+      },
+      "coupons": {
+        "nav": "Coupons",
+        "title": "Secret coupons & exclusives",
+        "body": "Promo codes and members-only drops — including the exclusive offer surfaced from our exit-intent experience.",
+        "cta": "Villas with codes"
+      }
+    }
+  },
   "villaDetail": {
     "capacity": "Capacity",
     "bedrooms": "Bedrooms",
@@ -443,12 +484,13 @@
     "amenitiesHeading": "Amenities",
     "policies": {
       "eyebrow": "Before you book",
-      "heading": "Guest rules & cancellation",
-      "guestPolicyTitle": "Who may stay",
+      "heading": "Rules & policies",
+      "guestPolicyTitle": "Guest policy",
       "cancellationTitle": "Cancellation",
+      "cancellationEmpty": "Please contact us for current cancellation terms.",
       "guestPolicyEveryone": "Open to all guests",
       "guestPolicyCouplesOnly": "Couples only",
-      "guestPolicyFamiliesOnly": "Families only",
+      "guestPolicyFamiliesOnly": "Families with children only",
       "guestPolicyNoFriendGroups": "No friend groups"
     },
     "reviews": {
@@ -476,6 +518,7 @@
       "selectDates": "Please select both check-in and check-out.",
       "baseTotal": "Accommodation (before discounts)",
       "promotions": "Applied offers",
+      "commissionWaiverLine": "No Commission ({percent}% off)",
       "totalDiscount": "Total discounts",
       "cleaningFee": "Cleaning fee",
       "grandTotal": "Estimated total",
@@ -503,7 +546,11 @@
       "title": "Complete your inquiry",
       "missingDates": "Add check-in, check-out, and guests from the villa page before continuing.",
       "estimatedTotal": "Estimated total: {total}",
+      "viewPriceDetails": "View price details",
+      "hidePriceDetails": "Hide price details",
       "datesLine": "{checkIn} → {checkOut} · {nights, plural, one {# night} other {# nights}}",
+      "phoneCountryCode": "Country code",
+      "phoneRequired": "Enter a valid phone number.",
       "guestName": "Full name",
       "guestEmail": "Email",
       "guestPhone": "Phone",

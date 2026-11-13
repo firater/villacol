@@ -1,5 +1,6 @@
 "use server";
 
+import { connection } from "next/server";
 import { z } from "zod";
 
 import { loadVillaPricingContext } from "@/db/queries/pricing.queries";
@@ -92,6 +93,8 @@ export async function getVillaQuote(
   input: z.input<typeof quoteSchema>,
 ): Promise<ActionResult<QuoteDisplay>> {
   try {
+    await connection();
+
     const parsed = quoteSchema.safeParse(input);
     if (!parsed.success) return invalid(parsed.error);
 

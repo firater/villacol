@@ -6,7 +6,14 @@ import { useState, useTransition } from "react";
 import { createBookingInquiry } from "@/actions/public/booking.actions";
 import { Link, useRouter } from "@/i18n/navigation";
 import { markExitIntentUsed } from "@/lib/exit-intent-cookies";
+import {
+  defaultPhoneDialCode,
+  formatGuestPhone,
+  PHONE_DIAL_OPTIONS,
+} from "@/lib/phone-dial-codes";
 import type { QuoteDisplay } from "@/actions/public/quote.actions";
+
+import { QuotePriceBreakdown } from "./QuotePriceBreakdown";
 
 type Props = {
   villaId: number;
@@ -28,13 +35,19 @@ export function BookingInquiryForm({
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [priceDetailsOpen, setPriceDetailsOpen] = useState(false);
 
   const [guestName, setGuestName] = useState("");
   const [guestEmail, setGuestEmail] = useState("");
-  const [guestPhone, setGuestPhone] = useState("");
+  const [phoneDialCode, setPhoneDialCode] = useState(() =>
+    defaultPhoneDialCode(quote.locale),
+  );
+  const [phoneNational, setPhoneNational] = useState("");
   const [guestNote, setGuestNote] = useState("");
   const [partySize, setPartySize] = useState(guestCount);
   const [acceptTerms, setAcceptTerms] = useState(false);
+
+  const canSubmit = acceptTerms && !pending;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,6 +56,12 @@ export function BookingInquiryForm({
 
     if (!acceptTerms) {
       setFieldErrors({ acceptTerms: [t("termsRequired")] });
+      return;
+    }
+
+    const guestPhone = formatGuestPhone(phoneDialCode, phoneNational);
+    if (guestPhone.length < 5) {
+      setFieldErrors({ guestPhone: [t("phoneRequired")] });
       return;
     }
 
@@ -86,6 +105,21 @@ export function BookingInquiryForm({
             nights: quote.nightCount,
           })}
         </p>
+        <div className="mt-3 border-t border-zinc-200/80 pt-3 dark:border-zinc-700">
+          <button
+            type="button"
+            onClick={() => setPriceDetailsOpen((open) => !open)}
+            aria-expanded={priceDetailsOpen}
+            className="text-xs font-medium tracking-wide text-amber-900/90 underline-offset-2 hover:underline dark:text-amber-200/90"
+          >
+            {priceDetailsOpen ? t("hidePriceDetails") : t("viewPriceDetails")}
+          </button>
+          {priceDetailsOpen ? (
+            <div className="mt-3">
+              <QuotePriceBreakdown display={quote} guestCount={partySize} />
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <label className="block">
@@ -111,6 +145,7 @@ export function BookingInquiryForm({
         <input
           type="email"
           required
+          autoComplete="email"
           value={guestEmail}
           onChange={(e) => setGuestEmail(e.target.value)}
           className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
@@ -124,13 +159,33 @@ export function BookingInquiryForm({
         <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
           {t("guestPhone")}
         </span>
-        <input
-          type="tel"
-          required
-          value={guestPhone}
-          onChange={(e) => setGuestPhone(e.target.value)}
-          className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
-        />
+        <div className="mt-1.5 flex gap-2">
+          <select
+            value={phoneDialCode}
+            onChange={(e) => setPhoneDialCode(e.target.value)}
+            aria-label={t("phoneCountryCode")}
+            className="w-[6.25rem] shrink-0 rounded-lg border border-zinc-300 bg-white px-2 py-2 text-sm tabular-nums text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+          >
+            {PHONE_DIAL_OPTIONS.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <input
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            required
+            minLength={5}
+            value={phoneNational}
+            onChange={(e) => setPhoneNational(e.target.value)}
+            className="min-w-0 flex-1 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+          />
+        </div>
+        {fieldErrors.guestPhone?.[0] ? (
+          <p className="mt-1 text-xs text-red-600">{fieldErrors.guestPhone[0]}</p>
+        ) : null}
       </label>
 
       <label className="block">
@@ -164,9 +219,17 @@ export function BookingInquiryForm({
       <label className="flex items-start gap-2 text-sm text-zinc-800 dark:text-zinc-200">
         <input
           type="checkbox"
-          required
           checked={acceptTerms}
-          onChange={(e) => setAcceptTerms(e.target.checked)}
+          onChange={(e) => {
+            setAcceptTerms(e.target.checked);
+            if (e.target.checked) {
+              setFieldErrors((prev) => {
+                const next = { ...prev };
+                delete next.acceptTerms;
+                return next;
+              });
+            }
+          }}
           className="mt-0.5 rounded border-zinc-300"
         />
         <span>
@@ -189,8 +252,8 @@ export function BookingInquiryForm({
 
       <button
         type="submit"
-        disabled={pending}
-        className="w-full rounded-full bg-zinc-900 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+        disabled={!canSubmit}
+        className="w-full rounded-full bg-zinc-900 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-45 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
         {pending ? t("submitting") : t("submit")}
       </button>

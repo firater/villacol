@@ -1084,6 +1084,7 @@ describe("quote metadata", () => {
         displayName: "10% off",
         discountType: "percentage",
         discountCents: 7_000,
+        percentBp: 1_000,
       },
       {
         stepIndex: 1,
@@ -1091,6 +1092,7 @@ describe("quote metadata", () => {
         displayName: "1 night free",
         discountType: "free_days",
         discountCents: 9_000,
+        percentBp: null,
       },
     ]);
   });

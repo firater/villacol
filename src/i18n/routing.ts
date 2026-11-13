@@ -43,6 +43,11 @@ export const pathnames = {
     de: "/villa-angebote",
     ru: "/predlozheniya",
   },
+  "/promotions": {
+    en: "/promotions",
+    de: "/promotionen",
+    ru: "/akcii",
+  },
   "/find-villa": {
     en: "/find-villa",
     de: "/villa-finden",
@@ -115,6 +120,7 @@ export const pathnames = {
   "/admin/deals": "/admin/deals",
   "/admin/deals/[id]": "/admin/deals/[id]",
   "/admin/messages": "/admin/messages",
+  "/admin/bookings": "/admin/bookings",
   "/admin/promotions/[id]": "/admin/promotions/[id]",
 
   "/login": "/login",

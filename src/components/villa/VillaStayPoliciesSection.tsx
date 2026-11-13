@@ -11,6 +11,7 @@ type PolicyCopy = {
     families_only: string;
     no_friend_groups: string;
   };
+  cancellationEmpty?: string;
 };
 
 type Props = {
@@ -24,60 +25,57 @@ export function VillaStayPoliciesSection({
   cancellationPolicy,
   copy,
 }: Props) {
-  const showGuestPolicy = guestPolicy !== "everyone";
-  const showCancellation = cancellationPolicy !== null && cancellationPolicy.trim() !== "";
+  const cancellationText =
+    cancellationPolicy !== null && cancellationPolicy.trim() !== ""
+      ? cancellationPolicy.trim()
+      : null;
 
-  if (!showGuestPolicy && !showCancellation) {
+  if (guestPolicy === "everyone" && cancellationText === null) {
     return null;
   }
 
   const guestPolicyLabel = copy.guestPolicy[guestPolicy];
 
   return (
-    <section aria-labelledby="stay-policies-heading" className="space-y-6">
-      <div className="max-w-3xl">
-        <div
-          aria-hidden
-          className="mb-6 h-px w-full bg-gradient-to-r from-stone-300/85 via-stone-300/40 to-transparent"
-        />
-        <p className="mb-3 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-400">
+    <section aria-labelledby="rules-policies-heading" className="space-y-8">
+      <header className="max-w-3xl">
+        <div aria-hidden className="mb-6 h-px w-full bg-stone-300/80" />
+        <p className="mb-3 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-500">
           {copy.eyebrow}
         </p>
         <h2
-          id="stay-policies-heading"
-          className="font-serif text-2xl font-semibold tracking-tight text-stone-900 dark:text-stone-50"
+          id="rules-policies-heading"
+          className="font-serif text-[clamp(1.65rem,3vw,2.1rem)] font-semibold tracking-tight text-stone-900 dark:text-stone-50"
         >
           {copy.heading}
         </h2>
+      </header>
+
+      <div className="grid max-w-3xl gap-px border border-stone-300/90 bg-stone-300/90 dark:border-stone-700 dark:bg-stone-700 sm:grid-cols-2">
+        <article className="bg-stone-50/90 px-6 py-7 dark:bg-stone-950/90 sm:min-h-[11rem]">
+          <h3 className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-500">
+            {copy.guestPolicyTitle}
+          </h3>
+          <p className="mt-4 font-serif text-xl leading-snug text-stone-900 dark:text-stone-100">
+            {guestPolicyLabel}
+          </p>
+        </article>
+
+        <article className="bg-white px-6 py-7 dark:bg-stone-950 sm:min-h-[11rem]">
+          <h3 className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-500">
+            {copy.cancellationTitle}
+          </h3>
+          {cancellationText !== null ? (
+            <p className="mt-4 font-sans text-sm leading-[1.85] text-stone-700 dark:text-stone-300">
+              {cancellationText}
+            </p>
+          ) : (
+            <p className="mt-4 font-sans text-sm italic text-stone-500 dark:text-stone-400">
+              {copy.cancellationEmpty ?? "Contact us for cancellation terms."}
+            </p>
+          )}
+        </article>
       </div>
-
-      <dl className="grid max-w-3xl gap-8 sm:grid-cols-2">
-        {showGuestPolicy ? (
-          <div className="space-y-2 border-l border-stone-300/80 pl-5 dark:border-stone-700">
-            <dt className="font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-500">
-              {copy.guestPolicyTitle}
-            </dt>
-            <dd className="font-serif text-lg text-stone-900 dark:text-stone-100">
-              {guestPolicyLabel}
-            </dd>
-          </div>
-        ) : null}
-
-        {showCancellation ? (
-          <div
-            className={`space-y-2 border-l border-stone-300/80 pl-5 dark:border-stone-700 ${
-              showGuestPolicy ? "" : "sm:col-span-2"
-            }`}
-          >
-            <dt className="font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-500">
-              {copy.cancellationTitle}
-            </dt>
-            <dd className="font-sans text-sm leading-[1.75] text-stone-700 dark:text-stone-300">
-              {cancellationPolicy}
-            </dd>
-          </div>
-        ) : null}
-      </dl>
     </section>
   );
 }

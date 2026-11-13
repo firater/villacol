@@ -4,7 +4,9 @@ import { hasLocale } from "next-intl";
 import { Suspense } from "react";
 
 import { getDashboardMetrics } from "@/actions/admin/analytics.actions";
+import { AdminBookingStatusControl } from "@/components/admin/AdminBookingStatusControl";
 import { AdminDashboardSkeleton } from "@/components/admin/AdminDashboardSkeleton";
+import type { BookingStatus } from "@/db/tables/enums";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/lib/locales";
 import { fromCents } from "@/lib/money";
@@ -19,19 +21,6 @@ const EUR_FORMAT = new Intl.NumberFormat("en-GB", {
 function formatEur(cents: number): string {
   return EUR_FORMAT.format(fromCents(cents));
 }
-
-const STATUS_STYLES: Record<string, string> = {
-  inquiry:
-    "bg-amber-100 text-amber-900 dark:bg-amber-950/50 dark:text-amber-100",
-  pending: "bg-sky-100 text-sky-900 dark:bg-sky-950/50 dark:text-sky-100",
-  awaiting_payment:
-    "bg-violet-100 text-violet-900 dark:bg-violet-950/50 dark:text-violet-100",
-  confirmed:
-    "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-100",
-  completed:
-    "bg-zinc-200 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-200",
-};
 
 export default function AdminDashboardPage() {
   return (
@@ -158,7 +147,7 @@ async function AdminDashboardContent() {
                 <th className="px-4 py-3 font-medium">Villa</th>
                 <th className="px-4 py-3 font-medium">Dates</th>
                 <th className="px-4 py-3 font-medium text-right">Total</th>
-                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Status &amp; actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -187,14 +176,11 @@ async function AdminDashboardContent() {
                       {formatEur(row.grandTotalCents)}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${
-                          STATUS_STYLES[row.status] ??
-                          "bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200"
-                        }`}
-                      >
-                        {row.status.replaceAll("_", " ")}
-                      </span>
+                      <AdminBookingStatusControl
+                        bookingId={row.id}
+                        initialStatus={row.status as BookingStatus}
+                        variant="compact"
+                      />
                     </td>
                   </tr>
                 ))

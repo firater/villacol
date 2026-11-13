@@ -18,6 +18,7 @@ type StaticPathname =
   | "/"
   | "/villas"
   | "/villa-offers"
+  | "/promotions"
   | "/contact"
   | "/about"
   | "/terms"

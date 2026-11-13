@@ -6,11 +6,10 @@
  * `villa_promotions`, so attaching a promotion in the admin changes the counts
  * on the next request instead of on the next scheduled run.
  */
-import { and, eq, isNull, or, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 
 import { db } from "@/db";
-import { promotions, villaPromotions, villas } from "@/db/schema";
 import type { DiscountType, PromotionTrigger } from "@/db/tables/enums";
 import { resolveCommissionRateBp } from "@/lib/commission";
 
@@ -41,6 +40,12 @@ const UNIT_BY_DISCOUNT_TYPE: Record<DiscountType, DiscountTierUnit> = {
   free_days: "free_nights",
 };
 
+type DiscountTierRow = {
+  discount_type: DiscountType;
+  discount_value: number;
+  villa_count: number;
+};
+
 /**
  * Counts active villas per exact discount value.
  *
@@ -62,56 +67,49 @@ export async function getDiscountTiers(
 
   const commissionRateBp = resolveCommissionRateBp();
 
-  // `commission_waiver` with no value of its own discounts by the global rate,
-  // so it has to be folded in here or those villas would group under null.
-  const discountValue = sql<number>`
-    case ${promotions.discountType}::text
-      when 'percentage' then ${promotions.percentBp}
-      when 'commission_waiver' then coalesce(${promotions.percentBp}, ${commissionRateBp})
-      when 'fixed_amount' then ${promotions.fixedAmountCents}
-      when 'free_days' then ${promotions.freeNights}
-    end
-  `;
+  const discountTypeClause = filter.discountType
+    ? sql`AND p.discount_type = ${filter.discountType}`
+    : sql``;
+  const triggerTypeClause = filter.triggerType
+    ? sql`AND p.trigger_type = ${filter.triggerType}`
+    : sql``;
 
-  const today = sql`current_date`;
+  // Inner query computes `discount_value` once per row; outer query groups by alias.
+  // Drizzle inlines repeated CASE fragments in GROUP BY and triggers Postgres 42803.
+  const result = await db.execute<DiscountTierRow>(sql`
+    SELECT
+      discount_type,
+      discount_value,
+      count(DISTINCT villa_id)::int AS villa_count
+    FROM (
+      SELECT
+        p.discount_type,
+        (CASE p.discount_type::text
+          WHEN 'percentage' THEN p.percent_bp
+          WHEN 'commission_waiver' THEN coalesce(p.percent_bp, ${commissionRateBp})
+          WHEN 'fixed_amount' THEN p.fixed_amount_cents
+          WHEN 'free_days' THEN p.free_nights
+        END)::int AS discount_value,
+        v.id AS villa_id
+      FROM villa_promotions vp
+      INNER JOIN promotions p ON p.id = vp.promotion_id
+      INNER JOIN villas v ON v.id = vp.villa_id
+      WHERE p.is_active = true
+        AND v.is_active = true
+        AND (p.booking_window_start IS NULL OR p.booking_window_start <= current_date)
+        AND (p.booking_window_end IS NULL OR p.booking_window_end >= current_date)
+        ${discountTypeClause}
+        ${triggerTypeClause}
+    ) tier_rows
+    WHERE discount_value IS NOT NULL
+    GROUP BY discount_type, discount_value
+    ORDER BY discount_value DESC
+  `);
 
-  const rows = await db
-    .select({
-      discountType: promotions.discountType,
-      value: sql<number>`${discountValue}::int`,
-      villaCount: sql<number>`count(distinct ${villas.id})::int`,
-    })
-    .from(villaPromotions)
-    .innerJoin(promotions, eq(promotions.id, villaPromotions.promotionId))
-    .innerJoin(villas, eq(villas.id, villaPromotions.villaId))
-    .where(
-      and(
-        eq(promotions.isActive, true),
-        eq(villas.isActive, true),
-        or(
-          isNull(promotions.bookingWindowStart),
-          sql`${promotions.bookingWindowStart} <= ${today}`,
-        ),
-        or(
-          isNull(promotions.bookingWindowEnd),
-          sql`${promotions.bookingWindowEnd} >= ${today}`,
-        ),
-        filter.discountType
-          ? eq(promotions.discountType, filter.discountType)
-          : undefined,
-        filter.triggerType
-          ? eq(promotions.triggerType, filter.triggerType)
-          : undefined,
-        sql`${discountValue} is not null`,
-      ),
-    )
-    .groupBy(promotions.discountType, discountValue)
-    .orderBy(sql`${discountValue} desc`);
-
-  return rows.map((row) => ({
-    discountType: row.discountType,
-    unit: UNIT_BY_DISCOUNT_TYPE[row.discountType],
-    value: row.value,
-    villaCount: row.villaCount,
+  return result.rows.map((row) => ({
+    discountType: row.discount_type,
+    unit: UNIT_BY_DISCOUNT_TYPE[row.discount_type],
+    value: row.discount_value,
+    villaCount: row.villa_count,
   }));
 }

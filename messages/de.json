@@ -423,6 +423,47 @@
     "timerLabel": "Sonderrabatt",
     "timerAria": "Exklusives Angebot und Countdown erneut öffnen"
   },
+  "promotionsHub": {
+    "eyebrow": "Angebote",
+    "title": "Promotionen",
+    "subtitle": "Alle Angebote an einem Ort — vom Direktbuchungs-Verzicht auf {waiverPercent} Provision bis zu Last-Minute- und Code-Aktionen.",
+    "allDiscountedCta": "Alle Villen mit Rabatt",
+    "jumpNavAria": "Zu Angebotskategorie springen",
+    "tiersHeading": "Rabattstufen",
+    "villasCount": "{count, plural, one {# Villa} other {# Villen}}",
+    "sections": {
+      "direct-booking": {
+        "nav": "Direktbuchung",
+        "title": "Direktbuchung ohne Provision",
+        "body": "Buchen Sie direkt bei uns — wir verzichten auf unsere Agenturprovision, in der Regel {waiverPercent}, und die Ersparnis bleibt bei Ihnen.",
+        "cta": "Direktbuchungs-Villen"
+      },
+      "long-stay": {
+        "nav": "Langaufenthalt",
+        "title": "Langaufenthalt & Gratisnächte",
+        "body": "Bleiben Sie länger: Buchen Sie z. B. sieben Nächte und die siebte geht auf unser Konto — bei ausgewählten Villen.",
+        "cta": "Langaufenthalt-Angebote"
+      },
+      "early-bird": {
+        "nav": "Frühbucher",
+        "title": "Frühbucher-Rabatte",
+        "body": "Planen Sie früh und sichern Sie sich die besten Preise für Villen mit großzügigen Vorlaufbedingungen.",
+        "cta": "Frühbucher-Villen"
+      },
+      "last-minute": {
+        "nav": "Last minute",
+        "title": "Last-Minute-Deals",
+        "body": "Spontan in den Urlaub? Diese Villen senken den Preis, wenn Ihre Anreise nur noch wenige Tage entfernt ist.",
+        "cta": "Last-Minute-Villen"
+      },
+      "coupons": {
+        "nav": "Gutscheine",
+        "title": "Geheime Codes & Exklusives",
+        "body": "Promo-Codes und exklusive Angebote — einschließlich der Exit-Intent-Aktion.",
+        "cta": "Villen mit Codes"
+      }
+    }
+  },
   "villaDetail": {
     "capacity": "Kapazität",
     "bedrooms": "Schlafzimmer",
@@ -430,12 +471,13 @@
     "amenitiesHeading": "Ausstattung",
     "policies": {
       "eyebrow": "Vor der Buchung",
-      "heading": "Gästeregeln & Stornierung",
-      "guestPolicyTitle": "Wer buchen darf",
+      "heading": "Regeln & Richtlinien",
+      "guestPolicyTitle": "Gästerichtlinie",
       "cancellationTitle": "Stornierung",
+      "cancellationEmpty": "Bitte kontaktieren Sie uns für die aktuellen Stornobedingungen.",
       "guestPolicyEveryone": "Für alle Gäste",
       "guestPolicyCouplesOnly": "Nur Paare",
-      "guestPolicyFamiliesOnly": "Nur Familien",
+      "guestPolicyFamiliesOnly": "Nur Familien mit Kindern",
       "guestPolicyNoFriendGroups": "Keine Freundesgruppen"
     },
     "reviews": {
@@ -463,6 +505,7 @@
       "selectDates": "Bitte An- und Abreisedatum angeben.",
       "baseTotal": "Unterkunft (vor Rabatten)",
       "promotions": "Aktive Angebote",
+      "commissionWaiverLine": "Keine Provision ({percent} % Rabatt)",
       "totalDiscount": "Rabatte gesamt",
       "cleaningFee": "Reinigungsgebühr",
       "grandTotal": "Geschätzte Gesamtsumme",
@@ -490,7 +533,11 @@
       "title": "Anfrage abschließen",
       "missingDates": "Bitte wählen Sie auf der Villenseite Ein- und Abreise sowie Gästezahl.",
       "estimatedTotal": "Geschätzter Gesamtpreis: {total}",
+      "viewPriceDetails": "Preisdetails anzeigen",
+      "hidePriceDetails": "Preisdetails ausblenden",
       "datesLine": "{checkIn} → {checkOut} · {nights, plural, one {# Nacht} other {# Nächte}}",
+      "phoneCountryCode": "Ländervorwahl",
+      "phoneRequired": "Bitte geben Sie eine gültige Telefonnummer ein.",
       "guestName": "Name",
       "guestEmail": "E-Mail",
       "guestPhone": "Telefon",

@@ -77,11 +77,30 @@ export async function VillaDetailView({ villaId, locale }: Props) {
           <div className="min-w-0 space-y-10">
             <VillaDetailGallery title={villa.title} images={images} />
 
-            <header className="min-h-[8rem] space-y-3">
-              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                <h1 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
-                  {villa.title}
-                </h1>
+            <header className="min-h-[8rem] space-y-4">
+              <h1 className="max-w-3xl font-serif text-[clamp(2rem,4.5vw,2.75rem)] font-semibold leading-[1.05] tracking-tight text-stone-900 dark:text-stone-50">
+                {villa.title}
+              </h1>
+              <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <div className="space-y-2">
+                  {villa.locationName !== null && villa.locationSlug !== null ? (
+                    <p className="font-sans text-base text-stone-600 dark:text-stone-400">
+                      <Link
+                        href={{
+                          pathname: "/locations/[slug]",
+                          params: { slug: villa.locationSlug },
+                        }}
+                        className="hover:text-stone-900 hover:underline dark:hover:text-stone-200"
+                      >
+                        {villa.locationName}
+                      </Link>
+                    </p>
+                  ) : villa.locationName !== null ? (
+                    <p className="font-sans text-base text-stone-600 dark:text-stone-400">
+                      {villa.locationName}
+                    </p>
+                  ) : null}
+                </div>
                 {villa.editorRating !== null ? (
                   <VillaEditorScore
                     rating={villa.editorRating}
@@ -89,24 +108,7 @@ export async function VillaDetailView({ villaId, locale }: Props) {
                   />
                 ) : null}
               </div>
-              {villa.locationName !== null && villa.locationSlug !== null ? (
-                <p className="text-base text-zinc-600 dark:text-zinc-400">
-                  <Link
-                    href={{
-                      pathname: "/locations/[slug]",
-                      params: { slug: villa.locationSlug },
-                    }}
-                    className="hover:text-amber-800 hover:underline dark:hover:text-amber-200"
-                  >
-                    {villa.locationName}
-                  </Link>
-                </p>
-              ) : villa.locationName !== null ? (
-                <p className="text-base text-zinc-600 dark:text-zinc-400">
-                  {villa.locationName}
-                </p>
-              ) : null}
-              <dl className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-700 dark:text-zinc-300">
+              <dl className="flex flex-wrap gap-x-6 gap-y-2 font-sans text-sm text-stone-700 dark:text-stone-300">
                 <div>
                   <dt className="sr-only">{t("capacity")}</dt>
                   <dd>{common("guestCount", { count: villa.capacity })}</dd>
@@ -148,6 +150,7 @@ export async function VillaDetailView({ villaId, locale }: Props) {
                 heading: t("policies.heading"),
                 guestPolicyTitle: t("policies.guestPolicyTitle"),
                 cancellationTitle: t("policies.cancellationTitle"),
+                cancellationEmpty: t("policies.cancellationEmpty"),
                 guestPolicy: {
                   everyone: t("policies.guestPolicyEveryone"),
                   couples_only: t("policies.guestPolicyCouplesOnly"),

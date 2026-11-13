@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 
 import { getVillaQuote, type QuoteDisplay } from "@/actions/public/quote.actions";
+import { QuotePriceBreakdown } from "@/components/booking/QuotePriceBreakdown";
 import { Link } from "@/i18n/navigation";
 
 import {
@@ -118,7 +119,10 @@ export function VillaPricingSidebar() {
           <p className="text-sm text-zinc-500 dark:text-zinc-500">{t("emptyHint")}</p>
         ) : (
           <>
-            <QuoteBreakdown display={quote.display} t={t} guestCount={guestCount} />
+            <QuotePriceBreakdown
+              display={quote.display}
+              guestCount={guestCount}
+            />
             {checkIn !== null && checkOut !== null ? (
               <Link
                 href={{
@@ -139,64 +143,5 @@ export function VillaPricingSidebar() {
         )}
       </div>
     </aside>
-  );
-}
-
-function QuoteBreakdown({
-  display,
-  t,
-  guestCount,
-}: {
-  display: QuoteDisplay;
-  t: ReturnType<typeof useTranslations<"villaDetail.pricing">>;
-  guestCount: number;
-}) {
-  return (
-    <dl className="space-y-3 text-sm">
-      <div className="flex justify-between gap-4">
-        <dt className="text-zinc-600 dark:text-zinc-400">{t("baseTotal")}</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-          {display.baseTotal.formatted}
-        </dd>
-      </div>
-      {display.appliedPromotions.length > 0 ? (
-        <div>
-          <dt className="text-zinc-600 dark:text-zinc-400">{t("promotions")}</dt>
-          <dd className="mt-2 space-y-2">
-            {display.appliedPromotions.map((p) => (
-              <div
-                key={`${p.promotionId}-${p.stepIndex}`}
-                className="flex justify-between gap-2 text-zinc-800 dark:text-zinc-200"
-              >
-                <span className="min-w-0 truncate">{p.displayName}</span>
-                <span className="shrink-0 font-medium">−{p.discount.formatted}</span>
-              </div>
-            ))}
-          </dd>
-        </div>
-      ) : null}
-      <div className="flex justify-between gap-4 border-t border-zinc-200 pt-3 dark:border-zinc-800">
-        <dt className="text-zinc-600 dark:text-zinc-400">{t("totalDiscount")}</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-          −{display.totalDiscount.formatted}
-        </dd>
-      </div>
-      <div className="flex justify-between gap-4">
-        <dt className="text-zinc-600 dark:text-zinc-400">{t("cleaningFee")}</dt>
-        <dd className="font-medium text-zinc-900 dark:text-zinc-100">
-          {display.cleaningFee.formatted}
-        </dd>
-      </div>
-      <div className="flex justify-between gap-4 border-t border-zinc-200 pt-3 text-base font-semibold dark:border-zinc-800">
-        <dt className="text-zinc-900 dark:text-zinc-50">{t("grandTotal")}</dt>
-        <dd className="text-zinc-900 dark:text-zinc-50">{display.grandTotal.formatted}</dd>
-      </div>
-      <p className="text-xs text-zinc-500 dark:text-zinc-500">
-        {t("footnote", {
-          nights: display.nightCount,
-          guests: guestCount,
-        })}
-      </p>
-    </dl>
   );
 }

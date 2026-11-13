@@ -541,13 +541,17 @@ export function calculateQuote(input: PricingInput): PriceQuote {
 
   const nightlyTotalCents = baseTotalCents - totalDiscountCents;
 
-  const appliedPromotions: AppliedPromotion[] = steps.map((step) => ({
-    stepIndex: step.stepIndex,
-    promotionId: step.promotionId,
-    displayName: selected[step.stepIndex].displayName,
-    discountType: step.discountType,
-    discountCents: step.discountCents,
-  }));
+  const appliedPromotions: AppliedPromotion[] = steps.map((step) => {
+    const rule = selected[step.stepIndex];
+    return {
+      stepIndex: step.stepIndex,
+      promotionId: step.promotionId,
+      displayName: rule.displayName,
+      discountType: step.discountType,
+      discountCents: step.discountCents,
+      percentBp: rule.percentBp,
+    };
+  });
 
   const quote: PriceQuote = {
     nightCount,

@@ -5,6 +5,7 @@ const nav = [
   { href: "/admin/villas" as const, label: "Villas" },
   { href: "/admin/promotions" as const, label: "Promotions" },
   { href: "/admin/deals" as const, label: "Deals" },
+  { href: "/admin/bookings" as const, label: "Bookings" },
   { href: "/admin/messages" as const, label: "Messages" },
 ];
 

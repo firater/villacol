@@ -2,8 +2,10 @@ import { getTranslations } from "next-intl/server";
 
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getExchangeRates } from "@/db/queries/rates.queries";
+import { getPromoHubListingVillaIds } from "@/db/queries/promo-hub.queries";
 import { getVillaListing } from "@/db/queries/villas.queries";
 import { Link } from "@/i18n/navigation";
+import { parsePromoListingFilter } from "@/lib/promo-listing-params";
 import {
   buildVillaFilterQuery,
   DEFAULT_PAGE_SIZE,
@@ -49,9 +51,17 @@ export async function VillaListingGrid({
     ]);
 
   const parsed = parseVillaFilters(resolvedSearch);
+  const promoFilter = parsePromoListingFilter(resolvedSearch);
   const listingFilters = toListingFilters(parsed, locale, {
     lockOffersOnly,
   });
+
+  if (promoFilter !== null) {
+    const villaIds = await getPromoHubListingVillaIds(promoFilter);
+    listingFilters.villaIds = villaIds;
+    listingFilters.offersOnly = true;
+  }
+
   const listing = await getVillaListing(listingFilters);
 
   const rates = buildExchangeRateMap(ratesRows);

@@ -223,7 +223,7 @@ function MegaMenuHomeColumn({ onNavigate }: { onNavigate: () => void }) {
       <div className="pt-5">
         <MegaMenuColumnHeading title={t("megaMenu.moreLinks")} compact />
         <ul className="mt-3 space-y-2">
-          <MegaMenuLink href="/villa-offers" onClick={onNavigate} subdued>
+          <MegaMenuLink href="/promotions" onClick={onNavigate} subdued>
             {t("nav.offers")}
           </MegaMenuLink>
           <MegaMenuLink href="/find-villa" onClick={onNavigate} subdued>

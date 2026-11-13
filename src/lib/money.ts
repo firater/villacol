@@ -48,3 +48,15 @@ export function scaleCents(
   if (denominator === 0) return 0;
   return Math.round((cents * numerator) / denominator);
 }
+
+const EUR_DISPLAY = new Intl.NumberFormat("en-GB", {
+  style: "currency",
+  currency: "EUR",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** Safe to call from client components (no server-only imports). */
+export function formatEurFromCents(cents: Cents): string {
+  return EUR_DISPLAY.format(fromCents(cents));
+}
