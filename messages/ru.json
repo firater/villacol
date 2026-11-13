@@ -31,11 +31,26 @@
     },
     "footer": {
       "tagline": "Отобранные виллы на средиземноморском побережье Турции.",
+      "exploreTitle": "Обзор",
+      "colophon": "Журнал вилл",
+      "intro": "Ищите, сравнивайте и бронируйте отобранные виллы с актуальными ценами.",
+      "socialLabel": "Соцсети",
+      "faq": "Частые вопросы",
       "browse": "Каталог",
       "legal": "Правовая информация",
       "terms": "Условия",
       "privacy": "Конфиденциальность",
-      "copyright": "© {year} {brand}. Все права защищены."
+      "copyright": "© {year} {brand}. Все права защищены.",
+      "utilityNavAria": "Правовые и служебные ссылки",
+      "utilityLinks": {
+        "userAgreement": "Пользовательское соглашение",
+        "privacyPolicy": "Политика конфиденциальности",
+        "californiaPrivacy": "Права конфиденциальности (Калифорния)",
+        "accessibility": "Доступность",
+        "masthead": "Обложка",
+        "visualStories": "Визуальные истории",
+        "siteMap": "Карта сайта"
+      }
     },
     "home": {
       "heroEyebrow": "Villa Collection",

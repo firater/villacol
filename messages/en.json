@@ -31,11 +31,26 @@
     },
     "footer": {
       "tagline": "Hand-picked villas on the Turkish Mediterranean coast.",
+      "exploreTitle": "Explore",
+      "colophon": "Villa journal",
+      "intro": "Search, compare, and book hand-picked villas with live pricing.",
+      "socialLabel": "Follow",
+      "faq": "Frequently asked questions",
       "browse": "Browse",
       "legal": "Legal",
       "terms": "Terms",
       "privacy": "Privacy",
-      "copyright": "© {year} {brand}. All rights reserved."
+      "copyright": "© {year} {brand}. All rights reserved.",
+      "utilityNavAria": "Legal and site links",
+      "utilityLinks": {
+        "userAgreement": "User Agreement",
+        "privacyPolicy": "Privacy Policy",
+        "californiaPrivacy": "Your California Privacy Rights",
+        "accessibility": "Accessibility Help",
+        "masthead": "Masthead",
+        "visualStories": "Visual Stories",
+        "siteMap": "Site Map"
+      }
     },
     "home": {
       "heroEyebrow": "Villa Collection",

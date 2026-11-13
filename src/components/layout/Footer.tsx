@@ -1,91 +1,109 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
+
+const UTILITY_FOOTER_LINKS = [
+  { messageKey: "userAgreement", href: "/terms" },
+  { messageKey: "privacyPolicy", href: "/privacy" },
+  { messageKey: "californiaPrivacy", href: "/privacy" },
+  { messageKey: "accessibility", href: "/contact" },
+  { messageKey: "masthead", href: "/" },
+  { messageKey: "visualStories", href: "/villas" },
+  { messageKey: "siteMap", href: "/villas" },
+] as const;
+
+const FOOTER_NAV_LINK =
+  "inline-block text-[15px] font-light leading-[1.55] text-stone-400 transition-colors duration-200 hover:text-white";
+
+const FOOTER_UTILITY_LINK =
+  "text-sm font-light leading-snug text-stone-500 transition-colors duration-200 hover:text-stone-200";
+
+type FooterHref =
+  | "/"
+  | "/villas"
+  | "/villa-offers"
+  | "/find-villa"
+  | "/contact"
+  | "/about"
+  | "/terms"
+  | "/privacy"
+  | { pathname: "/"; hash: string };
 
 export function Footer() {
   const t = useTranslations("layout.footer");
   const tNav = useTranslations("layout.nav");
   const tCommon = useTranslations("common");
-  const tHome = useTranslations("layout.home.footer");
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const tHomeFooter = useTranslations("layout.home.footer");
 
   return (
-    <footer className="relative mt-auto w-full bg-stone-950 text-stone-300">
+    <footer className="relative mt-auto w-full bg-[#0a0a0a] font-sans text-stone-300 antialiased">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-500/40 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-400/25 to-transparent"
       />
 
-      <div className="mx-auto max-w-7xl px-4 pb-12 pt-16 sm:px-6 lg:px-8 lg:pb-14 lg:pt-20">
-        <div className="flex flex-col gap-10 border-b border-stone-800/90 pb-12 lg:flex-row lg:items-end lg:justify-between lg:gap-16 lg:pb-14">
-          <div className="max-w-xl">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="flex flex-col gap-14 lg:flex-row lg:items-start lg:justify-between lg:gap-16 xl:gap-24">
+          <div className="max-w-[22rem] shrink-0">
+            <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-stone-500">
+              {t("colophon")}
+            </p>
             <Link
               href="/"
-              className="inline-block font-serif text-[clamp(2.65rem,7.5vw,4.35rem)] font-normal leading-[0.92] tracking-[-0.04em] text-white transition hover:text-stone-200"
+              className="mt-3.5 inline-block font-serif text-[clamp(2rem,4.2vw,2.35rem)] font-normal leading-none tracking-[-0.03em] text-white transition-colors duration-200 hover:text-stone-100"
             >
               <span className="text-orange-500">.</span>
               {tCommon("brand")}
             </Link>
-            <p className="mt-5 font-serif text-[clamp(1.02rem,1.9vw,1.2rem)] font-normal italic leading-[1.6] text-stone-500">
-              {t("tagline")}
+            <p className="mt-4 text-[15px] font-light leading-[1.65] text-stone-400">
+              {t("intro")}
             </p>
+            <FooterSocial />
           </div>
 
-          <Link
-            href="/contact"
-            className="inline-flex w-fit shrink-0 items-center justify-center border border-stone-600 px-6 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-100 transition hover:border-white hover:bg-white hover:text-stone-950"
-          >
-            {tNav("contact")}
-          </Link>
+          <div className="flex flex-col gap-12 sm:flex-row sm:gap-14 md:gap-16 lg:gap-20 lg:pt-1 xl:gap-28">
+            <FooterColumn title={t("exploreTitle")}>
+              <FooterLink href="/">{tNav("home")}</FooterLink>
+              <FooterLink href="/find-villa">{tNav("findVilla")}</FooterLink>
+              <FooterLink href={{ pathname: "/", hash: "help" }}>{t("faq")}</FooterLink>
+              <FooterLink href="/contact">{tNav("contact")}</FooterLink>
+              <FooterLink href="/villas">{tNav("villas")}</FooterLink>
+            </FooterColumn>
+            <FooterColumn title={t("legal")}>
+              <FooterLink href="/terms">{t("terms")}</FooterLink>
+              <FooterLink href="/privacy">{t("privacy")}</FooterLink>
+              <FooterLink href="/about">{tNav("about")}</FooterLink>
+            </FooterColumn>
+          </div>
         </div>
 
-        <nav
-          className="grid gap-12 pt-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10 lg:pt-14 xl:gap-x-14"
-          aria-label={t("browse")}
-        >
-          <FooterColumn title={tHome("discoverTitle")}>
-            <FooterLink href="/villas">{tNav("villas")}</FooterLink>
-            <FooterLink href="/villa-offers">{tNav("offers")}</FooterLink>
-            <FooterLink href="/find-villa">{tNav("findVilla")}</FooterLink>
-          </FooterColumn>
-          <FooterColumn title={tHome("supportTitle")}>
-            <FooterLink href="/contact">{tNav("contact")}</FooterLink>
-            <FooterLink href="/about">{tNav("about")}</FooterLink>
-            <FooterLink href="/find-villa">{tHome("concierge")}</FooterLink>
-          </FooterColumn>
-          <FooterColumn title={t("legal")}>
-            <FooterLink href="/terms">{t("terms")}</FooterLink>
-            <FooterLink href="/privacy">{t("privacy")}</FooterLink>
-          </FooterColumn>
-          <FooterColumn title={t("browse")}>
-            <FooterLink href="/">{tNav("home")}</FooterLink>
-            <FooterLink href="/villas">{tNav("villas")}</FooterLink>
-            <FooterLink href="/villa-offers">{tNav("offers")}</FooterLink>
-          </FooterColumn>
-        </nav>
-
-        <div className="mt-12 flex flex-col gap-8 border-t border-stone-800/90 pt-10 lg:mt-14 lg:flex-row lg:items-center lg:justify-between lg:pt-12">
-          <FooterSocial />
-          <p className="font-sans text-[10px] font-medium uppercase tracking-[0.22em] text-stone-600 lg:max-w-xs lg:text-right">
-            {tHome("paymentsNote")}
+        <div className="mt-14 border-t border-stone-800 pt-9 lg:mt-16 lg:pt-10">
+          <p className="text-[11px] font-light uppercase tracking-[0.2em] text-stone-500">
+            {tHomeFooter("paymentsNote")}
           </p>
-        </div>
 
-        <div className="mt-8 border-t border-stone-800/70 pt-8">
-          {year === null ? (
-            <span className="inline-block min-h-[1rem] min-w-[12rem] animate-pulse rounded bg-stone-800" />
-          ) : (
-            <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-600">
-              {t("copyright", { year, brand: tCommon("brand") })}
-            </p>
-          )}
+          <nav className="mt-7 lg:mt-8" aria-label={t("utilityNavAria")}>
+            <ul className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-1 sm:gap-y-2">
+              {UTILITY_FOOTER_LINKS.map(({ messageKey, href }, index) => (
+                <li key={messageKey} className="flex items-center">
+                  {index > 0 ? (
+                    <span
+                      aria-hidden
+                      className="mx-2.5 hidden text-stone-700 sm:inline"
+                    >
+                      ·
+                    </span>
+                  ) : null}
+                  <Link href={href} className={FOOTER_UTILITY_LINK}>
+                    {t(`utilityLinks.${messageKey}`)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </div>
     </footer>
@@ -94,34 +112,21 @@ export function Footer() {
 
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div>
-      <h3 className="font-serif text-xl font-normal tracking-[-0.02em] text-white lg:text-[1.35rem]">
+    <div className="min-w-[10rem] sm:min-w-[11rem]">
+      <h3 className="text-base font-medium tracking-[0.02em] text-white sm:text-[1.0625rem]">
         {title}
       </h3>
-      <div
-        aria-hidden
-        className="mt-3 h-px w-10 bg-gradient-to-r from-stone-500/70 to-transparent"
-      />
-      <ul role="list" className="mt-5 space-y-3.5">
+      <ul role="list" className="mt-5 space-y-3 sm:space-y-3.5">
         {children}
       </ul>
     </div>
   );
 }
 
-function FooterLink({
-  href,
-  children,
-}: {
-  href: "/" | "/villas" | "/villa-offers" | "/find-villa" | "/contact" | "/about" | "/terms" | "/privacy";
-  children: ReactNode;
-}) {
+function FooterLink({ href, children }: { href: FooterHref; children: ReactNode }) {
   return (
     <li>
-      <Link
-        href={href}
-        className="font-serif text-[1.0625rem] font-normal leading-snug tracking-[-0.01em] text-stone-400 transition-colors hover:text-white lg:text-lg"
-      >
+      <Link href={href} className={FOOTER_NAV_LINK}>
         {children}
       </Link>
     </li>
@@ -130,7 +135,7 @@ function FooterLink({
 
 function FooterSocial() {
   return (
-    <div className="flex items-center gap-6">
+    <div className="mt-7 flex flex-wrap items-center gap-1 sm:gap-1.5">
       <SocialIcon label="Facebook">
         <path
           fillRule="evenodd"
@@ -145,14 +150,30 @@ function FooterSocial() {
           clipRule="evenodd"
         />
       </SocialIcon>
+      <SocialIcon label="X">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      </SocialIcon>
+      <SocialIcon label="LinkedIn">
+        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 114.126 0 2.063 2.063 0 01-2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+      </SocialIcon>
+      <SocialIcon label="YouTube">
+        <path
+          fillRule="evenodd"
+          d="M19.812 5.418c.861.23 1.538.907 1.768 1.768C21.998 8.746 22 12 22 12s0 3.255-.418 4.814a2.504 2.504 0 01-1.768 1.768c-1.56.419-7.814.419-7.814.419s-6.255 0-7.814-.419a2.505 2.505 0 01-1.768-1.768C2 15.255 2 12 2 12s0-3.255.417-4.814a2.507 2.507 0 011.768-1.768C5.744 5 11.998 5 11.998 5s6.255 0 7.814.418zm-5.945 7.444l-5.338 3.092V9.77l5.338 3.092z"
+          clipRule="evenodd"
+        />
+      </SocialIcon>
     </div>
   );
 }
 
 function SocialIcon({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <span className="text-stone-500 transition-colors hover:text-stone-300" aria-hidden>
-      <span className="sr-only">{label}</span>
+    <span
+      className="inline-flex rounded-full p-2.5 text-stone-500 transition-colors duration-200 hover:bg-white/[0.06] hover:text-white"
+      role="img"
+      aria-label={label}
+    >
       <svg fill="currentColor" viewBox="0 0 24 24" className="size-[1.125rem]">
         {children}
       </svg>

@@ -7,6 +7,7 @@ export * from "./admin.deals.queries";
 export * from "./admin.contact.queries";
 export * from "./filter-facets.queries";
 export * from "./landing.queries";
+export * from "./home-categories.queries";
 export * from "./pricing.queries";
 export * from "./rates.queries";
 export * from "./deals.queries";

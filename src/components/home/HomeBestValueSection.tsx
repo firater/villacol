@@ -3,9 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { VillaCard } from "@/components/villa/VillaCard";
 import { getBestValueLandingVillas } from "@/db/queries/landing.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
-import { toDisplayAmount } from "@/lib/currency";
+import type { VillaCardRow } from "@/db/queries/villas.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
+import { formatPromotionBadges } from "@/lib/promo-badge-labels";
 import {
   buildExchangeRateMap,
   mapVillaCardRowToProps,
@@ -52,35 +53,19 @@ export async function HomeBestValueSection({ locale }: Props) {
       cardCopy,
     );
 
-    let { priceMain, stayLabel } = cardProps;
-    const nights =
-      row.cacheNightCount !== null && row.cacheNightCount > 0
-        ? row.cacheNightCount
-        : 3 + (row.id % 3);
-
-    if (stayLabel === null) {
-      stayLabel = cardCopy.perStay({ nights });
-    }
-
-    if (priceMain === "—" || row.priceFromCents === null) {
-      const nightlyCents = row.avgNightlyCents ?? 18_500 + (row.id % 11) * 1_275;
-      const mockTotalCents = nightlyCents * nights;
-      priceMain = toDisplayAmount(
-        mockTotalCents,
-        preferences.currency,
-        locale,
-        rates,
-      ).formatted;
-    }
-
     return {
       key: String(row.id),
       card: {
         ...cardProps,
-        priceMain,
-        stayLabel,
         layout: "recommended" as const,
         viewLabel: cardCopy.view,
+        promotionBadges: formatPromotionBadges(
+          row.appliedPromotions,
+          locale,
+          preferences.currency,
+          rates,
+        ),
+        editorRating: readEditorRating(row),
         promoStatLabels: {
           guests: tCard("statGuests"),
           bedrooms: tCard("statBedrooms"),
@@ -100,4 +85,12 @@ export async function HomeBestValueSection({ locale }: Props) {
       items={items}
     />
   );
+}
+
+function readEditorRating(row: VillaCardRow): number | null {
+  const extended = row as VillaCardRow & { editorRating?: number | null };
+  if (extended.editorRating == null || !Number.isFinite(extended.editorRating)) {
+    return null;
+  }
+  return extended.editorRating;
 }

@@ -3,13 +3,14 @@ import { getTranslations } from "next-intl/server";
 import { VillaCard, type VillaCardLayout } from "@/components/villa/VillaCard";
 import {
   getBestValueLandingVillas,
+  getFeaturedLandingVillas,
   getOfferLandingVillas,
 } from "@/db/queries/landing.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
+import type { VillaCardRow } from "@/db/queries/villas.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
-import { sortOfferVillasForHomeRail } from "@/lib/home-offer-villa-sort";
-import { toDisplayAmount } from "@/lib/currency";
+import { formatPromotionBadges } from "@/lib/promo-badge-labels";
 import {
   buildExchangeRateMap,
   mapVillaCardRowToProps,
@@ -21,8 +22,6 @@ import { VillaCarousel } from "./VillaCarousel";
 export type HomeSectionVariant = "featured" | "offers" | "bestValue";
 
 const RAIL_SIZE = 6;
-/** Pull a wider offer pool, then sort client-side before slicing the rail. */
-const FEATURED_OFFER_POOL_SIZE = 24;
 
 type Props = {
   locale: Locale;
@@ -49,10 +48,7 @@ export async function HomeVillaSection({
     loadVillas(locale, variant),
   ]);
 
-  const displayRows =
-    variant === "featured"
-      ? sortOfferVillasForHomeRail(listing.rows).slice(0, RAIL_SIZE)
-      : listing.rows;
+  const displayRows = listing.rows;
 
   if (displayRows.length === 0) {
     return (
@@ -78,69 +74,99 @@ export async function HomeVillaSection({
     view: tCard("viewVilla"),
   };
 
+  const promoRatingLabels = {
+    noUserReviews: tCard("noUserReviews"),
+    noUserReviewsAria: tCard("noUserReviewsAria"),
+    editorScoreLabel: tCard("editorScoreLabel"),
+  };
+
   return (
     <VillaCarousel
       label={t(HEADING_KEYS[variant])}
       density={carouselDensity}
-      items={displayRows.map((row) => {
-        const cardProps = mapVillaCardRowToProps(
+      items={displayRows.map((row) => ({
+        key: String(row.id),
+        node: buildVillaCardNode({
           row,
           locale,
-          preferences.currency,
+          currency: preferences.currency,
           rates,
           cardCopy,
-        );
-
-        let { priceMain, stayLabel } = cardProps;
-
-        // UI preview: show a stay total when the cache row has nights but no total yet.
-        if (variant === "bestValue" && cardLayout === "recommended") {
-          const nights =
-            row.cacheNightCount !== null && row.cacheNightCount > 0
-              ? row.cacheNightCount
-              : 3 + (row.id % 3);
-
-          if (stayLabel === null) {
-            stayLabel = cardCopy.perStay({ nights });
-          }
-
-          if (priceMain === "—" || row.priceFromCents === null) {
-            const nightlyCents =
-              row.avgNightlyCents ?? 18_500 + (row.id % 11) * 1_275;
-            const mockTotalCents = nightlyCents * nights;
-            priceMain = toDisplayAmount(
-              mockTotalCents,
-              preferences.currency,
-              locale,
-              rates,
-            ).formatted;
-          }
-        }
-
-        return {
-          key: String(row.id),
-          node: (
-            <VillaCard
-              layout={cardLayout}
-              viewLabel={cardCopy.view}
-              promoStatLabels={
-                cardLayout === "recommended"
-                  ? {
-                      guests: tCard("statGuests"),
-                      bedrooms: tCard("statBedrooms"),
-                      bathrooms: tCard("statBathrooms"),
-                    }
-                  : undefined
-              }
-              {...cardProps}
-              priceMain={priceMain}
-              stayLabel={stayLabel}
-            />
-          ),
-        };
-      })}
+          viewLabel: cardCopy.view,
+          cardLayout,
+          carouselDensity,
+          promoRatingLabels,
+          statLabels:
+            cardLayout === "recommended" || carouselDensity === "promo"
+              ? {
+                  guests: tCard("statGuests"),
+                  bedrooms: tCard("statBedrooms"),
+                  bathrooms: tCard("statBathrooms"),
+                }
+              : undefined,
+        }),
+      }))}
     />
   );
+}
+
+function buildVillaCardNode({
+  row,
+  locale,
+  currency,
+  rates,
+  cardCopy,
+  viewLabel,
+  cardLayout,
+  carouselDensity,
+  promoRatingLabels,
+  statLabels,
+}: {
+  row: VillaCardRow;
+  locale: Locale;
+  currency: Parameters<typeof mapVillaCardRowToProps>[2];
+  rates: Parameters<typeof mapVillaCardRowToProps>[3];
+  cardCopy: Parameters<typeof mapVillaCardRowToProps>[4];
+  viewLabel: string;
+  cardLayout: VillaCardLayout;
+  carouselDensity: "default" | "promo";
+  promoRatingLabels: {
+    noUserReviews: string;
+    noUserReviewsAria: string;
+    editorScoreLabel: string;
+  };
+  statLabels?: {
+    guests: string;
+    bedrooms: string;
+    bathrooms: string;
+  };
+}) {
+  const cardProps = mapVillaCardRowToProps(row, locale, currency, rates, cardCopy);
+
+  return (
+    <VillaCard
+      layout={carouselDensity === "promo" ? "promo" : cardLayout}
+      viewLabel={viewLabel}
+      promoStatLabels={statLabels}
+      promoRatingLabels={promoRatingLabels}
+      promotionBadges={formatPromotionBadges(
+        row.appliedPromotions,
+        locale,
+        currency,
+        rates,
+      )}
+      editorRating={readEditorRating(row)}
+      {...cardProps}
+    />
+  );
+}
+
+function readEditorRating(row: VillaCardRow): number | null {
+  const extended = row as VillaCardRow & { editorRating?: number | null };
+  if (extended.editorRating == null || !Number.isFinite(extended.editorRating)) {
+    return null;
+  }
+  return extended.editorRating;
 }
 
 const HEADING_KEYS = {
@@ -150,14 +176,14 @@ const HEADING_KEYS = {
 } as const;
 
 const EMPTY_KEYS = {
-  featured: "offersEmpty",
+  featured: "featuredEmpty",
   offers: "offersEmpty",
   bestValue: "bestValueEmpty",
 } as const;
 
 function loadVillas(locale: Locale, variant: HomeSectionVariant) {
   if (variant === "featured") {
-    return getOfferLandingVillas(locale, FEATURED_OFFER_POOL_SIZE);
+    return getFeaturedLandingVillas(locale, RAIL_SIZE);
   }
   if (variant === "offers") {
     return getOfferLandingVillas(locale, RAIL_SIZE);

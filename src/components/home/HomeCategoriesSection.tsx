@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { getHomeCategoriesCarouselData } from "@/db/queries/home-categories.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
 import { toDisplayAmount } from "@/lib/currency";
 import type { Locale } from "@/lib/locales";
@@ -8,34 +9,36 @@ import { buildExchangeRateMap } from "@/lib/villa-listing-cards";
 
 import { HomeFeaturedBestValueBridge } from "./HomeFeaturedBestValueBridge";
 import { HomeCategoriesCarousel } from "./HomeCategoriesCarousel";
-import { HOME_CATEGORIES_MOCK, HOME_EDITORS_CHOICE_LEAD } from "./homeCategoriesMock";
 
 type Props = {
   locale: Locale;
 };
 
 export async function HomeCategoriesSection({ locale }: Props) {
-  const [t, preferences, ratesRows] = await Promise.all([
+  const [t, preferences, ratesRows, carouselData] = await Promise.all([
     getTranslations("layout.home"),
     resolvePreferences(),
     getExchangeRates(),
+    getHomeCategoriesCarouselData(locale),
   ]);
 
   const rates = buildExchangeRateMap(ratesRows);
   const { currency } = preferences;
 
-  const formatFromEur = (eurCents: number) =>
-    toDisplayAmount(eurCents, currency, locale, rates).formatted;
+  const formatFromEur = (eurCents: number | null) => {
+    if (eurCents === null) return "—";
+    return toDisplayAmount(eurCents, currency, locale, rates).formatted;
+  };
 
   const editorsChoice = {
     label: t("categoriesEditorsChoice"),
-    image: HOME_EDITORS_CHOICE_LEAD.image,
-    villaCount: HOME_EDITORS_CHOICE_LEAD.villaCount,
-    priceFormatted: formatFromEur(HOME_EDITORS_CHOICE_LEAD.startingFromEurCents),
-    isGoodDeal: HOME_EDITORS_CHOICE_LEAD.isGoodDeal,
+    image: carouselData.editorsChoice.image,
+    villaCount: carouselData.editorsChoice.villaCount,
+    priceFormatted: formatFromEur(carouselData.editorsChoice.startingFromEurCents),
+    isGoodDeal: carouselData.editorsChoice.isGoodDeal,
   };
 
-  const categories = HOME_CATEGORIES_MOCK.map((category) => ({
+  const categories = carouselData.categories.map((category) => ({
     slug: category.slug,
     label: category.label,
     image: category.image,

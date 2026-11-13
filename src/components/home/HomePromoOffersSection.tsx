@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { getOfferLandingVillas } from "@/db/queries/landing.queries";
+import type { VillaCardRow } from "@/db/queries/villas.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
@@ -47,7 +48,7 @@ export async function HomePromoOffersSection({ locale }: Props) {
     key: String(row.id),
     hasActiveDiscount: row.hasActiveDiscount,
     appliedPromotions: row.appliedPromotions,
-    card: {
+      card: {
       ...mapVillaCardRowToProps(row, locale, preferences.currency, rates, cardCopy),
       promotionBadges: formatPromotionBadges(
         row.appliedPromotions,
@@ -55,6 +56,7 @@ export async function HomePromoOffersSection({ locale }: Props) {
         preferences.currency,
         rates,
       ),
+      editorRating: readEditorRating(row),
       viewLabel: cardCopy.view,
       promoStatLabels: {
         guests: tCard("statGuests"),
@@ -76,4 +78,12 @@ export async function HomePromoOffersSection({ locale }: Props) {
       sectionEmptyLabel={t("offersEmpty")}
     />
   );
+}
+
+function readEditorRating(row: VillaCardRow): number | null {
+  const extended = row as VillaCardRow & { editorRating?: number | null };
+  if (extended.editorRating == null || !Number.isFinite(extended.editorRating)) {
+    return null;
+  }
+  return extended.editorRating;
 }

@@ -15,7 +15,7 @@ import { formatBusinessLongDate } from "@/lib/dates";
 import type { Locale } from "@/lib/locales";
 
 import { CarouselArrow } from "./CarouselArrow";
-import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoriesMock";
+import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoryConstants";
 
 export type HomeCategoryCarouselItem = {
   slug: string;

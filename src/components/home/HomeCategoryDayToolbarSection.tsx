@@ -1,14 +1,23 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+
+import { getHomeCategoriesCarouselData } from "@/db/queries/home-categories.queries";
+import { hasLocale } from "next-intl";
+import { routing } from "@/i18n/routing";
+import type { Locale } from "@/lib/locales";
 
 import { CategoryDayToolbar } from "./CategoryDayToolbar";
-import {
-  HOME_CATEGORIES_MOCK,
-  HOME_CATEGORY_OF_THE_DAY_INDEX,
-} from "./homeCategoriesMock";
+import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoryConstants";
 
 export async function HomeCategoryDayToolbarSection() {
-  const t = await getTranslations("layout.home");
-  const categoryOfTheDay = HOME_CATEGORIES_MOCK[HOME_CATEGORY_OF_THE_DAY_INDEX];
+  const localeRaw = await getLocale();
+  const locale = (
+    hasLocale(routing.locales, localeRaw) ? localeRaw : routing.defaultLocale
+  ) as Locale;
+  const [t, carouselData] = await Promise.all([
+    getTranslations("layout.home"),
+    getHomeCategoriesCarouselData(locale),
+  ]);
+  const categoryOfTheDay = carouselData.categories[HOME_CATEGORY_OF_THE_DAY_INDEX];
 
   return (
     <section className="w-full bg-white" aria-label={t("categoriesOfTheDay")}>

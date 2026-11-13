@@ -31,11 +31,26 @@
     },
     "footer": {
       "tagline": "Ausgewählte Villen an der türkischen Mittelmeerküste.",
+      "exploreTitle": "Entdecken",
+      "colophon": "Villa Journal",
+      "intro": "Handverlesene Villen mit Live-Preisen finden, vergleichen und buchen.",
+      "socialLabel": "Folgen",
+      "faq": "Häufige Fragen",
       "browse": "Entdecken",
       "legal": "Rechtliches",
       "terms": "AGB",
       "privacy": "Datenschutz",
-      "copyright": "© {year} {brand}. Alle Rechte vorbehalten."
+      "copyright": "© {year} {brand}. Alle Rechte vorbehalten.",
+      "utilityNavAria": "Rechtliches und Seitenlinks",
+      "utilityLinks": {
+        "userAgreement": "Nutzungsvereinbarung",
+        "privacyPolicy": "Datenschutzerklärung",
+        "californiaPrivacy": "Kalifornien — Datenschutzrechte",
+        "accessibility": "Barrierefreiheit",
+        "masthead": "Titelseite",
+        "visualStories": "Visual Stories",
+        "siteMap": "Seitenübersicht"
+      }
     },
     "home": {
       "heroEyebrow": "Villa Collection",

@@ -48,6 +48,8 @@ export type VillaCardProps = {
   };
   /** Promo list card: show “category of the day” pill on the image (e.g. rail index === 1). */
   showVillaOfTheDay?: boolean;
+  /** From `villas.editor_rating` when wired; hidden when null. */
+  editorRating?: number | null;
 };
 
 const DEFAULT_PROMO_RATING_LABELS = {
@@ -84,6 +86,7 @@ export function VillaCard({
   promoStatLabels,
   promoRatingLabels,
   showVillaOfTheDay = false,
+  editorRating = null,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -157,6 +160,7 @@ export function VillaCard({
           promotionBadges={promoBadgeItems}
           promoStatLabels={promoStatLabels}
           promoRatingLabels={promoRatingLabels ?? DEFAULT_PROMO_RATING_LABELS}
+          editorRating={editorRating ?? null}
           priceStartingAtLabel={priceStartingAtLabel}
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
@@ -309,27 +313,43 @@ function StatsRow({
   );
 }
 
-/** UI-only: distinguishes empty user reviews from hardcoded editor score. */
 function PromoRatingsBlock({
   labels,
+  editorRating,
 }: {
   labels: NonNullable<VillaCardProps["promoRatingLabels"]>;
+  editorRating: number | null;
 }) {
+  const editorScore =
+    editorRating !== null && Number.isFinite(editorRating)
+      ? editorRating.toLocaleString(undefined, {
+          minimumFractionDigits: editorRating % 1 === 0 ? 0 : 1,
+          maximumFractionDigits: 1,
+        })
+      : null;
+
   return (
     <div className="flex flex-col items-end gap-0.5 leading-none">
       <div className="inline-flex items-center gap-1" aria-label={labels.noUserReviewsAria}>
         <Star className="size-3 shrink-0 text-stone-300" strokeWidth={1.75} aria-hidden />
         <span className="text-[10px] font-normal text-stone-400">{labels.noUserReviews}</span>
       </div>
-      <div className="inline-flex flex-wrap items-center justify-end gap-x-1 gap-y-0.5">
-        <Gem className="size-3 shrink-0 fill-amber-400/90 text-amber-500" strokeWidth={1.75} aria-hidden />
-        <span className="font-sans text-[10px] font-bold tracking-tight text-stone-900">
-          8.5<span className="font-semibold text-stone-600">/10</span>
-        </span>
-        <span className="text-[8px] font-medium uppercase tracking-widest text-stone-500">
-          {labels.editorScoreLabel}
-        </span>
-      </div>
+      {editorScore !== null ? (
+        <div className="inline-flex flex-wrap items-center justify-end gap-x-1 gap-y-0.5">
+          <Gem
+            className="size-3 shrink-0 fill-amber-400/90 text-amber-500"
+            strokeWidth={1.75}
+            aria-hidden
+          />
+          <span className="font-sans text-[10px] font-bold tracking-tight text-stone-900">
+            {editorScore}
+            <span className="font-semibold text-stone-600">/10</span>
+          </span>
+          <span className="text-[8px] font-medium uppercase tracking-widest text-stone-500">
+            {labels.editorScoreLabel}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -366,6 +386,7 @@ function PromoCardBody({
   promotionBadges,
   promoStatLabels,
   promoRatingLabels,
+  editorRating,
 }: {
   title: string;
   location: string | null;
@@ -375,6 +396,7 @@ function PromoCardBody({
   promotionBadges: PromotionBadgeItem[];
   promoStatLabels?: VillaCardProps["promoStatLabels"];
   promoRatingLabels: NonNullable<VillaCardProps["promoRatingLabels"]>;
+  editorRating: number | null;
   priceStartingAtLabel: string;
   displayNightly: string;
   perNightLabel: string;
@@ -440,7 +462,7 @@ function PromoCardBody({
         </div>
 
         <div className="shrink-0">
-          <PromoRatingsBlock labels={promoRatingLabels} />
+          <PromoRatingsBlock labels={promoRatingLabels} editorRating={editorRating} />
         </div>
       </div>
     </div>
