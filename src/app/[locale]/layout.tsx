@@ -10,6 +10,7 @@ import { Suspense, type ReactNode } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { HeaderFallback } from "@/components/layout/HeaderFallback";
 import { HeaderWithPreferences } from "@/components/layout/HeaderWithPreferences";
+import { PublicNavGate } from "@/components/layout/PublicNavGate";
 import { TopAnnouncementBar } from "@/components/layout/TopAnnouncementBar";
 import { routing } from "@/i18n/routing";
 import type { Locale } from "@/lib/locales";
@@ -67,12 +68,16 @@ export default async function LocaleLayout({ children }: { children: ReactNode }
     >
       <body className="font-sans min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="Europe/Istanbul">
-          <TopAnnouncementBar />
-          <Suspense fallback={<HeaderFallback />}>
-            <HeaderWithPreferences locale={locale} />
-          </Suspense>
+          <PublicNavGate>
+            <TopAnnouncementBar />
+            <Suspense fallback={<HeaderFallback />}>
+              <HeaderWithPreferences locale={locale} />
+            </Suspense>
+          </PublicNavGate>
           <div className="flex flex-1 flex-col">{children}</div>
-          <Footer />
+          <PublicNavGate>
+            <Footer />
+          </PublicNavGate>
         </NextIntlClientProvider>
       </body>
     </html>
