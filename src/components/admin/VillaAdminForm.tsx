@@ -15,12 +15,32 @@ import type {
   AdminLocationOption,
   AdminVillaEditRow,
 } from "@/db/queries/admin.villas.queries";
+import type { GuestPolicy } from "@/db/tables/enums";
 import { Link, useRouter } from "@/i18n/navigation";
-import type { Locale } from "@/lib/locales";
+import type { Locale, LocalizedText } from "@/lib/locales";
 import { LOCALES } from "@/lib/locales";
 import { fromCents, toCents } from "@/lib/money";
 
 type Mode = "create" | "edit";
+
+const GUEST_POLICIES: { value: GuestPolicy; label: string; hint: string }[] = [
+  { value: "everyone", label: "Everyone", hint: "No restriction." },
+  {
+    value: "couples_only",
+    label: "Couples only",
+    hint: "At most two guests, and never a declared family or friend group.",
+  },
+  {
+    value: "families_only",
+    label: "Families only",
+    hint: "Requires a declared family or at least one child among the guests.",
+  },
+  {
+    value: "no_friend_groups",
+    label: "No friend groups",
+    hint: "Rejects parties that declare themselves a friend group.",
+  },
+];
 
 type Props =
   | {
@@ -110,6 +130,19 @@ export function VillaAdminForm(props: Props) {
   );
   const [isBestValue, setIsBestValue] = useState(villa?.isBestValue ?? false);
   const [orderValue, setOrderValue] = useState(String(villa?.orderValue ?? 0));
+  const [guestPolicy, setGuestPolicy] = useState<GuestPolicy>(
+    villa?.guestPolicy ?? "everyone",
+  );
+  const [editorRating, setEditorRating] = useState(
+    villa?.editorRating != null ? String(villa.editorRating) : "",
+  );
+  const [cancellationPolicy, setCancellationPolicy] = useState<
+    Record<Locale, string>
+  >(() => ({
+    en: villa?.cancellationPolicyI18n?.en ?? "",
+    de: villa?.cancellationPolicyI18n?.de ?? "",
+    ru: villa?.cancellationPolicyI18n?.ru ?? "",
+  }));
 
   const [translations, setTranslations] = useState(() => buildInitialTranslations(villa));
 
@@ -133,6 +166,38 @@ export function VillaAdminForm(props: Props) {
       throw new Error("Enter a valid non-negative amount for price fields.");
     }
     return toCents(n);
+  }
+
+  /** English is the fallback, so a translation without it would never render. */
+  function buildCancellationPolicy(): LocalizedText | null {
+    const en = cancellationPolicy.en.trim();
+    const de = cancellationPolicy.de.trim();
+    const ru = cancellationPolicy.ru.trim();
+
+    if (en === "") {
+      if (de !== "" || ru !== "") {
+        throw new Error(
+          "Add the English cancellation policy before translating it.",
+        );
+      }
+      return null;
+    }
+
+    return {
+      en,
+      ...(de === "" ? {} : { de }),
+      ...(ru === "" ? {} : { ru }),
+    };
+  }
+
+  function parseEditorRating(): number | null {
+    const raw = editorRating.trim();
+    if (raw === "") return null;
+    const value = Number(raw);
+    if (!Number.isFinite(value) || value < 1 || value > 10) {
+      throw new Error("Editor rating must be between 1 and 10.");
+    }
+    return Math.round(value * 10) / 10;
   }
 
   function parseRequiredCents(eurStr: string): number {
@@ -161,6 +226,8 @@ export function VillaAdminForm(props: Props) {
 
       const defaultNightlyCents = parseOptionalCents(defaultNightlyEur);
       const cleaningFeeCents = parseRequiredCents(cleaningEur);
+      const cancellationPolicyI18n = buildCancellationPolicy();
+      const editorRatingValue = parseEditorRating();
 
       const locId =
         locationId === "" ? null : Number(locationId);
@@ -213,6 +280,9 @@ export function VillaAdminForm(props: Props) {
           isEditorsChoice,
           isBestValue,
           orderValue: order,
+          guestPolicy,
+          editorRating: editorRatingValue,
+          cancellationPolicyI18n,
         });
 
         if (!core.ok) {
@@ -251,6 +321,9 @@ export function VillaAdminForm(props: Props) {
           isEditorsChoice,
           isBestValue,
           orderValue: order,
+          guestPolicy,
+          editorRating: editorRatingValue,
+          cancellationPolicyI18n,
           translations: translationPayload,
         });
 
@@ -538,6 +611,53 @@ export function VillaAdminForm(props: Props) {
 
         <section className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900/40">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+            Policies &amp; editorial
+          </h2>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Guest policy
+              </span>
+              <select
+                value={guestPolicy}
+                onChange={(e) =>
+                  setGuestPolicy(e.target.value as GuestPolicy)
+                }
+                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              >
+                {GUEST_POLICIES.map((policy) => (
+                  <option key={policy.value} value={policy.value}>
+                    {policy.label}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs text-zinc-500">
+                {GUEST_POLICIES.find((p) => p.value === guestPolicy)?.hint}
+              </span>
+            </label>
+            <label className="block">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Editor rating (1–10)
+              </span>
+              <input
+                type="number"
+                min={1}
+                max={10}
+                step={0.1}
+                value={editorRating}
+                onChange={(e) => setEditorRating(e.target.value)}
+                placeholder="Leave empty to hide the score"
+                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              />
+              <span className="mt-1 block text-xs text-zinc-500">
+                Internal editorial score. Shown on the villa card when set.
+              </span>
+            </label>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
             Translations
           </h2>
           <div className="mt-3 flex gap-1 border-b border-zinc-200 dark:border-zinc-700">
@@ -598,6 +718,23 @@ export function VillaAdminForm(props: Props) {
                 rows={8}
                 value={current.description}
                 onChange={(e) => updateCurrent({ description: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Cancellation policy
+              </span>
+              <textarea
+                rows={4}
+                value={cancellationPolicy[tab]}
+                onChange={(e) =>
+                  setCancellationPolicy((prev) => ({
+                    ...prev,
+                    [tab]: e.target.value,
+                  }))
+                }
+                placeholder="Free cancellation up to 30 days before check-in…"
                 className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
               />
             </label>

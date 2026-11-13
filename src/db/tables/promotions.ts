@@ -32,6 +32,8 @@ export const promotions = pgTable(
 
     // Exactly one of these three is populated, enforced by the CHECK below.
     // Basis points: 1000 = 10%. Integers only, so no float creeps into the chain.
+    // On a `commission_waiver` row this is optional: null means "use the global
+    // commission rate", which is what makes the waiver track a rate change.
     percentBp: integer("percent_bp"),
     fixedAmountCents: integer("fixed_amount_cents"),
     // Pay-6-stay-7 is free_nights = 1 with free_nights_threshold = 7.
@@ -84,22 +86,29 @@ export const promotions = pgTable(
 
     // The discount value must match the discount type. Without this a
     // 'percentage' row with a null percent_bp would silently discount nothing.
+    //
+    // Compared as text, not as the enum: `ALTER TYPE ... ADD VALUE` and a
+    // constraint naming the new label cannot share one transaction, and the
+    // migrator runs each migration in exactly one.
     check(
       "promotions_value_shape_check",
       sql`(
-        (${table.discountType} = 'percentage'
+        (${table.discountType}::text = 'percentage'
           AND ${table.percentBp} IS NOT NULL
           AND ${table.fixedAmountCents} IS NULL
           AND ${table.freeNights} IS NULL)
-        OR (${table.discountType} = 'fixed_amount'
+        OR (${table.discountType}::text = 'fixed_amount'
           AND ${table.fixedAmountCents} IS NOT NULL
           AND ${table.percentBp} IS NULL
           AND ${table.freeNights} IS NULL)
-        OR (${table.discountType} = 'free_days'
+        OR (${table.discountType}::text = 'free_days'
           AND ${table.freeNights} IS NOT NULL
           AND ${table.freeNightsThreshold} IS NOT NULL
           AND ${table.percentBp} IS NULL
           AND ${table.fixedAmountCents} IS NULL)
+        OR (${table.discountType}::text = 'commission_waiver'
+          AND ${table.fixedAmountCents} IS NULL
+          AND ${table.freeNights} IS NULL)
       )`,
     ),
 

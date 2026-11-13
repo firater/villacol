@@ -127,6 +127,20 @@ function percentagePromo(
   };
 }
 
+function commissionWaiverPromo(
+  id: number,
+  overrides: Partial<PromotionRule> = {},
+): PromotionRule {
+  return {
+    ...PROMOTION_DEFAULTS,
+    id,
+    name: "commission waiver",
+    displayName: "Book direct",
+    discountType: "commission_waiver",
+    ...overrides,
+  };
+}
+
 function fixedPromo(
   id: number,
   fixedAmountCents: Cents,
@@ -481,6 +495,32 @@ describe("selectApplicablePromotions", () => {
     expect(promotions.map((p) => p.id)).toEqual([2, 1]);
   });
 
+  it("lets a non-stackable commission waiver override a higher-priority promotion", () => {
+    // The waiver sorts last, so the generic "first eligible wins" rule would
+    // have skipped it entirely.
+    const stackable = percentagePromo(1, 1_000, { priorityOrder: 10 });
+    const waiver = commissionWaiverPromo(2, {
+      priorityOrder: 90,
+      isStackable: false,
+    });
+    const input = makeInput({ promotions: [stackable, waiver] });
+
+    expect(selectApplicablePromotions(input.promotions, input)).toEqual([
+      waiver,
+    ]);
+  });
+
+  it("keeps a stackable commission waiver in the chain", () => {
+    const waiver = commissionWaiverPromo(1, { priorityOrder: 10 });
+    const stackable = percentagePromo(2, 1_000, { priorityOrder: 20 });
+    const input = makeInput({ promotions: [waiver, stackable] });
+
+    expect(selectApplicablePromotions(input.promotions, input)).toEqual([
+      waiver,
+      stackable,
+    ]);
+  });
+
   it("drops ineligible promotions", () => {
     const input = makeInput({
       promotions: [
@@ -490,6 +530,94 @@ describe("selectApplicablePromotions", () => {
     });
 
     expect(selectApplicablePromotions(input.promotions, input)).toEqual([]);
+  });
+});
+
+describe("commission waiver", () => {
+  it("discounts by the global commission rate when the promotion carries no percent", () => {
+    const input = makeInput({
+      promotions: [commissionWaiverPromo(1)],
+      commissionRateBp: 2_000,
+    });
+
+    const quote = calculateQuote(input);
+    expect(quote.totalDiscountCents).toBe(14_000);
+    expect(quote.nightlyTotalCents).toBe(56_000);
+  });
+
+  it("follows a changed commission rate without touching the promotion row", () => {
+    const promotions = [commissionWaiverPromo(1)];
+
+    expect(
+      calculateQuote(makeInput({ promotions, commissionRateBp: 1_500 }))
+        .totalDiscountCents,
+    ).toBe(10_500);
+    expect(
+      calculateQuote(makeInput({ promotions, commissionRateBp: 2_500 }))
+        .totalDiscountCents,
+    ).toBe(17_500);
+  });
+
+  it("prefers the promotion's own percent over the global rate", () => {
+    const input = makeInput({
+      promotions: [commissionWaiverPromo(1, { percentBp: 500 })],
+      commissionRateBp: 2_000,
+    });
+
+    expect(calculateQuote(input).totalDiscountCents).toBe(3_500);
+  });
+
+  it("falls back to the default rate when the input omits one", () => {
+    const input = makeInput({ promotions: [commissionWaiverPromo(1)] });
+    expect(input.commissionRateBp).toBeUndefined();
+    expect(calculateQuote(input).totalDiscountCents).toBe(14_000);
+  });
+
+  it("compounds against the running balance when stacked", () => {
+    const input = makeInput({
+      promotions: [
+        percentagePromo(1, 1_000, { priorityOrder: 10 }),
+        commissionWaiverPromo(2, { priorityOrder: 20 }),
+      ],
+      commissionRateBp: 2_000,
+    });
+
+    const quote = calculateQuote(input);
+    // 70_000 - 7_000 = 63_000, then 20% of 63_000 = 12_600.
+    expect(quote.discountSteps.map((step) => step.discountCents)).toEqual([
+      7_000, 12_600,
+    ]);
+    expect(quote.nightlyTotalCents).toBe(50_400);
+  });
+
+  it("replaces every other discount when non-stackable", () => {
+    const input = makeInput({
+      promotions: [
+        percentagePromo(1, 1_000, { priorityOrder: 10 }),
+        fixedPromo(2, 5_000, { priorityOrder: 20 }),
+        commissionWaiverPromo(3, { priorityOrder: 30, isStackable: false }),
+      ],
+      commissionRateBp: 2_000,
+    });
+
+    const quote = calculateQuote(input);
+    expect(quote.discountSteps).toHaveLength(1);
+    expect(quote.totalDiscountCents).toBe(14_000);
+  });
+
+  it("still honours its trigger", () => {
+    const input = makeInput({
+      promotions: [
+        commissionWaiverPromo(1, {
+          triggerType: "long_stay",
+          minNights: 10,
+          isStackable: false,
+        }),
+      ],
+    });
+
+    expect(selectApplicablePromotions(input.promotions, input)).toEqual([]);
+    expect(calculateQuote(input).totalDiscountCents).toBe(0);
   });
 });
 

@@ -36,6 +36,13 @@
       "when": 1794300000000,
       "tag": "0004_best_value",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794573367191,
+      "tag": "0005_guest_policy_reviews_commission_waiver",
+      "breakpoints": true
     }
   ]
 }

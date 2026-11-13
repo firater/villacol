@@ -20,6 +20,7 @@ import {
   villaCalendar,
   villaTranslations,
 } from "@/db/schema";
+import { partyTypeEnum } from "@/db/tables/enums";
 import {
   invalid,
   ok,
@@ -36,6 +37,7 @@ import { env } from "@/env";
 import { buildBookingStatusUrl } from "@/lib/booking-urls";
 import { sendEmail } from "@/lib/email/send";
 import { renderBookingInquiryEmail } from "@/lib/email/templates";
+import { validateGuestPolicy } from "@/lib/guest-policy";
 import { localize, type Locale } from "@/lib/locales";
 import { BASE_CURRENCY } from "@/lib/money";
 import { resolvePreferences } from "@/lib/preferences";
@@ -66,6 +68,8 @@ const createBookingInquirySchema = z
     checkOut: dateStringSchema,
     guestCount: z.number().int().min(1).max(100),
     extraGuests: z.array(extraGuestSchema).max(50).optional(),
+    /** Optional: a villa with `guest_policy = 'everyone'` never asks for it. */
+    partyType: z.enum(partyTypeEnum.enumValues).optional(),
 
     guestName: z.string().trim().min(2).max(160),
     guestEmail: z.string().trim().email().max(254),
@@ -183,6 +187,22 @@ export async function createBookingInquiry(
       return { ok: false, error: "This villa is not available for booking." };
     }
 
+    // Who may stay is a letting restriction, so it is enforced here rather than
+    // trusted to the form that collected the party details.
+    const guestPolicy = validateGuestPolicy({
+      policy: sources.villa.guestPolicy,
+      guestCount: data.guestCount,
+      partyType: data.partyType ?? null,
+      extraGuests: data.extraGuests,
+    });
+    if (!guestPolicy.valid) {
+      return {
+        ok: false,
+        error: guestPolicy.violation.message,
+        fieldErrors: { guestCount: [guestPolicy.violation.message] },
+      };
+    }
+
     const context: PricingContext = {
       today,
       bookedAt: today,
@@ -285,6 +305,7 @@ export async function createBookingInquiry(
           guestNote: data.guestNote ?? null,
           guestCount: data.guestCount,
           extraGuests: data.extraGuests ?? null,
+          partyType: data.partyType ?? null,
 
           checkIn,
           checkOut,

@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
 import { promotions, villaPromotions } from "@/db/schema";
+import type { DiscountType } from "@/db/tables/enums";
 import {
   invalid,
   ok,
@@ -42,6 +43,12 @@ const discountValueSchema = z.discriminatedUnion("discountType", [
     discountType: z.literal("free_days"),
     freeNights: z.number().int().min(1).max(364),
     freeNightsThreshold: z.number().int().min(2).max(365),
+  }),
+  // Direct booking. `percentBp` is an optional override; leaving it out makes
+  // the waiver follow the global commission rate.
+  z.object({
+    discountType: z.literal("commission_waiver"),
+    percentBp: z.number().int().min(1).max(10_000).nullish(),
   }),
 ]);
 
@@ -153,7 +160,7 @@ const detachPromotionSchema = z.object({
 function discountColumns(
   discount: z.output<typeof discountValueSchema>,
 ): {
-  discountType: "percentage" | "fixed_amount" | "free_days";
+  discountType: DiscountType;
   percentBp: number | null;
   fixedAmountCents: number | null;
   freeNights: number | null;
@@ -161,7 +168,12 @@ function discountColumns(
 } {
   return {
     discountType: discount.discountType,
-    percentBp: discount.discountType === "percentage" ? discount.percentBp : null,
+    percentBp:
+      discount.discountType === "percentage"
+        ? discount.percentBp
+        : discount.discountType === "commission_waiver"
+          ? (discount.percentBp ?? null)
+          : null,
     fixedAmountCents:
       discount.discountType === "fixed_amount" ? discount.fixedAmountCents : null,
     freeNights: discount.discountType === "free_days" ? discount.freeNights : null,

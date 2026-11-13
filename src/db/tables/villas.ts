@@ -1,9 +1,12 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   doublePrecision,
   index,
   integer,
   jsonb,
+  numeric,
   pgTable,
   primaryKey,
   serial,
@@ -22,7 +25,7 @@ import {
   locations,
   villaRules,
 } from "./taxonomy";
-import { localeEnum } from "./enums";
+import { guestPolicyEnum, localeEnum } from "./enums";
 
 export const villas = pgTable(
   "villas",
@@ -50,6 +53,25 @@ export const villas = pgTable(
     checkInTime: text("check_in_time").notNull().default("16:00"),
     checkOutTime: text("check_out_time").notNull().default("10:00"),
 
+    /**
+     * Free text, per villa, shown beside the quote. Inline jsonb rather than a
+     * `villa_translations` column because it needs no slug and no full-text
+     * search — the same hybrid-i18n rule the taxonomy labels follow.
+     */
+    cancellationPolicyI18n: jsonb("cancellation_policy_i18n").$type<LocalizedText>(),
+    /** Who may book. `createBookingInquiry` rejects a party that violates it. */
+    guestPolicy: guestPolicyEnum("guest_policy").notNull().default("everyone"),
+    /**
+     * Internal editorial score on a 1–10 scale, one decimal. `numeric` rather
+     * than a float so the stored value is exactly what the editor typed; the
+     * query layer parses it to a number for display.
+     */
+    editorRating: numeric("editor_rating", {
+      precision: 3,
+      scale: 1,
+      mode: "number",
+    }),
+
     latitude: doublePrecision("latitude"),
     longitude: doublePrecision("longitude"),
 
@@ -75,6 +97,12 @@ export const villas = pgTable(
     index("villas_active_order_idx").on(table.isActive, table.orderValue),
     index("villas_capacity_idx").on(table.capacity),
     index("villas_bedrooms_idx").on(table.bedrooms),
+
+    check(
+      "villas_editor_rating_range_check",
+      sql`${table.editorRating} IS NULL
+        OR (${table.editorRating} >= 1 AND ${table.editorRating} <= 10)`,
+    ),
   ],
 );
 

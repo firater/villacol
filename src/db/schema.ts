@@ -12,6 +12,7 @@ export * from "./tables/taxonomy";
 export * from "./tables/villas";
 export * from "./tables/promotions";
 export * from "./tables/bookings";
+export * from "./tables/reviews";
 export * from "./tables/guest-access";
 export * from "./tables/calendar";
 export * from "./tables/caches";

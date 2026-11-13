@@ -5,6 +5,7 @@ export * from "./admin.calendar.queries";
 export * from "./admin.taxonomy.queries";
 export * from "./admin.deals.queries";
 export * from "./admin.contact.queries";
+export * from "./discount-tiers.queries";
 export * from "./filter-facets.queries";
 export * from "./landing.queries";
 export * from "./home-categories.queries";

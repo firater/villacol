@@ -73,6 +73,19 @@ export const dateRangeSchema = z
 
 export const orderValueSchema = z.number().int().min(0).max(1_000_000);
 
+/**
+ * The internal editorial score: 1–10 with one decimal, matching the
+ * `numeric(3,1)` column and its CHECK constraint.
+ */
+export const editorRatingSchema = z
+  .number()
+  .min(1)
+  .max(10)
+  .refine(
+    (value) => Number.isInteger(value * 10),
+    "Expected at most one decimal place",
+  );
+
 /** `{ id, orderValue }[]`, the payload every reorder action takes. */
 export const reorderSchema = z
   .array(z.object({ id: idSchema, orderValue: orderValueSchema }))

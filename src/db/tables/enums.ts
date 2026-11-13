@@ -26,6 +26,28 @@ export const discountTypeEnum = pgEnum("discount_type_enum", [
   "percentage",
   "fixed_amount",
   "free_days",
+  /**
+   * Direct-booking waiver. Behaves as a percentage whose value is the global
+   * commission rate unless the row overrides `percent_bp`.
+   */
+  "commission_waiver",
+]);
+
+/** Who a villa may be let to; enforced on every booking inquiry. */
+export const guestPolicyEnum = pgEnum("guest_policy_enum", [
+  "everyone",
+  "couples_only",
+  "families_only",
+  "no_friend_groups",
+]);
+
+/** Party composition the guest declares, which `guest_policy` is checked against. */
+export const partyTypeEnum = pgEnum("party_type_enum", [
+  "couple",
+  "family",
+  "friends",
+  "solo",
+  "other",
 ]);
 
 export const promotionTriggerEnum = pgEnum("promotion_trigger_enum", [
@@ -76,6 +98,8 @@ export const synonymKindEnum = pgEnum("synonym_kind_enum", [
 export type UserRole = (typeof userRoleEnum.enumValues)[number];
 export type BookingStatus = (typeof bookingStatusEnum.enumValues)[number];
 export type DiscountType = (typeof discountTypeEnum.enumValues)[number];
+export type GuestPolicy = (typeof guestPolicyEnum.enumValues)[number];
+export type PartyType = (typeof partyTypeEnum.enumValues)[number];
 export type PromotionTrigger = (typeof promotionTriggerEnum.enumValues)[number];
 export type CalendarBlockSource =
   (typeof calendarBlockSourceEnum.enumValues)[number];

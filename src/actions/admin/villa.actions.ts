@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
 import { villas, villaTranslations } from "@/db/schema";
+import { guestPolicyEnum } from "@/db/tables/enums";
 import {
   invalid,
   ok,
@@ -20,8 +21,10 @@ import {
 } from "@/lib/cron/trigger";
 import {
   centsSchema,
+  editorRatingSchema,
   idSchema,
   localeSchema,
+  localizedTextSchema,
   orderValueSchema,
   reorderSchema,
   slugSchema,
@@ -69,6 +72,9 @@ const villaFieldsSchema = z.object({
   isEditorsChoice: z.boolean(),
   isBestValue: z.boolean(),
   orderValue: orderValueSchema,
+  cancellationPolicyI18n: localizedTextSchema.nullish(),
+  guestPolicy: z.enum(guestPolicyEnum.enumValues),
+  editorRating: editorRatingSchema.nullish(),
 });
 
 const createVillaSchema = z.object({

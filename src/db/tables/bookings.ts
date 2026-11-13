@@ -14,7 +14,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { bookingStatusEnum, currencyEnum } from "./enums";
+import { bookingStatusEnum, currencyEnum, partyTypeEnum } from "./enums";
 import { promotions } from "./promotions";
 import { user } from "./auth";
 import { villas } from "./villas";
@@ -46,6 +46,12 @@ export const bookings = pgTable(
     guestNote: text("guest_note"),
     guestCount: integer("guest_count").notNull(),
     extraGuests: jsonb("extra_guests").$type<ExtraGuest[]>(),
+    /**
+     * What the guest declared the party to be. Null on bookings taken before
+     * guest policies existed; `validateGuestPolicy` treats that as undeclared
+     * and falls back to the guest count and extra-guest ages.
+     */
+    partyType: partyTypeEnum("party_type"),
 
     checkIn: date("check_in").notNull(),
     checkOut: date("check_out").notNull(),

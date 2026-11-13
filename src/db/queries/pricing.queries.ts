@@ -10,6 +10,7 @@ import { cacheLife } from "next/cache";
 
 import { db } from "@/db";
 import { promotions, villaCalendar, villaPromotions, villas } from "@/db/schema";
+import { resolveCommissionRateBp } from "@/lib/commission";
 import {
   addDays,
   enumerateNights,
@@ -220,6 +221,7 @@ export async function loadVillaPricingContext(
     defaultMinStay: villaRow.defaultMinStay,
     capacity: villaRow.capacity,
     promotions: promotionRules,
+    commissionRateBp: resolveCommissionRateBp(),
     context,
   };
 }
@@ -363,6 +365,7 @@ export function buildPricingInputFromSources(
     defaultMinStay: sources.villa.defaultMinStay,
     capacity: sources.villa.capacity,
     promotions: sources.promotions,
+    commissionRateBp: resolveCommissionRateBp(),
     context,
   };
 }

@@ -38,8 +38,13 @@ import {
   villaRules,
   villas,
   villaTranslations,
+  guestReviews,
 } from "@/db/schema";
-import type { DiscountType, PromotionTrigger } from "@/db/tables/enums";
+import type {
+  DiscountType,
+  GuestPolicy,
+  PromotionTrigger,
+} from "@/db/tables/enums";
 import { addDays, getBusinessToday, type DateString } from "@/lib/dates";
 import type { Locale, LocalizedText } from "@/lib/locales";
 
@@ -302,6 +307,11 @@ type SeedVilla = {
   isEditorsChoice: boolean;
   isBestValue: boolean;
   orderValue: number;
+  /** Who the villa may be let to; `createBookingInquiry` enforces it. */
+  guestPolicy: GuestPolicy;
+  /** Internal editorial score, 1–10 with one decimal. */
+  editorRating: number;
+  cancellationPolicyI18n: LocalizedText;
   latitude: number;
   longitude: number;
   categorySlugs: string[];
@@ -339,6 +349,13 @@ const VILLA_DATA: SeedVilla[] = [
     isEditorsChoice: true,
     isBestValue: false,
     orderValue: 10,
+    guestPolicy: "everyone",
+    editorRating: 9.2,
+    cancellationPolicyI18n: {
+      en: "Free cancellation up to 30 days before check-in. Within 30 days the deposit is retained; within 7 days the full stay is charged.",
+      de: "Kostenlose Stornierung bis 30 Tage vor Anreise. Innerhalb von 30 Tagen wird die Anzahlung einbehalten, innerhalb von 7 Tagen der gesamte Aufenthalt berechnet.",
+      ru: "Бесплатная отмена не позднее чем за 30 дней до заезда. Менее чем за 30 дней удерживается депозит, менее чем за 7 дней — полная стоимость проживания.",
+    },
     latitude: 36.2661,
     longitude: 29.4082,
     categorySlugs: ["sea-view-villas", "honeymoon-villas"],
@@ -387,6 +404,15 @@ const VILLA_DATA: SeedVilla[] = [
     isEditorsChoice: true,
     isBestValue: true,
     orderValue: 20,
+    // Let only to families: an inquiry with no child among the extra guests and
+    // no `family` party type is rejected by `validateGuestPolicy`.
+    guestPolicy: "families_only",
+    editorRating: 8.6,
+    cancellationPolicyI18n: {
+      en: "Free cancellation up to 14 days before check-in. After that the deposit is retained.",
+      de: "Kostenlose Stornierung bis 14 Tage vor Anreise. Danach wird die Anzahlung einbehalten.",
+      ru: "Бесплатная отмена не позднее чем за 14 дней до заезда. После этого удерживается депозит.",
+    },
     latitude: 36.3190,
     longitude: 29.3702,
     categorySlugs: ["family-villas"],
@@ -437,6 +463,15 @@ const VILLA_DATA: SeedVilla[] = [
     isEditorsChoice: true,
     isBestValue: true,
     orderValue: 30,
+    // Two bedrooms by the water: couples only, so a party of three or more is
+    // rejected even though `capacity` is four.
+    guestPolicy: "couples_only",
+    editorRating: 9.5,
+    cancellationPolicyI18n: {
+      en: "Flexible: cancel up to 48 hours before check-in for a full refund.",
+      de: "Flexibel: Stornierung bis 48 Stunden vor Anreise mit voller Rückerstattung.",
+      ru: "Гибкие условия: отмена не позднее чем за 48 часов до заезда с полным возвратом.",
+    },
     latitude: 36.2015,
     longitude: 29.6392,
     categorySlugs: ["honeymoon-villas", "sea-view-villas"],
@@ -702,6 +737,49 @@ const PROMOTION_MATRIX: SeedPromotion[] = [
     isStackable: true,
     isActive: true,
   },
+  // ---- commission_waiver ----
+  /**
+   * Direct booking. Coupon-triggered on purpose: an always-on waiver attached to
+   * a seeded villa would override that villa's other promotions in the cache and
+   * flatten the fixtures the drift check reads. Behind a code it stays inert
+   * until a quote supplies `DIRECT20`, which is exactly the override to demo.
+   *
+   * `percentBp` is omitted, so the waiver tracks `COMMISSION_RATE_BP` (20%).
+   */
+  {
+    name: "Commission waiver · coupon · DIRECT20",
+    displayNameI18n: {
+      en: "Book direct, we waive our commission",
+      de: "Direkt buchen — wir verzichten auf unsere Provision",
+      ru: "Бронируйте напрямую — мы не берём комиссию",
+    },
+    discountType: "commission_waiver",
+    triggerType: "coupon",
+    code: "DIRECT20",
+    priorityOrder: 5,
+    // Non-stackable: the waiver replaces every other discount, wherever it sorts.
+    isStackable: false,
+    isActive: true,
+  },
+  /**
+   * The same thing with its own rate, left inactive so an admin can flip it on
+   * and watch an always-on waiver override the stackable chain.
+   */
+  {
+    name: "Commission waiver · always · 25% override",
+    displayNameI18n: {
+      en: "Direct booking waiver",
+      de: "Direktbuchungs-Verzicht",
+      ru: "Отказ от комиссии при прямом бронировании",
+    },
+    discountType: "commission_waiver",
+    triggerType: "always",
+    percentBp: 2_500,
+    priorityOrder: 5,
+    isStackable: false,
+    isActive: false,
+  },
+
   {
     name: "Free days · exit intent · LASTCHANCE",
     displayNameI18n: { en: "Last-chance free night", de: "Letzte Chance: Gratisnacht", ru: "Последний шанс: бесплатная ночь" },
@@ -745,8 +823,88 @@ const VILLA_PROMOTION_LINKS: Record<string, string[]> = {
     "Percentage · coupon · WELCOME8",
     "Free days · coupon · FREENIGHT",
     "Percentage · exit intent · STAY7",
+    // Quoting VS-003 with `DIRECT20` is the one place the non-stackable waiver
+    // beats a coupon that would otherwise apply.
+    "Commission waiver · coupon · DIRECT20",
   ],
 };
+
+/* -------------------------------------------------------------------------- */
+/* Guest reviews                                                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Seeded reviews carry no `booking_id`: the seed writes no bookings, and a
+ * review without one is the unverified case the table is built to accept.
+ * Stay dates are offsets from `today` so the fixture stays in the past however
+ * long after seeding it is read.
+ */
+type SeedReview = {
+  /** Villa `ref_code`, resolved to an id during the insert. */
+  villaRefCode: string;
+  guestName: string;
+  locale: Locale;
+  /** Negative day offsets from today; check-out must be the later one. */
+  stayCheckInOffset: number;
+  stayCheckOutOffset: number;
+  guestCount: number;
+  rating: number;
+  reviewText: string;
+  isPublished: boolean;
+};
+
+const REVIEW_DATA: SeedReview[] = [
+  {
+    villaRefCode: "VS-001",
+    guestName: "Hannah R.",
+    locale: "en",
+    stayCheckInOffset: -62,
+    stayCheckOutOffset: -55,
+    guestCount: 6,
+    rating: 5,
+    reviewText:
+      "The pool terrace really does get the whole sunset, which is the reason we booked and it delivered. Four bedrooms meant nobody drew the short straw. The drive down to the bay is steeper than it looks on the map — hire the car.",
+    isPublished: true,
+  },
+  {
+    villaRefCode: "VS-002",
+    guestName: "Familie Brandt",
+    locale: "de",
+    stayCheckInOffset: -121,
+    stayCheckOutOffset: -111,
+    guestCount: 5,
+    rating: 4,
+    reviewText:
+      "Ruhiges Haus zwischen Olivenbäumen, ideal mit zwei Kindern. Der Pool ist schattig am Nachmittag, was wir sehr geschätzt haben. Ein Stern Abzug nur für die Anfahrt über die Bergstraße.",
+    isPublished: true,
+  },
+  {
+    villaRefCode: "VS-003",
+    guestName: "Елена и Марк",
+    locale: "ru",
+    stayCheckInOffset: -40,
+    stayCheckOutOffset: -34,
+    guestCount: 2,
+    rating: 5,
+    reviewText:
+      "Идеально для двоих: до моря пешком, с террасы виден Мейс, вечером слышно только цикад. Вернёмся в следующем сезоне.",
+    isPublished: true,
+  },
+  // Unpublished on purpose: nothing is public until an admin moderates it, and
+  // the read path has to have a row that proves the gate works.
+  {
+    villaRefCode: "VS-001",
+    guestName: "Tom W.",
+    locale: "en",
+    stayCheckInOffset: -18,
+    stayCheckOutOffset: -13,
+    guestCount: 8,
+    rating: 3,
+    reviewText:
+      "Lovely house, but the wifi dropped most evenings and we were working. Everything else was as described.",
+    isPublished: false,
+  },
+];
 
 /* -------------------------------------------------------------------------- */
 /* Search synonyms, deals, rates                                              */
@@ -1033,6 +1191,7 @@ export type SeedResult = {
   villaPromotionLinkCount: number;
   synonymCount: number;
   dealCount: number;
+  reviewCount: number;
   /** `ref_code` to database id, so a caller can target the seeded villas. */
   villaIdsByRefCode: Record<string, number>;
 };
@@ -1222,6 +1381,9 @@ export async function seed(
         isEditorsChoice: villa.isEditorsChoice,
         isBestValue: villa.isBestValue,
         orderValue: villa.orderValue,
+        guestPolicy: villa.guestPolicy,
+        editorRating: villa.editorRating,
+        cancellationPolicyI18n: villa.cancellationPolicyI18n,
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
@@ -1243,6 +1405,9 @@ export async function seed(
           isEditorsChoice: villa.isEditorsChoice,
           isBestValue: villa.isBestValue,
           orderValue: villa.orderValue,
+          guestPolicy: villa.guestPolicy,
+          editorRating: villa.editorRating,
+          cancellationPolicyI18n: villa.cancellationPolicyI18n,
           updatedAt: new Date(),
         },
       })
@@ -1381,6 +1546,53 @@ export async function seed(
     calendarRowCount += calendarRows.length;
   }
 
+  /* -- Guest reviews ------------------------------------------------------ */
+  // No natural key, so the seeded set is replaced rather than upserted. Scoped
+  // to the seeded villas and guest names so a review an admin entered by hand,
+  // or one attached to a real booking, survives a re-run.
+  const seededVillaIds = Object.values(villaIdsByRefCode);
+  const seededReviewNames = [
+    ...new Set(REVIEW_DATA.map((review) => review.guestName)),
+  ];
+
+  if (seededVillaIds.length > 0) {
+    await dbPool
+      .delete(guestReviews)
+      .where(
+        and(
+          inArray(guestReviews.villaId, seededVillaIds),
+          inArray(guestReviews.guestName, seededReviewNames),
+          isNull(guestReviews.bookingId),
+        ),
+      );
+  }
+
+  const reviewRows = REVIEW_DATA.flatMap((review) => {
+    const villaId = villaIdsByRefCode[review.villaRefCode];
+    if (villaId === undefined) return [];
+
+    return [
+      {
+        villaId,
+        bookingId: null,
+        guestName: review.guestName,
+        locale: review.locale,
+        stayCheckIn: addDays(today, review.stayCheckInOffset),
+        stayCheckOut: addDays(today, review.stayCheckOutOffset),
+        guestCount: review.guestCount,
+        rating: review.rating,
+        reviewText: review.reviewText,
+        isPublished: review.isPublished,
+        publishedAt: review.isPublished ? new Date() : null,
+        updatedAt: new Date(),
+      },
+    ];
+  });
+
+  if (reviewRows.length > 0) {
+    await dbPool.insert(guestReviews).values(reviewRows);
+  }
+
   /* -- Search synonyms ---------------------------------------------------- */
   for (const synonym of SYNONYM_DATA) {
     await dbPool
@@ -1450,6 +1662,7 @@ export async function seed(
     villaPromotionLinkCount,
     synonymCount: SYNONYM_DATA.length,
     dealCount: DEAL_DATA.length,
+    reviewCount: reviewRows.length,
     villaIdsByRefCode,
   };
 }

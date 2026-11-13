@@ -13,6 +13,7 @@
  * Currency conversion deliberately lives outside this file, in
  * `src/lib/currency.ts`, because it is a display concern.
  */
+import { DEFAULT_COMMISSION_RATE_BP } from "@/lib/commission";
 import {
   addDays,
   diffInNights,
@@ -206,6 +207,11 @@ function requireCondition<T>(
  * "Exclusive" has exactly one meaning: take the first eligible promotion; if it
  * is non-stackable, it is the only one. Otherwise keep taking the subsequent
  * stackable ones, skipping any later exclusive promotion.
+ *
+ * A non-stackable commission waiver is the one exception. It is an override,
+ * not a link in the chain: booking direct replaces every other discount no
+ * matter where the waiver sorts, because a waiver that quietly lost to a
+ * higher-priority promotion would advertise a saving the guest never receives.
  */
 export function selectApplicablePromotions(
   promotions: readonly PromotionRule[],
@@ -217,6 +223,12 @@ export function selectApplicablePromotions(
       (left, right) =>
         left.priorityOrder - right.priorityOrder || left.id - right.id,
     );
+
+  const waiverOverride = eligible.find(
+    (promotion) =>
+      promotion.discountType === "commission_waiver" && !promotion.isStackable,
+  );
+  if (waiverOverride !== undefined) return [waiverOverride];
 
   const [first, ...rest] = eligible;
   if (first === undefined) return [];
@@ -282,12 +294,22 @@ function discountFor(
   nights: readonly NightRate[],
   balanceBeforeCents: Cents,
   baseTotalCents: Cents,
+  commissionRateBp: number,
 ): Cents {
   switch (promotion.discountType) {
     case "percentage":
       return applyPercentageDiscount(
         balanceBeforeCents,
         requireValue(promotion, promotion.percentBp, "percent_bp"),
+      );
+
+    // The guest keeps what the agency would have taken. `percentBp` is an
+    // optional per-promotion override; without one the waiver follows the
+    // global rate, so changing the rate changes every waiver at once.
+    case "commission_waiver":
+      return applyPercentageDiscount(
+        balanceBeforeCents,
+        promotion.percentBp ?? commissionRateBp,
       );
 
     case "fixed_amount":
@@ -337,6 +359,7 @@ export function calculateSequentialDiscounts(
   baseTotalCents: Cents,
   nights: readonly NightRate[],
   selectedPromotions: readonly PromotionRule[],
+  commissionRateBp: number = DEFAULT_COMMISSION_RATE_BP,
 ): SequentialDiscountResult {
   const steps: DiscountStep[] = [];
   let runningBalanceCents = baseTotalCents;
@@ -344,7 +367,13 @@ export function calculateSequentialDiscounts(
   selectedPromotions.forEach((promotion, stepIndex) => {
     const balanceBeforeCents = runningBalanceCents;
     const discountCents = clampCents(
-      discountFor(promotion, nights, balanceBeforeCents, baseTotalCents),
+      discountFor(
+        promotion,
+        nights,
+        balanceBeforeCents,
+        baseTotalCents,
+        commissionRateBp,
+      ),
       0,
       balanceBeforeCents,
     );
@@ -507,6 +536,7 @@ export function calculateQuote(input: PricingInput): PriceQuote {
     baseTotalCents,
     input.nights,
     selected,
+    input.commissionRateBp ?? DEFAULT_COMMISSION_RATE_BP,
   );
 
   const nightlyTotalCents = baseTotalCents - totalDiscountCents;

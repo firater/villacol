@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createPromotion, updatePromotion } from "@/actions/admin/promotion.actions";
 import type { AdminPromotionDetailRow } from "@/db/queries/admin.promotions.queries";
 import { useRouter } from "@/i18n/navigation";
+import { DEFAULT_COMMISSION_RATE_BP } from "@/lib/commission";
 import type { Locale } from "@/lib/locales";
 import { fromCents, toCents } from "@/lib/money";
 
@@ -18,6 +19,7 @@ const DISCOUNT_TYPES = [
   { value: "percentage", label: "Percentage" },
   { value: "fixed_amount", label: "Fixed amount (EUR)" },
   { value: "free_days", label: "Free nights" },
+  { value: "commission_waiver", label: "Commission waiver (direct booking)" },
 ] as const;
 
 const TRIGGER_TYPES = [
@@ -92,6 +94,7 @@ function buildDiscountPayload(
     fixedEur: string;
     freeNights: string;
     freeNightsThreshold: string;
+    waiverPercentInput: string;
   },
 ) {
   switch (discountType) {
@@ -127,6 +130,23 @@ function buildDiscountPayload(
         freeNights: fn,
         freeNightsThreshold: th,
       };
+    }
+    case "commission_waiver": {
+      // Blank means "track the global commission rate", which is the point of
+      // the waiver — a rate change should not need every promotion rewritten.
+      const raw = fields.waiverPercentInput.trim();
+      if (raw === "") {
+        return { discountType: "commission_waiver" as const, percentBp: null };
+      }
+      const pct = Number(raw);
+      if (!Number.isFinite(pct) || pct <= 0 || pct > 100) {
+        throw new Error(
+          "Commission waiver: leave blank to use the global rate, or enter 0–100.",
+        );
+      }
+      const bp = Math.round(pct * 100);
+      if (bp < 1 || bp > 10_000) throw new Error("Percentage out of range.");
+      return { discountType: "commission_waiver" as const, percentBp: bp };
     }
     default: {
       const _x: never = discountType;
@@ -164,13 +184,22 @@ export function PromotionAdminForm(props: Props) {
   const [discountType, setDiscountType] = useState<
     (typeof DISCOUNT_TYPES)[number]["value"]
   >(
-    p?.discountType === "fixed_amount" || p?.discountType === "free_days"
-      ? (p.discountType as "fixed_amount" | "free_days")
+    p?.discountType === "fixed_amount" ||
+      p?.discountType === "free_days" ||
+      p?.discountType === "commission_waiver"
+      ? (p.discountType as "fixed_amount" | "free_days" | "commission_waiver")
       : "percentage",
   );
 
   const [percentInput, setPercentInput] = useState(
-    p?.percentBp != null ? String(p.percentBp / 100) : "10",
+    p?.discountType === "percentage" && p.percentBp != null
+      ? String(p.percentBp / 100)
+      : "10",
+  );
+  const [waiverPercentInput, setWaiverPercentInput] = useState(
+    p?.discountType === "commission_waiver" && p.percentBp != null
+      ? String(p.percentBp / 100)
+      : "",
   );
   const [fixedEur, setFixedEur] = useState(
     p?.fixedAmountCents != null ? String(fromCents(p.fixedAmountCents)) : "",
@@ -249,6 +278,7 @@ export function PromotionAdminForm(props: Props) {
         fixedEur,
         freeNights,
         freeNightsThreshold,
+        waiverPercentInput,
       });
 
       const trigger = buildTriggerPayload(triggerType, {
@@ -459,6 +489,26 @@ export function PromotionAdminForm(props: Props) {
                   />
                 </label>
               </div>
+            ) : null}
+
+            {discountType === "commission_waiver" ? (
+              <label className="block">
+                <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  Waiver percent (%) — blank uses the global commission rate
+                </span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder={String(DEFAULT_COMMISSION_RATE_BP / 100)}
+                  value={waiverPercentInput}
+                  onChange={(e) => setWaiverPercentInput(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+                />
+                <span className="mt-1 block text-xs text-zinc-500">
+                  Turn off “stackable” to make booking direct override every
+                  other promotion.
+                </span>
+              </label>
             ) : null}
           </div>
         </section>

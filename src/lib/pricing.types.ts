@@ -94,6 +94,13 @@ export type PricingInput = {
   /** Villa `capacity`; `validateStay` rejects a larger `guestCount`. */
   capacity: number;
   promotions: readonly PromotionRule[];
+  /**
+   * Global agency commission, in basis points. A `commission_waiver` promotion
+   * with no `percentBp` of its own discounts by exactly this. Optional so every
+   * existing call site keeps working; omitting it uses
+   * `DEFAULT_COMMISSION_RATE_BP`.
+   */
+  commissionRateBp?: number;
   context: PricingContext;
 };
 

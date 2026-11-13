@@ -11,7 +11,12 @@ import {
   villas,
   villaTranslations,
 } from "@/db/schema";
-import { DEFAULT_LOCALE, type Locale } from "@/lib/locales";
+import type { GuestPolicy } from "@/db/tables/enums";
+import {
+  DEFAULT_LOCALE,
+  type Locale,
+  type LocalizedText,
+} from "@/lib/locales";
 
 const ADMIN_LABEL_LOCALE = DEFAULT_LOCALE;
 
@@ -102,6 +107,9 @@ export type AdminVillaEditRow = {
   isEditorsChoice: boolean;
   isBestValue: boolean;
   orderValue: number;
+  cancellationPolicyI18n: LocalizedText | null;
+  guestPolicy: GuestPolicy;
+  editorRating: number | null;
   translations: AdminVillaTranslationRow[];
   images: AdminVillaImageRow[];
 };
@@ -134,6 +142,9 @@ export async function getAdminVillaForEdit(
       isEditorsChoice: villas.isEditorsChoice,
       isBestValue: villas.isBestValue,
       orderValue: villas.orderValue,
+      cancellationPolicyI18n: villas.cancellationPolicyI18n,
+      guestPolicy: villas.guestPolicy,
+      editorRating: villas.editorRating,
     })
     .from(villas)
     .where(eq(villas.id, villaId))

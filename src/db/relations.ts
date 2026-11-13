@@ -14,6 +14,7 @@ import {
 import { villaCalendar } from "./tables/calendar";
 import { dealReads, deals } from "./tables/engagement";
 import { promotions, villaPromotions } from "./tables/promotions";
+import { guestReviews } from "./tables/reviews";
 import { villaSearchDocuments } from "./tables/search";
 import {
   amenities,
@@ -124,6 +125,7 @@ export const villasRelations = relations(villas, ({ one, many }) => ({
   priceCache: many(villaPriceCache),
   searchDocuments: many(villaSearchDocuments),
   bookings: many(bookings),
+  reviews: many(guestReviews),
   // Villas this one is an alternative *for*, and the alternatives *of* it.
   similarTo: many(similarVillas, { relationName: "similar_source" }),
   similarFrom: many(similarVillas, { relationName: "similar_target" }),
@@ -246,6 +248,18 @@ export const bookingsRelations = relations(bookings, ({ one, many }) => ({
   blockedNights: many(villaCalendar),
   otpChallenges: many(bookingOtpChallenges),
   accessSessions: many(bookingAccessSessions),
+  review: many(guestReviews),
+}));
+
+export const guestReviewsRelations = relations(guestReviews, ({ one }) => ({
+  villa: one(villas, {
+    fields: [guestReviews.villaId],
+    references: [villas.id],
+  }),
+  booking: one(bookings, {
+    fields: [guestReviews.bookingId],
+    references: [bookings.id],
+  }),
 }));
 
 export const bookingOtpChallengesRelations = relations(

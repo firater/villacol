@@ -37,6 +37,7 @@ async function main() {
     `villa promotions   ${result.villaPromotionLinkCount} links`,
     `search synonyms    ${result.synonymCount}`,
     `deals              ${result.dealCount}`,
+    `guest reviews      ${result.reviewCount}`,
     `search documents   ${indexed.processedCount} written, ${indexed.failedCount} failed`,
   ];
 
