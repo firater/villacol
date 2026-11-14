@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { locale as localeParam } from "next/root-params";
 import { hasLocale } from "next-intl";
@@ -24,6 +25,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
  * blocked during partial prerender (Cache Components).
  */
 async function AdminLayoutContent({ children }: { children: ReactNode }) {
+  await connection();
+
   const localeRaw = await localeParam();
   if (!hasLocale(routing.locales, localeRaw)) {
     redirect(`/${DEFAULT_LOCALE}`);

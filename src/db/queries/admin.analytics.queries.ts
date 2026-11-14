@@ -2,7 +2,6 @@
  * Admin dashboard aggregates (uncached — operations metrics).
  */
 import { and, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
-
 import { db } from "@/db";
 import {
   bookings,
@@ -148,6 +147,7 @@ export async function getRecentBookings(
   limit: number,
   locale: Locale = DEFAULT_LOCALE,
 ): Promise<RecentBookingRow[]> {
+  // TEMP: "use cache" disabled while debugging Stripe webhook → admin status.
   const rows = await db
     .select({
       id: bookings.id,

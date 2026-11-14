@@ -53,7 +53,8 @@ export async function applyBookingStatusChange(
 
     if (booking === undefined) return null;
 
-    if (booking.status === status) {
+    const statusUnchanged = booking.status === status;
+    if (statusUnchanged && paymentPatch === undefined) {
       return {
         villaId: booking.villaId,
         blockedNights: 0,
@@ -79,6 +80,15 @@ export async function applyBookingStatusChange(
 
     let blockedNights = 0;
     let releasedNights = 0;
+
+    if (statusUnchanged) {
+      return {
+        villaId: booking.villaId,
+        blockedNights: 0,
+        releasedNights: 0,
+        skipped: false,
+      };
+    }
 
     if (BLOCKING_STATUSES.has(status)) {
       const nights = enumerateNights(

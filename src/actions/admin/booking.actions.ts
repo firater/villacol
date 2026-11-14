@@ -46,6 +46,8 @@ export async function updateBookingStatus(
 
     updateTag("villas");
     updateTag(`villa-${result.villaId}`);
+    updateTag("admin-bookings");
+    updateTag("bookings");
 
     return ok({
       bookingId,

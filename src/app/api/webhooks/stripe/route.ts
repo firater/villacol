@@ -1,14 +1,12 @@
 import { eq } from "drizzle-orm";
-import { updateTag } from "next/cache";
 import type Stripe from "stripe";
 
 import { dbPool } from "@/db/pool";
 import { bookings } from "@/db/schema";
 import { env } from "@/env";
 import { applyBookingStatusChange } from "@/lib/booking-status-update";
+import { revalidateBookingPaymentViews } from "@/lib/revalidate-booking-views";
 import { getStripeServerClient } from "@/lib/stripe";
-
-export const runtime = "nodejs";
 
 async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session,
@@ -26,19 +24,27 @@ async function handleCheckoutSessionCompleted(
 
   const paidAt = new Date();
 
-  const result = await applyBookingStatusChange(bookingId, "confirmed", {
-    paymentProvider: "stripe",
-    paymentIntentId,
-    paidAt,
-  });
+  console.log("ATTEMPTING UPDATE for booking:", bookingId);
+  let result;
+  try {
+    result = await applyBookingStatusChange(bookingId, "confirmed", {
+      paymentProvider: "stripe",
+      paymentIntentId,
+      paidAt,
+    });
+    console.log("UPDATE SUCCESSFUL");
+  } catch (error) {
+    console.error("WEBHOOK DB ERROR:", error);
+    return Response.json({ error: "Database update failed" }, { status: 500 });
+  }
 
   if (result === null) {
     console.error("[stripe webhook] booking not found:", bookingId);
     return Response.json({ error: "Booking not found" }, { status: 404 });
   }
 
-  updateTag("villas");
-  updateTag(`villa-${result.villaId}`);
+  await revalidateBookingPaymentViews(result.villaId);
+  console.log("Webhook success: status updated to confirmed");
 
   return Response.json({ received: true }, { status: 200 });
 }
@@ -67,24 +73,16 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: message }, { status: 400 });
   }
 
+  console.log("WEBHOOK HIT: Received event", event.type);
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    if (session.payment_status !== "paid") {
+    if (
+      session.payment_status !== "paid" &&
+      session.payment_status !== "no_payment_required"
+    ) {
       return Response.json({ received: true }, { status: 200 });
-    }
-
-    const bookingId = session.metadata?.bookingId;
-    if (bookingId !== undefined) {
-      const [row] = await dbPool
-        .select({ status: bookings.status })
-        .from(bookings)
-        .where(eq(bookings.id, bookingId))
-        .limit(1);
-
-      if (row?.status === "confirmed") {
-        return Response.json({ received: true }, { status: 200 });
-      }
     }
 
     return handleCheckoutSessionCompleted(session);
