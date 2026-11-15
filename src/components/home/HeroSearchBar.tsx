@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
   type FormEvent,
+  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -392,7 +393,9 @@ const Field = forwardRef<
     className?: string;
     interactive?: boolean;
     asButton?: boolean;
-    onClick?: (event: MouseEvent<HTMLDivElement>) => void;
+    onClick?: (
+      event: MouseEvent<HTMLDivElement> | KeyboardEvent<HTMLDivElement>,
+    ) => void;
     "aria-expanded"?: boolean;
     "aria-haspopup"?: "dialog" | "listbox" | boolean;
   }

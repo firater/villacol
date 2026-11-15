@@ -13,13 +13,16 @@ import {
 
 import { VillaCarousel } from "./VillaCarousel";
 
-const TAB_I18N_KEY: Record<PromoOfferTabKey, string> = {
+const TAB_I18N_KEY = {
   all: "all",
   last_minute: "lastMinute",
   early_bird: "earlyBird",
   long_stay: "longStay",
   coupon: "coupon",
-};
+} as const satisfies Record<
+  PromoOfferTabKey,
+  "all" | "lastMinute" | "earlyBird" | "longStay" | "coupon"
+>;
 
 export type PromoOfferRailItem = {
   key: string;
