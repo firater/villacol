@@ -11,6 +11,7 @@ import {
   type ActionResult,
 } from "@/lib/action-result";
 import { applyBookingStatusChange } from "@/lib/booking-status-update";
+import { queueBookingStatusNotification } from "@/lib/booking-status-notifications";
 import { requireAdmin } from "@/lib/auth-guard";
 import { uuidSchema } from "@/lib/validation";
 
@@ -48,6 +49,10 @@ export async function updateBookingStatus(
     updateTag(`villa-${result.villaId}`);
     updateTag("admin-bookings");
     updateTag("bookings");
+
+    queueBookingStatusNotification(bookingId, status, {
+      statusChanged: !result.skipped,
+    });
 
     return ok({
       bookingId,
