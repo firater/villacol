@@ -141,9 +141,6 @@ export const pathnames = {
   "/admin/promotions/[id]": "/admin/promotions/[id]",
 
   "/login": "/login",
-
-  /** Static UI preview (mock data only). */
-  "/refhome": "/refhome",
 } satisfies Pathnames<typeof LOCALES>;
 
 export const routing = defineRouting({
