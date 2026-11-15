@@ -5,7 +5,7 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
-import { features } from "@/db/schema";
+import { features, villaFeatures } from "@/db/schema";
 import {
   invalid,
   ok,
@@ -43,6 +43,8 @@ const updateFeatureSchema = z.object({
 });
 
 const reorderFeaturesSchema = z.object({ items: reorderSchema });
+
+const deleteFeatureSchema = z.object({ featureId: idSchema });
 
 function afterFeatureWrite(): void {
   updateTag("villas");
@@ -102,6 +104,48 @@ export async function updateFeature(
     enqueueFullSearchReindex("admin_edit");
 
     return ok({ featureId });
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function deleteFeature(
+  input: z.input<typeof deleteFeatureSchema>,
+): Promise<ActionResult<{ featureId: number }>> {
+  try {
+    await requireAdmin();
+
+    const parsed = deleteFeatureSchema.safeParse(input);
+    if (!parsed.success) return invalid(parsed.error);
+
+    const { featureId } = parsed.data;
+
+    const [linkHit] = await dbPool
+      .select({ villaId: villaFeatures.villaId })
+      .from(villaFeatures)
+      .where(eq(villaFeatures.featureId, featureId))
+      .limit(1);
+
+    if (linkHit !== undefined) {
+      return {
+        ok: false,
+        error:
+          "This feature is still assigned to villas. Remove it from those villas first.",
+      };
+    }
+
+    const [deleted] = await dbPool
+      .delete(features)
+      .where(eq(features.id, featureId))
+      .returning({ id: features.id });
+
+    if (deleted === undefined) {
+      return { ok: false, error: `Feature ${featureId} does not exist.` };
+    }
+
+    afterFeatureWrite();
+
+    return ok({ featureId: deleted.id });
   } catch (error) {
     return toActionError(error);
   }

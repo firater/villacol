@@ -146,17 +146,31 @@ export async function VillaDetailView({ villaId, locale }: Props) {
             <VillaStayPoliciesSection
               guestPolicy={villa.guestPolicy}
               cancellationPolicy={villa.cancellationPolicy}
+              houseRules={{
+                allowsPets: villa.allowsPets,
+                allowsSmoking: villa.allowsSmoking,
+                allowsParties: villa.allowsParties,
+              }}
               copy={{
                 eyebrow: t("policies.eyebrow"),
                 heading: t("policies.heading"),
                 guestPolicyTitle: t("policies.guestPolicyTitle"),
                 cancellationTitle: t("policies.cancellationTitle"),
+                houseRulesTitle: t("policies.houseRulesTitle"),
                 cancellationEmpty: t("policies.cancellationEmpty"),
                 guestPolicy: {
                   everyone: t("policies.guestPolicyEveryone"),
                   couples_only: t("policies.guestPolicyCouplesOnly"),
                   families_only: t("policies.guestPolicyFamiliesOnly"),
                   no_friend_groups: t("policies.guestPolicyNoFriendGroups"),
+                },
+                houseRules: {
+                  petsAllowed: t("policies.petsAllowed"),
+                  noPets: t("policies.noPets"),
+                  smokingAllowed: t("policies.smokingAllowed"),
+                  noSmoking: t("policies.noSmoking"),
+                  partiesAllowed: t("policies.partiesAllowed"),
+                  noParties: t("policies.noParties"),
                 },
               }}
             />

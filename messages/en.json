@@ -492,7 +492,14 @@
       "guestPolicyEveryone": "Open to all guests",
       "guestPolicyCouplesOnly": "Couples only",
       "guestPolicyFamiliesOnly": "Families with children only",
-      "guestPolicyNoFriendGroups": "No friend groups"
+      "guestPolicyNoFriendGroups": "No friend groups",
+      "houseRulesTitle": "House rules",
+      "petsAllowed": "Pets allowed",
+      "noPets": "No pets",
+      "smokingAllowed": "Smoking allowed",
+      "noSmoking": "No smoking",
+      "partiesAllowed": "Parties & events allowed",
+      "noParties": "No parties or events"
     },
     "reviews": {
       "eyebrow": "From our guests",

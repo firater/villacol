@@ -116,6 +116,16 @@ export function VillaAdminForm(props: Props) {
   const [capacity, setCapacity] = useState(String(villa?.capacity ?? 2));
   const [bedrooms, setBedrooms] = useState(String(villa?.bedrooms ?? 1));
   const [bathrooms, setBathrooms] = useState(String(villa?.bathrooms ?? 1));
+  const [defaultMinStay, setDefaultMinStay] = useState(
+    String(villa?.defaultMinStay ?? 5),
+  );
+  const [allowsPets, setAllowsPets] = useState(villa?.allowsPets ?? false);
+  const [allowsSmoking, setAllowsSmoking] = useState(
+    villa?.allowsSmoking ?? false,
+  );
+  const [allowsParties, setAllowsParties] = useState(
+    villa?.allowsParties ?? false,
+  );
   const [defaultNightlyEur, setDefaultNightlyEur] = useState(
     villa?.defaultNightlyPriceCents != null
       ? String(fromCents(villa.defaultNightlyPriceCents))
@@ -219,10 +229,14 @@ export function VillaAdminForm(props: Props) {
       const cap = Number(capacity);
       const bed = Number(bedrooms);
       const bath = Number(bathrooms);
+      const minStay = Number(defaultMinStay);
       const order = Number(orderValue);
       if (!Number.isInteger(cap) || cap < 1) throw new Error("Capacity must be a positive integer.");
       if (!Number.isInteger(bed) || bed < 0) throw new Error("Bedrooms must be a non-negative integer.");
       if (!Number.isInteger(bath) || bath < 0) throw new Error("Bathrooms must be a non-negative integer.");
+      if (!Number.isInteger(minStay) || minStay < 1 || minStay > 365) {
+        throw new Error("Minimum stay must be between 1 and 365 nights.");
+      }
       if (!Number.isInteger(order) || order < 0) throw new Error("Order must be a non-negative integer.");
 
       const defaultNightlyCents = parseOptionalCents(defaultNightlyEur);
@@ -270,7 +284,7 @@ export function VillaAdminForm(props: Props) {
           bathrooms: bath,
           defaultNightlyPriceCents: defaultNightlyCents,
           cleaningFeeCents,
-          defaultMinStay: villa.defaultMinStay,
+          defaultMinStay: minStay,
           depositCents: villa.depositCents,
           checkInTime: villa.checkInTime,
           checkOutTime: villa.checkOutTime,
@@ -284,6 +298,9 @@ export function VillaAdminForm(props: Props) {
           guestPolicy,
           editorRating: editorRatingValue,
           cancellationPolicyI18n,
+          allowsPets,
+          allowsSmoking,
+          allowsParties,
         });
 
         if (!core.ok) {
@@ -313,7 +330,7 @@ export function VillaAdminForm(props: Props) {
           bathrooms: bath,
           defaultNightlyPriceCents: defaultNightlyCents ?? undefined,
           cleaningFeeCents,
-          defaultMinStay: 5,
+          defaultMinStay: minStay,
           depositCents: 0,
           checkInTime: "16:00",
           checkOutTime: "10:00",
@@ -325,6 +342,9 @@ export function VillaAdminForm(props: Props) {
           guestPolicy,
           editorRating: editorRatingValue,
           cancellationPolicyI18n,
+          allowsPets,
+          allowsSmoking,
+          allowsParties,
           translations: translationPayload,
         });
 
@@ -530,6 +550,20 @@ export function VillaAdminForm(props: Props) {
             </label>
             <label className="block">
               <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                Minimum stay (nights)
+              </span>
+              <input
+                type="number"
+                min={1}
+                max={365}
+                required
+                value={defaultMinStay}
+                onChange={(e) => setDefaultMinStay(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                 Default nightly price (EUR)
               </span>
               <input
@@ -618,7 +652,52 @@ export function VillaAdminForm(props: Props) {
             Shown on the public villa page. English cancellation copy is required
             before other locales.
           </p>
-          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+          <div className="mt-6 border-t border-zinc-200 pt-6 dark:border-zinc-800">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              House rules
+            </h3>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Shown on the public villa page. Off by default — pets, smoking, and
+              parties are not allowed until enabled.
+            </p>
+            <div className="mt-4 flex flex-col gap-3">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={allowsPets}
+                  onChange={(e) => setAllowsPets(e.target.checked)}
+                  className="size-4 rounded border-zinc-300 text-zinc-900"
+                />
+                <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                  Allow pets
+                </span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={allowsSmoking}
+                  onChange={(e) => setAllowsSmoking(e.target.checked)}
+                  className="size-4 rounded border-zinc-300 text-zinc-900"
+                />
+                <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                  Allow smoking
+                </span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={allowsParties}
+                  onChange={(e) => setAllowsParties(e.target.checked)}
+                  className="size-4 rounded border-zinc-300 text-zinc-900"
+                />
+                <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                  Allow parties &amp; events
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-6 sm:grid-cols-2">
             <label className="block sm:col-span-2">
               <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
                 Guest policy

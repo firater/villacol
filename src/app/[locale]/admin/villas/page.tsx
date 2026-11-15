@@ -1,30 +1,44 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { locale as localeParam } from "next/root-params";
 import { hasLocale } from "next-intl";
-import { Suspense } from "react";
+import { type ReactNode, Suspense } from "react";
 
+import { AdminVillaListRow } from "@/components/admin/AdminVillaListRow";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { listAdminVillas } from "@/db/queries/admin.villas.queries";
+import {
+  listAdminVillas,
+  type AdminVillaListFilter,
+} from "@/db/queries/admin.villas.queries";
 import type { Locale } from "@/lib/locales";
 
-export default function AdminVillasPage() {
+type PageProps = {
+  searchParams: Promise<{ tab?: string }>;
+};
+
+export default function AdminVillasPage(props: PageProps) {
   return (
     <Suspense fallback={<AdminVillasPageFallback />}>
-      <AdminVillasPageContent />
+      <AdminVillasPageContent {...props} />
     </Suspense>
   );
 }
 
-async function AdminVillasPageContent() {
+function parseVillaTab(raw: string | undefined): AdminVillaListFilter {
+  if (raw === "inactive") return "inactive";
+  return "active";
+}
+
+async function AdminVillasPageContent({ searchParams }: PageProps) {
   const localeRaw = await localeParam();
   if (!hasLocale(routing.locales, localeRaw)) {
     notFound();
   }
   const locale = localeRaw as Locale;
 
-  const rows = await listAdminVillas();
+  const resolved = await searchParams;
+  const tab = parseVillaTab(resolved.tab);
+  const rows = await listAdminVillas(tab);
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
@@ -46,6 +60,18 @@ async function AdminVillasPageContent() {
         </Link>
       </div>
 
+      <nav
+        aria-label="Villa visibility"
+        className="flex flex-wrap gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-800"
+      >
+        <TabLink locale={locale} tab="active" active={tab === "active"}>
+          Active Villas
+        </TabLink>
+        <TabLink locale={locale} tab="inactive" active={tab === "inactive"}>
+          Inactive / Drafts
+        </TabLink>
+      </nav>
+
       <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/40">
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="border-b border-zinc-200 bg-zinc-50 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
@@ -62,71 +88,54 @@ async function AdminVillasPageContent() {
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-12 text-center text-zinc-500">
-                  No villas yet. Create one to get started.
+                  {tab === "active"
+                    ? "No active villas. Restore one from Inactive / Drafts."
+                    : "No inactive villas."}
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="bg-white dark:bg-zinc-950/40">
-                  <td className="px-4 py-3">
-                    <div
-                      className="relative h-12 w-16 overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800"
-                      style={{ aspectRatio: "4 / 3" }}
-                    >
-                      {row.thumbUrl ? (
-                        <Image
-                          src={row.thumbUrl}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                          —
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="max-w-xs px-4 py-3">
-                    <div className="font-medium text-zinc-900 dark:text-zinc-100">
-                      {row.titleEn}
-                    </div>
-                    <div className="text-xs text-zinc-500">{row.refCode}</div>
-                  </td>
-                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
-                    {row.locationName ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={
-                        row.isActive
-                          ? "rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
-                          : "rounded-full bg-zinc-200 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:bg-zinc-600 dark:text-zinc-100"
-                      }
-                    >
-                      {row.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 tabular-nums text-zinc-700 dark:text-zinc-300">
-                    {row.orderValue}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={{ pathname: "/admin/villas/[id]", params: { id: String(row.id) } }}
-                      locale={locale}
-                      className="font-medium text-amber-800 hover:underline dark:text-amber-200"
-                    >
-                      Edit
-                    </Link>
-                  </td>
-                </tr>
+                <AdminVillaListRow key={row.id} row={row} locale={locale} />
               ))
             )}
           </tbody>
         </table>
       </div>
     </div>
+  );
+}
+
+function TabLink({
+  locale,
+  tab,
+  active,
+  children,
+}: {
+  locale: Locale;
+  tab: AdminVillaListFilter;
+  active: boolean;
+  children: ReactNode;
+}) {
+  const href =
+    tab === "active"
+      ? ({ pathname: "/admin/villas" } as const)
+      : ({
+          pathname: "/admin/villas",
+          query: { tab: "inactive" },
+        } as const);
+
+  return (
+    <Link
+      href={href}
+      locale={locale}
+      className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+        active
+          ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
+          : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      }`}
+    >
+      {children}
+    </Link>
   );
 }
 
@@ -140,6 +149,7 @@ function AdminVillasPageFallback() {
         </div>
         <div className="h-9 w-28 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-800" />
       </div>
+      <div className="h-10 w-72 animate-pulse rounded-full bg-zinc-100 dark:bg-zinc-900" />
       <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/40">
         <div className="h-11 animate-pulse border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950" />
         {Array.from({ length: 6 }, (_, i) => (

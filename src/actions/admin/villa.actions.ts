@@ -5,7 +5,7 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
-import { villas, villaTranslations } from "@/db/schema";
+import { bookings, villas, villaTranslations } from "@/db/schema";
 import { guestPolicyEnum } from "@/db/tables/enums";
 import {
   invalid,
@@ -75,6 +75,9 @@ const villaFieldsSchema = z.object({
   cancellationPolicyI18n: localizedTextSchema.nullish(),
   guestPolicy: z.enum(guestPolicyEnum.enumValues),
   editorRating: editorRatingSchema.nullish(),
+  allowsPets: z.boolean(),
+  allowsSmoking: z.boolean(),
+  allowsParties: z.boolean(),
 });
 
 const createVillaSchema = z.object({
@@ -103,6 +106,10 @@ const setVillaActiveSchema = z.object({
 
 const updateVillaOrderValueSchema = z.object({
   items: reorderSchema,
+});
+
+const deleteVillaSchema = z.object({
+  villaId: idSchema,
 });
 
 /**
@@ -281,6 +288,52 @@ export async function setVillaActive(
     enqueueSearchReindex([villaId]);
 
     return ok({ villaId, isActive });
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function deleteVilla(
+  input: z.input<typeof deleteVillaSchema>,
+): Promise<ActionResult<{ villaId: number }>> {
+  try {
+    await requireAdmin();
+
+    const parsed = deleteVillaSchema.safeParse(input);
+    if (!parsed.success) return invalid(parsed.error);
+
+    const { villaId } = parsed.data;
+
+    const [bookingHit] = await dbPool
+      .select({ id: bookings.id })
+      .from(bookings)
+      .where(eq(bookings.villaId, villaId))
+      .limit(1);
+
+    if (bookingHit !== undefined) {
+      return {
+        ok: false,
+        error:
+          "This villa has bookings and cannot be deleted. Archive it instead.",
+      };
+    }
+
+    const [deleted] = await dbPool
+      .delete(villas)
+      .where(eq(villas.id, villaId))
+      .returning({ id: villas.id });
+
+    if (deleted === undefined) {
+      return { ok: false, error: `Villa ${villaId} does not exist.` };
+    }
+
+    updateTag("villas");
+    updateTag(`villa-${villaId}`);
+    enqueueVillaCacheRebuild(villaId, "admin_edit");
+    enqueueSimilarVillasRebuild(villaId);
+    enqueueSearchReindex([villaId]);
+
+    return ok({ villaId });
   } catch (error) {
     return toActionError(error);
   }

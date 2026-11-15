@@ -5,7 +5,11 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
-import { categories, categoryTranslations } from "@/db/schema";
+import {
+  categories,
+  categoryTranslations,
+  villaCategories,
+} from "@/db/schema";
 import {
   invalid,
   ok,
@@ -64,6 +68,8 @@ const updateCategoryTranslationsSchema = z.object({
 });
 
 const reorderCategoriesSchema = z.object({ items: reorderSchema });
+
+const deleteCategorySchema = z.object({ categoryId: idSchema });
 
 function afterCategoryWrite(slugs: readonly string[] = []): void {
   updateTag("villas");
@@ -191,6 +197,48 @@ export async function updateCategoryTranslations(
       categoryId,
       locales: translations.map((translation) => translation.locale),
     });
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function deleteCategory(
+  input: z.input<typeof deleteCategorySchema>,
+): Promise<ActionResult<{ categoryId: number }>> {
+  try {
+    await requireAdmin();
+
+    const parsed = deleteCategorySchema.safeParse(input);
+    if (!parsed.success) return invalid(parsed.error);
+
+    const { categoryId } = parsed.data;
+
+    const [linkHit] = await dbPool
+      .select({ villaId: villaCategories.villaId })
+      .from(villaCategories)
+      .where(eq(villaCategories.categoryId, categoryId))
+      .limit(1);
+
+    if (linkHit !== undefined) {
+      return {
+        ok: false,
+        error:
+          "This category is still used by villas. Remove it from those villas first.",
+      };
+    }
+
+    const [deleted] = await dbPool
+      .delete(categories)
+      .where(eq(categories.id, categoryId))
+      .returning({ id: categories.id });
+
+    if (deleted === undefined) {
+      return { ok: false, error: `Category ${categoryId} does not exist.` };
+    }
+
+    afterCategoryWrite();
+
+    return ok({ categoryId: deleted.id });
   } catch (error) {
     return toActionError(error);
   }

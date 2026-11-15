@@ -124,6 +124,9 @@ export type VillaDetailRow = {
   guestPolicy: GuestPolicy;
   editorRating: number | null;
   cancellationPolicy: string | null;
+  allowsPets: boolean;
+  allowsSmoking: boolean;
+  allowsParties: boolean;
 };
 
 async function resolveLocationId(
@@ -202,6 +205,9 @@ export async function getVillaBySlug(
       guestPolicy: villas.guestPolicy,
       editorRating: villas.editorRating,
       cancellationPolicyI18n: villas.cancellationPolicyI18n,
+      allowsPets: villas.allowsPets,
+      allowsSmoking: villas.allowsSmoking,
+      allowsParties: villas.allowsParties,
     })
     .from(villas)
     .innerJoin(
@@ -250,6 +256,9 @@ export async function getVillaBySlug(
       row.cancellationPolicyI18n as LocalizedText | null,
       locale,
     ),
+    allowsPets: row.allowsPets,
+    allowsSmoking: row.allowsSmoking,
+    allowsParties: row.allowsParties,
   };
 }
 
@@ -522,6 +531,9 @@ export async function getVillaDetailBundle(
       guestPolicy: villas.guestPolicy,
       editorRating: villas.editorRating,
       cancellationPolicyI18n: villas.cancellationPolicyI18n,
+      allowsPets: villas.allowsPets,
+      allowsSmoking: villas.allowsSmoking,
+      allowsParties: villas.allowsParties,
     })
     .from(villas)
     .innerJoin(
@@ -568,6 +580,9 @@ export async function getVillaDetailBundle(
       rawVilla.cancellationPolicyI18n as LocalizedText | null,
       locale,
     ),
+    allowsPets: rawVilla.allowsPets,
+    allowsSmoking: rawVilla.allowsSmoking,
+    allowsParties: rawVilla.allowsParties,
   };
 
   const [images, categoryRows, amenityRows, featureRows, rulesResolved, cacheRow] =

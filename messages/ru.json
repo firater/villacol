@@ -479,7 +479,14 @@
       "guestPolicyEveryone": "Для всех гостей",
       "guestPolicyCouplesOnly": "Только для пар",
       "guestPolicyFamiliesOnly": "Только для семей с детьми",
-      "guestPolicyNoFriendGroups": "Без компаний друзей"
+      "guestPolicyNoFriendGroups": "Без компаний друзей",
+      "houseRulesTitle": "Правила проживания",
+      "petsAllowed": "Можно с питомцами",
+      "noPets": "Без животных",
+      "smokingAllowed": "Курение разрешено",
+      "noSmoking": "Курение запрещено",
+      "partiesAllowed": "Вечеринки и мероприятия разрешены",
+      "noParties": "Без вечеринок и мероприятий"
     },
     "reviews": {
       "eyebrow": "От наших гостей",

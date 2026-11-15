@@ -5,7 +5,7 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
-import { locations, locationTranslations } from "@/db/schema";
+import { locations, locationTranslations, villas } from "@/db/schema";
 import {
   invalid,
   ok,
@@ -69,6 +69,8 @@ const updateLocationTranslationsSchema = z.object({
 });
 
 const reorderLocationsSchema = z.object({ items: reorderSchema });
+
+const deleteLocationSchema = z.object({ locationId: idSchema });
 
 /**
  * Location names and slugs are embedded in cached villa listings and landing
@@ -209,6 +211,48 @@ export async function updateLocationTranslations(
       locationId,
       locales: translations.map((translation) => translation.locale),
     });
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function deleteLocation(
+  input: z.input<typeof deleteLocationSchema>,
+): Promise<ActionResult<{ locationId: number }>> {
+  try {
+    await requireAdmin();
+
+    const parsed = deleteLocationSchema.safeParse(input);
+    if (!parsed.success) return invalid(parsed.error);
+
+    const { locationId } = parsed.data;
+
+    const [villaHit] = await dbPool
+      .select({ id: villas.id })
+      .from(villas)
+      .where(eq(villas.locationId, locationId))
+      .limit(1);
+
+    if (villaHit !== undefined) {
+      return {
+        ok: false,
+        error:
+          "This location still has villas assigned. Reassign or remove those villas first.",
+      };
+    }
+
+    const [deleted] = await dbPool
+      .delete(locations)
+      .where(eq(locations.id, locationId))
+      .returning({ id: locations.id });
+
+    if (deleted === undefined) {
+      return { ok: false, error: `Location ${locationId} does not exist.` };
+    }
+
+    afterLocationWrite();
+
+    return ok({ locationId: deleted.id });
   } catch (error) {
     return toActionError(error);
   }

@@ -44,6 +44,9 @@ export const villas = pgTable(
     bathrooms: integer("bathrooms").notNull().default(1),
 
     defaultMinStay: integer("default_min_stay").notNull().default(5),
+    allowsPets: boolean("allows_pets").notNull().default(false),
+    allowsSmoking: boolean("allows_smoking").notNull().default(false),
+    allowsParties: boolean("allows_parties").notNull().default(false),
     // Used for any night inside the horizon with no `villa_calendar` row.
     defaultNightlyPriceCents: integer("default_nightly_price_cents"),
     // Charged once per booking and never part of the nightly total.
@@ -93,6 +96,7 @@ export const villas = pgTable(
   },
   (table) => [
     index("villas_location_id_idx").on(table.locationId),
+    index("villas_is_active_idx").on(table.isActive),
     index("villas_order_value_idx").on(table.orderValue),
     index("villas_active_order_idx").on(table.isActive, table.orderValue),
     index("villas_capacity_idx").on(table.capacity),

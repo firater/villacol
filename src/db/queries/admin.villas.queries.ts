@@ -32,10 +32,17 @@ export type AdminVillaListRow = {
   thumbUrl: string | null;
 };
 
+export type AdminVillaListFilter = "active" | "inactive";
+
 /**
- * All villas for the admin table, ordered by `order_value` then id.
+ * Villas for the admin table, optionally filtered by `is_active`.
  */
-export async function listAdminVillas(): Promise<AdminVillaListRow[]> {
+export async function listAdminVillas(
+  filter: AdminVillaListFilter = "active",
+): Promise<AdminVillaListRow[]> {
+  const activePredicate =
+    filter === "active" ? eq(villas.isActive, true) : eq(villas.isActive, false);
+
   return db
     .select({
       id: villas.id,
@@ -68,6 +75,7 @@ export async function listAdminVillas(): Promise<AdminVillaListRow[]> {
       villaImages,
       and(eq(villaImages.villaId, villas.id), eq(villaImages.isMain, true)),
     )
+    .where(activePredicate)
     .orderBy(asc(villas.orderValue), asc(villas.id));
 }
 
@@ -110,6 +118,9 @@ export type AdminVillaEditRow = {
   cancellationPolicyI18n: LocalizedText | null;
   guestPolicy: GuestPolicy;
   editorRating: number | null;
+  allowsPets: boolean;
+  allowsSmoking: boolean;
+  allowsParties: boolean;
   translations: AdminVillaTranslationRow[];
   images: AdminVillaImageRow[];
 };
@@ -145,6 +156,9 @@ export async function getAdminVillaForEdit(
       cancellationPolicyI18n: villas.cancellationPolicyI18n,
       guestPolicy: villas.guestPolicy,
       editorRating: villas.editorRating,
+      allowsPets: villas.allowsPets,
+      allowsSmoking: villas.allowsSmoking,
+      allowsParties: villas.allowsParties,
     })
     .from(villas)
     .where(eq(villas.id, villaId))
@@ -201,5 +215,5 @@ export async function listAdminLocationOptions(): Promise<AdminLocationOption[]>
         eq(locationTranslations.locale, ADMIN_LABEL_LOCALE),
       ),
     )
-    .orderBy(asc(locationTranslations.name));
+    .orderBy(asc(locations.orderValue), asc(locations.id));
 }

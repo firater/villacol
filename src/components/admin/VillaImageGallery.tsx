@@ -149,14 +149,13 @@ export function VillaImageGallery({ villaId, initialImages, onError }: Props) {
     const { active, over } = event;
     if (over === null || active.id === over.id) return;
 
-    setImages((current) => {
-      const oldIndex = current.findIndex((img) => img.id === active.id);
-      const newIndex = current.findIndex((img) => img.id === over.id);
-      if (oldIndex < 0 || newIndex < 0) return current;
-      const next = arrayMove(current, oldIndex, newIndex);
-      persistOrder(next);
-      return next;
-    });
+    const oldIndex = images.findIndex((img) => img.id === active.id);
+    const newIndex = images.findIndex((img) => img.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const next = arrayMove(images, oldIndex, newIndex);
+    setImages(next);
+    persistOrder(next);
   }
 
   function removeImage(imageId: string) {

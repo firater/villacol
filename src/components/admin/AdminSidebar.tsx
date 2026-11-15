@@ -3,6 +3,10 @@ import { Link } from "@/i18n/navigation";
 const nav = [
   { href: "/admin" as const, label: "Dashboard" },
   { href: "/admin/villas" as const, label: "Villas" },
+  { href: "/admin/locations" as const, label: "Locations" },
+  { href: "/admin/categories" as const, label: "Categories" },
+  { href: "/admin/amenities" as const, label: "Amenities" },
+  { href: "/admin/features" as const, label: "Features" },
   { href: "/admin/promotions" as const, label: "Promotions" },
   { href: "/admin/deals" as const, label: "Deals" },
   { href: "/admin/bookings" as const, label: "Bookings" },

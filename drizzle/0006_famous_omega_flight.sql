@@ -1,0 +1,1 @@
+CREATE INDEX "villas_is_active_idx" ON "villas" USING btree ("is_active");

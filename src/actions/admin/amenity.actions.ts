@@ -5,7 +5,7 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { dbPool } from "@/db/pool";
-import { amenities } from "@/db/schema";
+import { amenities, villaAmenities } from "@/db/schema";
 import {
   invalid,
   ok,
@@ -44,6 +44,8 @@ const updateAmenitySchema = z.object({
 });
 
 const reorderAmenitiesSchema = z.object({ items: reorderSchema });
+
+const deleteAmenitySchema = z.object({ amenityId: idSchema });
 
 /** Amenity labels are embedded in the cached villa detail bundle. */
 function afterAmenityWrite(): void {
@@ -104,6 +106,48 @@ export async function updateAmenity(
     enqueueFullSearchReindex("admin_edit");
 
     return ok({ amenityId });
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function deleteAmenity(
+  input: z.input<typeof deleteAmenitySchema>,
+): Promise<ActionResult<{ amenityId: number }>> {
+  try {
+    await requireAdmin();
+
+    const parsed = deleteAmenitySchema.safeParse(input);
+    if (!parsed.success) return invalid(parsed.error);
+
+    const { amenityId } = parsed.data;
+
+    const [linkHit] = await dbPool
+      .select({ villaId: villaAmenities.villaId })
+      .from(villaAmenities)
+      .where(eq(villaAmenities.amenityId, amenityId))
+      .limit(1);
+
+    if (linkHit !== undefined) {
+      return {
+        ok: false,
+        error:
+          "This amenity is still assigned to villas. Remove it from those villas first.",
+      };
+    }
+
+    const [deleted] = await dbPool
+      .delete(amenities)
+      .where(eq(amenities.id, amenityId))
+      .returning({ id: amenities.id });
+
+    if (deleted === undefined) {
+      return { ok: false, error: `Amenity ${amenityId} does not exist.` };
+    }
+
+    afterAmenityWrite();
+
+    return ok({ amenityId: deleted.id });
   } catch (error) {
     return toActionError(error);
   }
