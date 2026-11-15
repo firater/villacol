@@ -37,10 +37,8 @@ const updateVillaImageSchema = z.object({
 
 const reorderVillaImagesSchema = z.object({
   villaId: idSchema,
-  items: z
-    .array(z.object({ imageId: uuidSchema, orderValue: orderValueSchema }))
-    .min(1)
-    .max(200),
+  /** Gallery order; index 0 becomes main. */
+  orderedImageIds: z.array(uuidSchema).max(200),
 });
 
 const setMainImageSchema = z.object({
@@ -148,26 +146,26 @@ export async function reorderVillaImages(
     const parsed = reorderVillaImagesSchema.safeParse(input);
     if (!parsed.success) return invalid(parsed.error);
 
-    const { villaId, items } = parsed.data;
+    const { villaId, orderedImageIds } = parsed.data;
 
     await dbPool.transaction(async (tx) => {
-      for (const item of items) {
+      for (let index = 0; index < orderedImageIds.length; index++) {
+        const imageId = orderedImageIds[index];
         await tx
           .update(villaImages)
-          .set({ orderValue: item.orderValue })
-          // Scoped by villa so a stray id cannot reorder another villa's gallery.
+          .set({
+            orderValue: index,
+            isMain: index === 0,
+          })
           .where(
-            and(
-              eq(villaImages.id, item.imageId),
-              eq(villaImages.villaId, villaId),
-            ),
+            and(eq(villaImages.id, imageId), eq(villaImages.villaId, villaId)),
           );
       }
     });
 
     afterImageWrite(villaId);
 
-    return ok({ villaId, imageIds: items.map((item) => item.imageId) });
+    return ok({ villaId, imageIds: orderedImageIds });
   } catch (error) {
     return toActionError(error);
   }

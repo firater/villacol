@@ -7,7 +7,7 @@ import {
   setVillaCategories,
   setVillaFeatures,
 } from "@/actions/admin/villa-taxonomy.actions";
-import { createVillaImage, deleteVillaImage } from "@/actions/admin/image.actions";
+import { VillaImageGallery } from "@/components/admin/VillaImageGallery";
 import type { AdminTaxonomyOption } from "@/db/queries/admin.taxonomy.queries";
 import type { AdminVillaImageRow } from "@/db/queries/admin.villas.queries";
 import { useRouter } from "@/i18n/navigation";
@@ -39,13 +39,6 @@ export function VillaMediaFeaturesPanel({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-
-  const [images, setImages] = useState(initialImages);
-  const [newUrl, setNewUrl] = useState("");
-
-  useEffect(() => {
-    setImages(initialImages);
-  }, [initialImages]);
 
   const amenityMap = useMemo(() => {
     const m = new Map<number, boolean>();
@@ -127,40 +120,6 @@ export function VillaMediaFeaturesPanel({
     return [result.error, extra].filter(Boolean).join(" ");
   }
 
-  function addImage(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    const url = newUrl.trim();
-    if (!url) return;
-
-    startTransition(async () => {
-      const out = await createVillaImage({
-        villaId,
-        url,
-        isMain: images.length === 0,
-        orderValue: images.length,
-      });
-      if (!out.ok) {
-        setError(formatErr(out));
-        return;
-      }
-      setNewUrl("");
-      router.refresh();
-    });
-  }
-
-  function removeImage(imageId: string) {
-    setError(null);
-    startTransition(async () => {
-      const out = await deleteVillaImage({ imageId });
-      if (!out.ok) {
-        setError(formatErr(out));
-        return;
-      }
-      router.refresh();
-    });
-  }
-
   function saveAmenities() {
     setError(null);
     const items = amenityOptions
@@ -205,53 +164,16 @@ export function VillaMediaFeaturesPanel({
           Images
         </h2>
         <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Paste image URLs. The first image is the main photo when none was set.
+          Upload villa photography. Reorder by dragging; the first slot is the main
+          hero image.
         </p>
-        <form onSubmit={addImage} className="mt-4 flex flex-wrap gap-2">
-          <input
-            type="url"
-            value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
-            placeholder="https://…"
-            className="min-w-[240px] flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+        <div className="mt-4">
+          <VillaImageGallery
+            villaId={villaId}
+            initialImages={initialImages}
+            onError={setError}
           />
-          <button
-            type="submit"
-            disabled={pending}
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
-          >
-            Add
-          </button>
-        </form>
-        <ul className="mt-4 divide-y divide-zinc-100 rounded-xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
-          {images.length === 0 ? (
-            <li className="px-4 py-6 text-sm text-zinc-500">No images yet.</li>
-          ) : (
-            images.map((img) => (
-              <li
-                key={img.id}
-                className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 text-sm"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-mono text-xs text-zinc-600 dark:text-zinc-400">
-                    {img.url}
-                  </div>
-                  {img.isMain ? (
-                    <span className="text-xs text-amber-700 dark:text-amber-300">Main</span>
-                  ) : null}
-                </div>
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => removeImage(img.id)}
-                  className="shrink-0 text-sm font-medium text-red-700 hover:underline dark:text-red-400"
-                >
-                  Delete
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
+        </div>
       </section>
 
       <section>
