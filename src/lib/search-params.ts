@@ -51,6 +51,9 @@ export type SortValue = (typeof SORT_VALUES)[number];
 export const DEFAULT_PAGE_SIZE = 24;
 export const MAX_PAGE_SIZE = 48;
 
+/** Free-text villa search (`?q=`) — universal English key, used with intent parsing. */
+export const LISTING_SEARCH_QUERY_KEY = "q" as const;
+
 /**
  * What a page receives: either a real `URLSearchParams` or Next's resolved
  * `searchParams` object, where a repeated key arrives as an array.
@@ -111,6 +114,25 @@ export const villaFilterSchema = z.object({
 });
 
 export type VillaFilters = z.infer<typeof villaFilterSchema>;
+
+function readRawParam(input: SearchParamsInput, key: string): string | undefined {
+  if (input instanceof URLSearchParams) {
+    return input.get(key) ?? undefined;
+  }
+
+  const value = input[key];
+  if (Array.isArray(value)) return value[0];
+  return value;
+}
+
+/** Parses `?q=` for AI / fuzzy listing search. */
+export function readListingSearchQuery(
+  input: SearchParamsInput,
+): string | undefined {
+  const raw = readRawParam(input, LISTING_SEARCH_QUERY_KEY)?.trim();
+  if (raw === undefined || raw.length === 0) return undefined;
+  return raw.slice(0, 200);
+}
 
 /** Reads one value, taking the first when a key was repeated. */
 function readParam(

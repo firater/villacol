@@ -14,6 +14,12 @@
       "contact": "Contact",
       "about": "About"
     },
+    "aiSearch": {
+      "ariaLabel": "Search villas",
+      "aiBadge": "AI",
+      "placeholderPrimary": "Sea view villa in Kalkan",
+      "placeholderSecondary": "6 guests · pool · July"
+    },
     "megaMenu": {
       "label": "Menu",
       "open": "Open menu",

@@ -15,6 +15,7 @@ import type { FilterFacetOption } from "@/db/queries/filter-facets.queries";
 import { Link } from "@/i18n/navigation";
 import type { Currency, Locale } from "@/lib/locales";
 
+import { HeaderAiSearch } from "./HeaderAiSearch";
 import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
 
 const MEGA_MENU_FEATURED_IMAGES = ["/smr2.webp", "/smr3.jpg", "/smr4.webp"] as const;
@@ -161,7 +162,8 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
             </button>
           </div>
 
-          <div className="ms-auto flex flex-wrap items-center gap-x-3 gap-y-3 lg:gap-x-4">
+          <div className="ms-auto flex w-full flex-wrap items-center justify-end gap-x-3 gap-y-2.5 lg:w-auto lg:gap-x-4 lg:gap-y-3">
+            <HeaderAiSearch />
             <LocaleCurrencyDropdown locale={locale} currency={currency} />
 
             {notificationsSlot}

@@ -14,6 +14,12 @@
       "contact": "Контакты",
       "about": "О нас"
     },
+    "aiSearch": {
+      "ariaLabel": "Поиск вилл",
+      "aiBadge": "AI",
+      "placeholderPrimary": "Вилла с видом на море в Калкане",
+      "placeholderSecondary": "6 гостей · бассейн · июль"
+    },
     "megaMenu": {
       "label": "Меню",
       "open": "Открыть меню",

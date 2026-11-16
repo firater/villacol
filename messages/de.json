@@ -14,6 +14,12 @@
       "contact": "Kontakt",
       "about": "Über uns"
     },
+    "aiSearch": {
+      "ariaLabel": "Villen suchen",
+      "aiBadge": "AI",
+      "placeholderPrimary": "Villa mit Meerblick in Kalkan",
+      "placeholderSecondary": "6 Gäste · Pool · Juli"
+    },
     "megaMenu": {
       "label": "Menü",
       "open": "Menü öffnen",

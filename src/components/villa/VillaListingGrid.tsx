@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getExchangeRates } from "@/db/queries/rates.queries";
 import { getPromoHubListingVillaIds } from "@/db/queries/promo-hub.queries";
+import { searchVillas } from "@/actions/public/search.actions";
 import { getVillaListing } from "@/db/queries/villas.queries";
 import { Link } from "@/i18n/navigation";
 import { parsePromoListingFilter } from "@/lib/promo-listing-params";
@@ -12,7 +13,9 @@ import {
   normalizeVillaFilters,
   getFilterStay,
   parseVillaFilters,
+  readListingSearchQuery,
   toListingFilters,
+  LISTING_SEARCH_QUERY_KEY,
   type SearchParamsInput,
   type VillaFilters,
 } from "@/lib/search-params";
@@ -56,6 +59,7 @@ export async function VillaListingGrid({
     ]);
 
   const parsed = parseVillaFilters(resolvedSearch);
+  const searchQuery = readListingSearchQuery(resolvedSearch);
   const promoFilter = parsePromoListingFilter(resolvedSearch);
   const listingFilters = toListingFilters(parsed, locale, {
     lockOffersOnly,
@@ -67,7 +71,41 @@ export async function VillaListingGrid({
     listingFilters.offersOnly = true;
   }
 
-  const listing = await getVillaListing(listingFilters);
+  const listing =
+    searchQuery !== undefined
+      ? await (async () => {
+          const result = await searchVillas({
+            query: searchQuery,
+            locale,
+            filters: {
+              offersOnly: listingFilters.offersOnly,
+              location: listingFilters.locationSlug,
+              category: listingFilters.categorySlug,
+              amenities: listingFilters.amenityKeys
+                ? [...listingFilters.amenityKeys]
+                : undefined,
+              features: listingFilters.featureKeys
+                ? [...listingFilters.featureKeys]
+                : undefined,
+              guests: listingFilters.guests,
+              bedrooms: listingFilters.bedrooms,
+              bathrooms: listingFilters.bathrooms,
+              minPriceCents: listingFilters.minPriceCents,
+              maxPriceCents: listingFilters.maxPriceCents,
+              sort: listingFilters.sort,
+              page: listingFilters.page,
+              pageSize: listingFilters.pageSize,
+            },
+          });
+          if (!result.ok) {
+            return getVillaListing(listingFilters);
+          }
+          return {
+            rows: result.data.rows,
+            total: result.data.total,
+          };
+        })()
+      : await getVillaListing(listingFilters);
 
   const filterStay = getFilterStay(parsed);
   const guestCount = listingFilters.guests ?? 2;
@@ -122,6 +160,9 @@ export async function VillaListingGrid({
         normalizeVillaFilters({ ...baseFilters, page: targetPage }),
       ).entries(),
     );
+    if (searchQuery !== undefined) {
+      query[LISTING_SEARCH_QUERY_KEY] = searchQuery;
+    }
     if (Object.keys(query).length === 0) {
       return { pathname: listingPath } as const;
     }
