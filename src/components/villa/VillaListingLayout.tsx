@@ -27,7 +27,7 @@ export async function VillaListingLayout({
   return (
     <main className="flex flex-1 flex-col">
       <div className="border-b border-zinc-200 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-950/50">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <h1 className="font-serif text-3xl font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
             {t(titleKey)}
           </h1>
@@ -37,7 +37,7 @@ export async function VillaListingLayout({
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:px-8">
         <Suspense fallback={<VillaFiltersSkeleton />}>
           <VillaFiltersPanel locale={locale} lockOffersOnly={lockOffersOnly} />
         </Suspense>

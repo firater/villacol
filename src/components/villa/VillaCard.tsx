@@ -218,7 +218,7 @@ export function VillaCard({
   return (
     <Link
       href={{ pathname: "/villas/[slug]", params: { slug } }}
-      className="group flex h-full flex-col overflow-hidden rounded-3xl border border-stone-200/60 bg-white transition-colors hover:border-stone-300"
+      className="group flex flex-col overflow-hidden rounded-3xl border border-stone-200/60 bg-white transition-colors hover:border-stone-300"
     >
       <div
         className="relative aspect-[4/3] w-full overflow-hidden rounded-t-3xl bg-neutral-100"
@@ -238,7 +238,7 @@ export function VillaCard({
           </span>
         ) : null}
       </div>
-      <div className="flex min-h-0 flex-1 flex-col p-5">
+      <div className="flex flex-col px-5 pt-5 pb-5">
         <h3 className="min-h-[3rem] text-base font-black leading-snug text-neutral-900 line-clamp-2">
           {title}
         </h3>
@@ -246,25 +246,27 @@ export function VillaCard({
           {location ?? "\u00A0"}
         </p>
         <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} />
-        <div className="mt-4 min-h-[8rem] border-t border-neutral-100 pt-3">
-          <p className="min-h-4 text-xs text-neutral-500">{availabilityLabel ?? "\u00A0"}</p>
+        <div className="mt-2.5">
+          <p className="text-xs text-neutral-500">{availabilityLabel ?? "\u00A0"}</p>
           {listingSelectedStay ? (
-            <p className="mt-1 min-h-4 text-xs font-medium text-neutral-600">
+            <p className="mt-1 text-xs font-medium text-neutral-600">
               {hideTripTotalPrice ? "\u00A0" : priceStartingAtLabel}
             </p>
           ) : null}
-          <p className="mt-1 min-h-5 text-sm text-neutral-400 line-through" aria-hidden={priceWas === null}>
-            {priceWas ?? "\u00A0"}
-          </p>
-          <p
-            className="text-lg font-semibold text-stone-900"
-            aria-hidden={hideTripTotalPrice}
-          >
-            {hideTripTotalPrice ? "\u00A0" : priceMain}
-          </p>
-          <p className="min-h-4 text-xs text-neutral-500">
-            {listingSelectedStay ? "\u00A0" : (stayLabel ?? "\u00A0")}
-          </p>
+          <div className="mt-2 space-y-0.5">
+            {priceWas ? (
+              <p className="text-sm text-neutral-400 line-through">{priceWas}</p>
+            ) : null}
+            <p
+              className="text-lg font-semibold leading-tight text-stone-900"
+              aria-hidden={hideTripTotalPrice}
+            >
+              {hideTripTotalPrice ? "\u00A0" : priceMain}
+            </p>
+            <p className="text-xs text-neutral-500">
+              {listingSelectedStay ? "\u00A0" : (stayLabel ?? "\u00A0")}
+            </p>
+          </div>
         </div>
       </div>
     </Link>
@@ -304,33 +306,27 @@ function StatsRow({
     ? "flex items-center gap-4 py-1"
     : "flex items-center gap-4 border-b border-neutral-100 py-1.5";
 
-  if (promoStatLabels) {
-    return (
-      <div className={rowClass}>
-        <PromoStatIconItem
-          icon={Users}
-          value={capacity}
-          ariaLabel={`${capacity} ${promoStatLabels.guests}`}
-        />
-        <PromoStatIconItem
-          icon={BedDouble}
-          value={bedrooms}
-          ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
-        />
-        <PromoStatIconItem
-          icon={Bath}
-          value={bathrooms}
-          ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
-        />
-      </div>
-    );
-  }
+  const guestsLabel = promoStatLabels?.guests ?? "Guests";
+  const bedroomsLabel = promoStatLabels?.bedrooms ?? "Bedrooms";
+  const bathroomsLabel = promoStatLabels?.bathrooms ?? "Bathrooms";
 
   return (
-    <div className="flex items-center gap-5 border-b border-neutral-100 py-2 text-sm font-medium text-neutral-600">
-      <span>{capacity}</span>
-      <span>{bedrooms}</span>
-      <span>{bathrooms}</span>
+    <div className={rowClass}>
+      <PromoStatIconItem
+        icon={Users}
+        value={capacity}
+        ariaLabel={`${capacity} ${guestsLabel}`}
+      />
+      <PromoStatIconItem
+        icon={BedDouble}
+        value={bedrooms}
+        ariaLabel={`${bedrooms} ${bedroomsLabel}`}
+      />
+      <PromoStatIconItem
+        icon={Bath}
+        value={bathrooms}
+        ariaLabel={`${bathrooms} ${bathroomsLabel}`}
+      />
     </div>
   );
 }

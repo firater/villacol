@@ -71,6 +71,7 @@ export async function VillaListingGrid({
     listingFilters.offersOnly = true;
   }
 
+  // `?q=` is only used when AI filter translation falls back to fuzzy search.
   const listing =
     searchQuery !== undefined
       ? await (async () => {
@@ -150,6 +151,12 @@ export async function VillaListingGrid({
       tCard("minStayBadge", { nights: values.nights }),
   };
 
+  const promoStatLabels = {
+    guests: tCard("statGuests"),
+    bedrooms: tCard("statBedrooms"),
+    bathrooms: tCard("statBathrooms"),
+  };
+
   const baseFilters: VillaFilters = lockOffersOnly
     ? { ...parsed, offersOnly: true }
     : parsed;
@@ -207,6 +214,7 @@ export async function VillaListingGrid({
                       }
                     : undefined,
               })}
+              promoStatLabels={promoStatLabels}
             />
           ))}
         </div>

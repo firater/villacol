@@ -6,12 +6,19 @@ const HERO_HEADER_ID = "home-hero-header";
 
 type Props = {
   extraHeightPx: number;
+  /** Caps the measured desktop height when set (hero main image). */
+  maxHeightPx?: number;
   children: ReactNode;
   className?: string;
 };
 
 /** Desktop: frame height = `#home-hero-header` height + `extraHeightPx`. */
-export function HeroImageFrame({ extraHeightPx, children, className }: Props) {
+export function HeroImageFrame({
+  extraHeightPx,
+  maxHeightPx,
+  children,
+  className,
+}: Props) {
   const [frameHeightPx, setFrameHeightPx] = useState<number | null>(null);
   const [useMeasuredHeight, setUseMeasuredHeight] = useState(false);
 
@@ -27,7 +34,12 @@ export function HeroImageFrame({ extraHeightPx, children, className }: Props) {
         setFrameHeightPx(null);
         return;
       }
-      setFrameHeightPx(header.offsetHeight + extraHeightPx);
+      const measured = header.offsetHeight + extraHeightPx;
+      setFrameHeightPx(
+        maxHeightPx !== undefined
+          ? Math.min(measured, maxHeightPx)
+          : measured,
+      );
     };
 
     sync();
@@ -41,7 +53,7 @@ export function HeroImageFrame({ extraHeightPx, children, className }: Props) {
       desktopMq.removeEventListener("change", sync);
       window.removeEventListener("resize", sync);
     };
-  }, [extraHeightPx]);
+  }, [extraHeightPx, maxHeightPx]);
 
   return (
     <div

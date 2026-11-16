@@ -18,7 +18,7 @@
       "ariaLabel": "Villen suchen",
       "aiBadge": "AI",
       "placeholderPrimary": "Villa mit Meerblick in Kalkan",
-      "placeholderSecondary": "6 Gäste · Pool · Juli"
+      "placeholderSecondary": "6 Gäste mit Pool im Juli"
     },
     "megaMenu": {
       "label": "Menü",
@@ -277,6 +277,7 @@
   "filters": {
     "heading": "Filter",
     "clearAll": "Alle zurücksetzen",
+    "clearDates": "Daten entfernen",
     "apply": "Ergebnisse anzeigen",
     "resultCount": "{count, plural, =0 {Keine Villen} one {# Villa} other {# Villen}}",
     "labels": {
@@ -291,6 +292,7 @@
       "features": "Merkmale",
       "check_in": "Anreise",
       "check_out": "Abreise",
+      "dates": "Reisedaten",
       "offers_only": "Nur Angebote",
       "sort": "Sortieren nach",
       "page": "Seite"
@@ -303,6 +305,7 @@
       "relevance": "Beste Übereinstimmung"
     },
     "placeholders": {
+      "addDates": "Daten wählen",
       "anyLocation": "Alle Regionen",
       "anyCategory": "Alle Kollektionen",
       "searchQuery": "Zum Beispiel \"6 Personen in Kalkan mit Pool\""

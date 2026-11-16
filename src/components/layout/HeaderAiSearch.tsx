@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   useCallback,
   useEffect,
@@ -11,11 +11,14 @@ import {
   type KeyboardEvent,
 } from "react";
 
+import { translateAiSearchQuery } from "@/actions/public/ai-search.actions";
 import { useRouter } from "@/i18n/navigation";
 import { useTypewriterPlaceholder } from "@/hooks/use-typewriter-placeholder";
+import type { Locale } from "@/lib/locales";
 
 export function HeaderAiSearch() {
   const t = useTranslations("layout.aiSearch");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const inputId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -29,8 +32,9 @@ export function HeaderAiSearch() {
   const [expanded, setExpanded] = useState(false);
   const [inputRevealed, setInputRevealed] = useState(false);
   const [query, setQuery] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const showTypewriter = query.length === 0;
+  const showTypewriter = query.length === 0 && !submitting;
   const animatedPlaceholder = useTypewriterPlaceholder({
     phrases,
     enabled: showTypewriter,
@@ -38,16 +42,32 @@ export function HeaderAiSearch() {
 
   const hasQuery = query.trim().length > 0;
 
-  const submitSearch = useCallback(() => {
+  const submitSearch = useCallback(async () => {
     const trimmed = query.trim();
-    if (trimmed.length === 0) return;
-    router.push({
-      pathname: "/villas",
-      query: { q: trimmed },
-    });
-    setInputRevealed(false);
-    setExpanded(false);
-  }, [query, router]);
+    if (trimmed.length === 0 || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const result = await translateAiSearchQuery({ query: trimmed, locale });
+      if (!result.ok) {
+        router.push({
+          pathname: "/villas",
+          query: { q: trimmed },
+        });
+        return;
+      }
+
+      router.push({
+        pathname: "/villas",
+        query: result.data.query,
+      });
+    } finally {
+      setQuery("");
+      setSubmitting(false);
+      setInputRevealed(false);
+      setExpanded(false);
+    }
+  }, [query, locale, router, submitting]);
 
   const openDesktop = useCallback(() => {
     setExpanded(true);
@@ -115,7 +135,8 @@ export function HeaderAiSearch() {
                 onKeyDown={onInputKeyDown}
                 autoComplete="off"
                 aria-label={t("ariaLabel")}
-                className="h-11 w-full bg-transparent pl-3.5 pr-1 text-sm text-stone-900 outline-none placeholder:text-transparent dark:text-stone-100"
+                disabled={submitting}
+                className="h-11 w-full bg-transparent pl-3.5 pr-1 text-sm text-stone-900 outline-none placeholder:text-transparent disabled:opacity-60 dark:text-stone-100"
               />
               {showTypewriter ? (
                 <span
@@ -130,12 +151,14 @@ export function HeaderAiSearch() {
 
             <SearchTriggerButton
               active={hasQuery}
-              showAiBadge={!hasQuery}
+              loading={submitting}
+              showAiBadge={!hasQuery && !submitting}
               aiBadge={t("aiBadge")}
               ariaLabel={t("ariaLabel")}
               onClick={() => {
+                if (submitting) return;
                 if (hasQuery) {
-                  submitSearch();
+                  void submitSearch();
                   return;
                 }
                 inputRef.current?.focus();
@@ -166,6 +189,7 @@ export function HeaderAiSearch() {
           ariaLabel={t("ariaLabel")}
           aiBadge={t("aiBadge")}
           hasQuery={hasQuery}
+          submitting={submitting}
         />
       </div>
     </>
@@ -182,6 +206,7 @@ function MobileHeaderSearch({
   ariaLabel,
   aiBadge,
   hasQuery,
+  submitting,
 }: {
   inputId: string;
   query: string;
@@ -192,6 +217,7 @@ function MobileHeaderSearch({
   ariaLabel: string;
   aiBadge: string;
   hasQuery: boolean;
+  submitting: boolean;
 }) {
   return (
     <div className="flex h-11 w-full min-w-0 items-stretch border border-stone-200/90 bg-white/95 dark:border-stone-700 dark:bg-stone-950/90">
@@ -209,7 +235,8 @@ function MobileHeaderSearch({
           }}
           autoComplete="off"
           aria-label={ariaLabel}
-          className="h-11 w-full bg-transparent pl-3 pr-2 text-sm text-stone-900 outline-none placeholder:text-transparent dark:text-stone-100"
+          disabled={submitting}
+          className="h-11 w-full bg-transparent pl-3 pr-2 text-sm text-stone-900 outline-none placeholder:text-transparent disabled:opacity-60 dark:text-stone-100"
         />
         {showTypewriter ? (
           <span
@@ -223,11 +250,13 @@ function MobileHeaderSearch({
       </div>
       <SearchTriggerButton
         active={hasQuery}
-        showAiBadge={!hasQuery}
+        loading={submitting}
+        showAiBadge={!hasQuery && !submitting}
         aiBadge={aiBadge}
         ariaLabel={ariaLabel}
         onClick={() => {
-          if (hasQuery) onSubmit();
+          if (submitting) return;
+          if (hasQuery) void onSubmit();
         }}
         className="shrink-0"
       />
@@ -237,6 +266,7 @@ function MobileHeaderSearch({
 
 function SearchTriggerButton({
   active,
+  loading = false,
   showAiBadge,
   aiBadge,
   ariaLabel,
@@ -244,6 +274,7 @@ function SearchTriggerButton({
   className = "",
 }: {
   active: boolean;
+  loading?: boolean;
   showAiBadge: boolean;
   aiBadge: string;
   ariaLabel: string;
@@ -254,20 +285,41 @@ function SearchTriggerButton({
     <button
       type="button"
       onClick={onClick}
+      disabled={loading}
+      aria-busy={loading}
       aria-label={ariaLabel}
-      className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-visible transition-colors duration-200 ${className} ${
-        active
-          ? "bg-orange-600 text-white hover:bg-orange-700"
-          : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+      className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center overflow-visible transition-colors duration-200 disabled:cursor-wait ${className} ${
+        loading
+          ? "bg-orange-600 text-white"
+          : active
+            ? "bg-orange-600 text-white hover:bg-orange-700"
+            : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
       }`}
     >
-      <SearchIcon className="h-4 w-4" filled={active} />
+      {loading ? (
+        <SearchSpinner className="h-4 w-4" />
+      ) : (
+        <SearchIcon className="h-4 w-4" filled={active} />
+      )}
       {showAiBadge ? (
         <span className="absolute -right-0.5 -top-0.5 rounded bg-stone-900 px-1 py-px text-[8px] font-semibold uppercase tracking-wide text-white">
           {aiBadge}
         </span>
       ) : null}
     </button>
+  );
+}
+
+function SearchSpinner({ className }: { className?: string }) {
+  return (
+    <svg className={`animate-spin ${className ?? ""}`} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+      <path
+        className="opacity-90"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"
+      />
+    </svg>
   );
 }
 

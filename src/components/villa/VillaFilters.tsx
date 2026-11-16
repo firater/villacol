@@ -6,6 +6,7 @@ import { useCallback, useMemo } from "react";
 
 import type { VillaFilterFacets } from "@/db/queries/filter-facets.queries";
 import { useRouter } from "@/i18n/navigation";
+import type { DateString } from "@/lib/dates";
 import {
   buildVillaFilterQuery,
   hasActiveFilters,
@@ -14,6 +15,8 @@ import {
   type VillaFilters,
 } from "@/lib/search-params";
 
+import { VillaListingDateFilter } from "./VillaListingDateFilter";
+
 type ListingPath = "/villas" | "/villa-offers";
 
 type Props = {
@@ -21,12 +24,14 @@ type Props = {
   listingPath: ListingPath;
   /** When true, `offers_only` stays on and the toggle is hidden. */
   lockOffersOnly?: boolean;
+  minDate: DateString;
 };
 
 export function VillaFilters({
   facets,
   listingPath,
   lockOffersOnly = false,
+  minDate,
 }: Props) {
   const t = useTranslations("filters");
   const router = useRouter();
@@ -56,6 +61,17 @@ export function VillaFilters({
     [listingPath, lockOffersOnly, router],
   );
 
+  const commitStayDates = useCallback(
+    (checkIn: DateString | undefined, checkOut: DateString | undefined) => {
+      pushFilters({
+        ...filters,
+        checkIn,
+        checkOut,
+      });
+    },
+    [filters, pushFilters],
+  );
+
   const clearAll = useCallback(() => {
     router.push(listingPath);
   }, [listingPath, router]);
@@ -81,7 +97,7 @@ export function VillaFilters({
   );
 
   return (
-    <aside className="w-full shrink-0 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 lg:sticky lg:top-24 lg:w-72 lg:self-start">
+    <aside className="relative z-40 w-full shrink-0 overflow-visible rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 lg:w-72 lg:self-start">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-900 dark:text-zinc-100">
           {t("heading")}
@@ -98,6 +114,12 @@ export function VillaFilters({
       </div>
 
       <div className="mt-6 space-y-5">
+        <VillaListingDateFilter
+          filters={filters}
+          minDate={minDate}
+          onCommitStay={commitStayDates}
+        />
+
         <label className="block">
           <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
             {t("labels.location")}
@@ -243,6 +265,25 @@ export function VillaFilters({
           />
         </label>
 
+        {!lockOffersOnly ? (
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200/90 bg-amber-50/70 px-3.5 py-3 transition-colors hover:bg-amber-50 dark:border-amber-800/60 dark:bg-amber-950/25 dark:hover:bg-amber-950/40">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 shrink-0 rounded border-amber-300 text-amber-700 focus:ring-amber-500/30 dark:border-amber-700 dark:text-amber-400"
+              checked={filters.offersOnly === true}
+              onChange={(e) => {
+                pushFilters({
+                  ...filters,
+                  offersOnly: e.target.checked ? true : undefined,
+                });
+              }}
+            />
+            <span className="text-sm font-semibold leading-snug text-amber-950 dark:text-amber-100">
+              {t("labels.offers_only")}
+            </span>
+          </label>
+        ) : null}
+
         {facets.amenities.length > 0 ? (
           <fieldset>
             <legend className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
@@ -264,23 +305,6 @@ export function VillaFilters({
               ))}
             </ul>
           </fieldset>
-        ) : null}
-
-        {!lockOffersOnly ? (
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-800 dark:text-zinc-200">
-            <input
-              type="checkbox"
-              className="rounded border-zinc-300"
-              checked={filters.offersOnly === true}
-              onChange={(e) => {
-                pushFilters({
-                  ...filters,
-                  offersOnly: e.target.checked ? true : undefined,
-                });
-              }}
-            />
-            <span>{t("labels.offers_only")}</span>
-          </label>
         ) : null}
       </div>
     </aside>

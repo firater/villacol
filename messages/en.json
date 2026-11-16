@@ -18,7 +18,7 @@
       "ariaLabel": "Search villas",
       "aiBadge": "AI",
       "placeholderPrimary": "Sea view villa in Kalkan",
-      "placeholderSecondary": "6 guests · pool · July"
+      "placeholderSecondary": "6 guests with pool in July"
     },
     "megaMenu": {
       "label": "Menu",
@@ -286,6 +286,7 @@
   "filters": {
     "heading": "Filters",
     "clearAll": "Clear all",
+    "clearDates": "Clear dates",
     "apply": "Show results",
     "resultCount": "{count, plural, =0 {No villas} one {# villa} other {# villas}}",
     "labels": {
@@ -300,6 +301,7 @@
       "features": "Features",
       "check_in": "Check-in",
       "check_out": "Check-out",
+      "dates": "Dates",
       "offers_only": "Special offers only",
       "sort": "Sort by",
       "page": "Page"
@@ -312,6 +314,7 @@
       "relevance": "Best match"
     },
     "placeholders": {
+      "addDates": "Add dates",
       "anyLocation": "Any location",
       "anyCategory": "Any collection",
       "searchQuery": "Try \"6 guests in Kalkan with a pool\""

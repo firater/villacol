@@ -108,6 +108,16 @@ export function ConciergeWizard({
                 label={row.name}
               />
             ))}
+            {showAllLocations
+              ? extraLocations.map((row) => (
+                  <ChoiceTile
+                    key={row.slug}
+                    selected={locationSlug === row.slug}
+                    onSelect={() => setLocationSlug(row.slug)}
+                    label={row.name}
+                  />
+                ))
+              : null}
           </ChoiceGrid>
           {extraLocations.length > 0 ? (
             <ExpandToggle
@@ -117,18 +127,6 @@ export function ConciergeWizard({
                 showAllLocations ? t("where.showLess") : t("where.viewAll")
               }
             />
-          ) : null}
-          {showAllLocations ? (
-            <ChoiceGrid className="mt-4 border-t border-stone-200/80 pt-6 dark:border-stone-800">
-              {extraLocations.map((row) => (
-                <ChoiceTile
-                  key={row.slug}
-                  selected={locationSlug === row.slug}
-                  onSelect={() => setLocationSlug(row.slug)}
-                  label={row.name}
-                />
-              ))}
-            </ChoiceGrid>
           ) : null}
         </StepShell>
       ) : null}
@@ -153,6 +151,16 @@ export function ConciergeWizard({
                 label={row.name}
               />
             ))}
+            {showAllCategories
+              ? extraCategories.map((row) => (
+                  <ChoiceTile
+                    key={row.slug}
+                    selected={categorySlug === row.slug}
+                    onSelect={() => setCategorySlug(row.slug)}
+                    label={row.name}
+                  />
+                ))
+              : null}
           </ChoiceGrid>
           {extraCategories.length > 0 ? (
             <ExpandToggle
@@ -162,18 +170,6 @@ export function ConciergeWizard({
                 showAllCategories ? t("type.showLess") : t("type.viewAll")
               }
             />
-          ) : null}
-          {showAllCategories ? (
-            <ChoiceGrid className="mt-4 border-t border-stone-200/80 pt-6 dark:border-stone-800">
-              {extraCategories.map((row) => (
-                <ChoiceTile
-                  key={row.slug}
-                  selected={categorySlug === row.slug}
-                  onSelect={() => setCategorySlug(row.slug)}
-                  label={row.name}
-                />
-              ))}
-            </ChoiceGrid>
           ) : null}
         </StepShell>
       ) : null}

@@ -18,7 +18,7 @@
       "ariaLabel": "Поиск вилл",
       "aiBadge": "AI",
       "placeholderPrimary": "Вилла с видом на море в Калкане",
-      "placeholderSecondary": "6 гостей · бассейн · июль"
+      "placeholderSecondary": "6 гостей с бассейном в июле"
     },
     "megaMenu": {
       "label": "Меню",
@@ -277,6 +277,7 @@
   "filters": {
     "heading": "Фильтры",
     "clearAll": "Сбросить всё",
+    "clearDates": "Сбросить даты",
     "apply": "Показать результаты",
     "resultCount": "{count, plural, =0 {Вилл не найдено} one {# вилла} few {# виллы} many {# вилл} other {# виллы}}",
     "labels": {
@@ -291,6 +292,7 @@
       "features": "Особенности",
       "check_in": "Заезд",
       "check_out": "Выезд",
+      "dates": "Даты",
       "offers_only": "Только спецпредложения",
       "sort": "Сортировка",
       "page": "Страница"
@@ -303,6 +305,7 @@
       "relevance": "По релевантности"
     },
     "placeholders": {
+      "addDates": "Выбрать даты",
       "anyLocation": "Любое направление",
       "anyCategory": "Любая коллекция",
       "searchQuery": "Например, «6 гостей в Калкане с бассейном»"

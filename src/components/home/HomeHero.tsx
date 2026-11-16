@@ -66,7 +66,8 @@ export async function HomeHero({ locale }: Props) {
         <div className="relative z-[1] hidden mt-6 w-4/5 sm:ms-auto sm:block lg:mt-0 lg:w-full lg:max-w-full">
           <HeroImageFrame
             extraHeightPx={180}
-            className="relative ms-auto aspect-[5/5] w-full max-w-full min-h-[17.5rem] overflow-visible bg-transparent sm:w-[92%] lg:ms-0 lg:aspect-auto lg:min-h-0 lg:w-full"
+            maxHeightPx={540}
+            className="relative ms-auto aspect-[5/5] w-full max-w-full min-h-[17.5rem] overflow-visible bg-transparent sm:w-[92%] lg:ms-0 lg:aspect-[4/5] lg:h-[540px] lg:max-h-[540px] lg:min-h-[540px] lg:w-full"
           >
             <div className="absolute inset-0 overflow-hidden bg-stone-100">
               <Image
