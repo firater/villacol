@@ -312,6 +312,8 @@ export function toListingFilters(
     sort: (normalized.sort ?? "default") satisfies VillaListingSort,
     page: normalized.page ?? 1,
     pageSize: Math.min(MAX_PAGE_SIZE, options.pageSize ?? DEFAULT_PAGE_SIZE),
+    checkIn: normalized.checkIn,
+    checkOut: normalized.checkOut,
   };
 }
 

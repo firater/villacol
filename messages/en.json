@@ -32,6 +32,9 @@
     "footer": {
       "tagline": "Hand-picked villas on the Turkish Mediterranean coast.",
       "exploreTitle": "Explore",
+      "destinationsTitle": "Featured locations",
+      "categoriesTitle": "Featured categories",
+      "columnsNavAria": "Footer navigation",
       "colophon": "Villa journal",
       "intro": "Search, compare, and book hand-picked villas with live pricing.",
       "socialLabel": "Follow",
@@ -233,6 +236,9 @@
       "viewVilla": "View",
       "firstAvailability": "Next availability",
       "priceStartingAt": "Starting from",
+      "totalForTrip": "Total for {nights, plural, one {# night} other {# nights}}",
+      "selectedStayDates": "{range}",
+      "minStayBadge": "Min stay: {nights, plural, one {# night} other {# nights}}",
       "perNight": "/ night",
       "statGuests": "Guests",
       "statBedrooms": "Bedrooms",
@@ -375,44 +381,67 @@
     }
   },
   "concierge": {
-    "eyebrow": "Curated AI Concierge",
+    "eyebrow": "Personal concierge",
     "title": "Find my villa",
-    "intro": "Answer three short questions. We will match you with up to three Editor's Choice villas from our collection.",
-    "progressLabel": "Concierge steps",
+    "intro": "Five quiet questions — then a shortlist drawn from live availability and pricing across our collection.",
+    "progressLabel": "Step {step} of {total}",
     "steps": {
-      "group": "Group",
-      "vibe": "Vibe",
+      "where": "Where",
+      "type": "Villa type",
+      "duration": "Duration",
+      "guests": "Guests",
       "budget": "Budget"
     },
-    "group": {
-      "heading": "Who is travelling?",
-      "hint": "We use this to size bedrooms and capacity.",
-      "couple": "Couple",
-      "family": "Family",
-      "friends": "Friends"
+    "where": {
+      "heading": "Where would you like to stay?",
+      "hint": "Choose a region, or keep Anywhere to see the full coast.",
+      "anywhere": "Anywhere",
+      "viewAll": "View all locations",
+      "showLess": "Show featured only"
     },
-    "vibe": {
-      "heading": "What is the vibe?",
-      "hint": "Each option maps to features our editors tag on the ground.",
-      "secludedLuxury": "Secluded luxury",
-      "closeToTown": "Close to town",
-      "beachfront": "Beachfront"
+    "type": {
+      "heading": "What kind of villa suits you?",
+      "hint": "Collections our editors use every day — or Any for no preference.",
+      "any": "Any style",
+      "viewAll": "View all categories",
+      "showLess": "Show featured only"
+    },
+    "duration": {
+      "heading": "How long is your stay?",
+      "hint": "We use this to tailor your results summary.",
+      "nights": "{count, plural, one {# night} other {# nights}}",
+      "decrease": "Fewer nights",
+      "increase": "More nights"
+    },
+    "guests": {
+      "heading": "How many guests?",
+      "hint": "We only show villas that comfortably fit your party.",
+      "count": "{count, plural, one {# guest} other {# guests}}",
+      "decrease": "Fewer guests",
+      "increase": "More guests"
     },
     "budget": {
-      "heading": "Average nightly budget",
-      "hint": "Compared to each villa's cached average nightly rate (EUR, before fees).",
-      "upTo200": "≤ €200 / night",
-      "mid": "€200 – €500 / night",
-      "above500": "> €500 / night"
+      "heading": "What is your total budget?",
+      "hint": "Total stay budget in euros, compared to each villa's cached price for its next available dates.",
+      "tiers": {
+        "any": "Flexible",
+        "up_to_2500": "Up to €2,500",
+        "up_to_5000": "Up to €5,000",
+        "up_to_10000": "Up to €10,000",
+        "above_10000": "€10,000 and above"
+      }
     },
     "continue": "Continue",
     "back": "Back",
-    "submit": "Find my perfect villa",
-    "finding": "Curating…",
+    "submit": "See my shortlist",
     "results": {
-      "heading": "Your curated picks",
-      "subtitle": "Hand-selected Editor's Choice villas that fit your answers.",
-      "empty": "No Editor's Choice villas matched these filters. Try another vibe or budget.",
+      "eyebrow": "Your shortlist",
+      "headline": "{count, plural, one {We found # perfect villa for your stay} other {We found # perfect villas for your stay}}",
+      "headlineEmpty": "No villas matched exactly — let us widen the search",
+      "subtitle": "Curated for {guests, plural, one {# guest} other {# guests}} · {nights, plural, one {# night} other {# nights}}",
+      "empty": "Nothing matched these filters today. Adjust your answers or browse the full catalogue with the same criteria.",
+      "seeAll": "See all {count, plural, one {# villa} other {# villas}} matching your criteria",
+      "browseAll": "Browse all villas",
       "startOver": "Start over"
     }
   },
@@ -478,6 +507,20 @@
       }
     }
   },
+  "categoryDetail": {
+    "eyebrow": "Collection",
+    "descriptionFallback": "Explore villas curated for this stay style — live pricing from the next available dates.",
+    "empty": "We are adding villas to this collection. Check back soon or browse the full catalogue.",
+    "viewAll": "View all {category} villas"
+  },
+  "locationDetail": {
+    "eyebrow": "Destination",
+    "heroSubtitleFallback": "A curated guide to villas and coastal life in this corner of the Mediterranean.",
+    "featuredHeading": "Featured villas",
+    "featuredSubtitle": "A shortlist of stays we love in {location}.",
+    "featuredEmpty": "New villas are being added — browse the full collection below.",
+    "viewAll": "View all villas in {location}"
+  },
   "villaDetail": {
     "capacity": "Capacity",
     "bedrooms": "Bedrooms",
@@ -532,6 +575,11 @@
       "grandTotal": "Estimated total",
       "footnote": "{nights, plural, one {# night} other {# nights}} · {guests, plural, one {# guest} other {# guests}}",
       "bookNow": "Reserve"
+    },
+    "floatingWidget": {
+      "selectDatesPrompt": "Select dates to check availability",
+      "selectDates": "Select dates",
+      "totalSummary": "{range} · Total: {total}"
     }
   },
   "booking": {

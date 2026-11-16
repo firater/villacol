@@ -4,6 +4,9 @@ import { Suspense } from "react";
 import { isAdminPathname } from "@/lib/admin-route";
 import type { Locale } from "@/lib/locales";
 
+import { listCategoryNavLinks } from "@/db/queries/categories.queries";
+import { listLocationNavLinks } from "@/db/queries/locations.queries";
+
 import { Footer } from "./Footer";
 import { HeaderFallback } from "./HeaderFallback";
 import { HeaderWithPreferences } from "./HeaderWithPreferences";
@@ -34,10 +37,17 @@ export async function PublicSiteHeader({ locale }: Props) {
   );
 }
 
-export async function PublicSiteFooter() {
+export async function PublicSiteFooter({ locale }: Props) {
   if (!(await shouldRenderPublicChrome())) {
     return null;
   }
 
-  return <Footer />;
+  const [destinations, featuredCategories] = await Promise.all([
+    listLocationNavLinks(locale),
+    listCategoryNavLinks(locale),
+  ]);
+
+  return (
+    <Footer destinations={destinations} featuredCategories={featuredCategories} />
+  );
 }

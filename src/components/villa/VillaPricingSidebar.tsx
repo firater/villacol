@@ -1,9 +1,8 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState, type ChangeEvent } from "react";
+import { useCallback, type ChangeEvent } from "react";
 
-import { getVillaQuote, type QuoteDisplay } from "@/actions/public/quote.actions";
 import { QuotePriceBreakdown } from "@/components/booking/QuotePriceBreakdown";
 import { Link } from "@/i18n/navigation";
 
@@ -12,19 +11,7 @@ import {
   useCalendarSelection,
 } from "./calendar/CalendarContext";
 import { VillaCalendar } from "./calendar/VillaCalendar";
-
-/** Collapses the roundtrip into one state write so a quote costs one re-render. */
-type QuoteState =
-  | { status: "empty" }
-  | { status: "loading" }
-  | { status: "error"; message: string }
-  | { status: "ready"; display: QuoteDisplay };
-
-const EMPTY_QUOTE: QuoteState = { status: "empty" };
-const LOADING_QUOTE: QuoteState = { status: "loading" };
-
-/** Guests can be re-typed quickly; hold the request until the input settles. */
-const QUOTE_DEBOUNCE_MS = 150;
+import { useVillaDetailPricing } from "./VillaDetailPricingContext";
 
 /**
  * Quote panel driven by the calendar context — it recalculates whenever
@@ -32,44 +19,9 @@ const QUOTE_DEBOUNCE_MS = 150;
  */
 export function VillaPricingSidebar() {
   const t = useTranslations("villaDetail.pricing");
-  const { villaId, villaSlug, capacity } = useCalendarData();
+  const { villaSlug, capacity } = useCalendarData();
   const { checkIn, checkOut } = useCalendarSelection();
-
-  const [guestCount, setGuestCount] = useState(() =>
-    Math.min(2, Math.max(1, capacity)),
-  );
-  const [quote, setQuote] = useState<QuoteState>(EMPTY_QUOTE);
-
-  useEffect(() => {
-    if (checkIn === null || checkOut === null) {
-      setQuote(EMPTY_QUOTE);
-      return;
-    }
-
-    let active = true;
-    setQuote(LOADING_QUOTE);
-
-    const timer = setTimeout(() => {
-      void getVillaQuote({ villaId, checkIn, checkOut, guestCount }).then(
-        (result) => {
-          // Dates may have changed while the action was in flight: dropping the
-          // stale answer keeps the panel from flashing a price for a range the
-          // visitor already abandoned.
-          if (!active) return;
-          setQuote(
-            result.ok
-              ? { status: "ready", display: result.data }
-              : { status: "error", message: result.error },
-          );
-        },
-      );
-    }, QUOTE_DEBOUNCE_MS);
-
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [checkIn, checkOut, guestCount, villaId]);
+  const { guestCount, setGuestCount, quote } = useVillaDetailPricing();
 
   const handleGuestChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +29,7 @@ export function VillaPricingSidebar() {
       if (Number.isNaN(parsed)) return;
       setGuestCount(Math.min(capacity, Math.max(1, parsed)));
     },
-    [capacity],
+    [capacity, setGuestCount],
   );
 
   return (

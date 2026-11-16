@@ -9,7 +9,7 @@ import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 
 import { db } from "@/db";
-import { searchSynonyms, villaSearchDocuments } from "@/db/schema";
+import { searchSynonyms, villas, villaSearchDocuments } from "@/db/schema";
 import { TEXT_SEARCH_CONFIG, type Locale } from "@/lib/locales";
 import type { SearchSynonym } from "@/lib/search/intent";
 
@@ -55,9 +55,11 @@ export async function searchVillaDocuments(options: {
       )`.mapWith(Number),
     })
     .from(villaSearchDocuments)
+    .innerJoin(villas, eq(villas.id, villaSearchDocuments.villaId))
     .where(
       and(
         eq(villaSearchDocuments.locale, options.locale),
+        eq(villas.isActive, true),
         sql`(
           ${villaSearchDocuments.tsv} @@ websearch_to_tsquery(${config}::regconfig, ${trimmed})
           OR similarity(${villaSearchDocuments.document}, ${trimmed}) > ${TRIGRAM_THRESHOLD}

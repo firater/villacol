@@ -35,6 +35,8 @@ import {
 } from "@/db/schema";
 import type { GuestPolicy } from "@/db/tables/enums";
 import { localize, type Locale, type LocalizedText } from "@/lib/locales";
+import { villaBookableForStaySql } from "@/lib/listing-stay-availability";
+import type { DateString } from "@/lib/dates";
 
 /** Sort keys aligned with the universal English `sort` query param (Phase 8). */
 export type VillaListingSort =
@@ -73,6 +75,9 @@ export type VillaListingFilters = {
   featuredOnly?: boolean;
   /** When true, only `villas.is_best_value` rows (landing page rail). */
   bestValueOnly?: boolean;
+  /** When both are set, only villas bookable for this stay window are listed. */
+  checkIn?: string;
+  checkOut?: string;
 };
 
 export type VillaCardRow = {
@@ -87,6 +92,7 @@ export type VillaCardRow = {
   mainImageUrl: string | null;
   mainImageAlt: string | null;
   locationName: string | null;
+  locationSlug?: string | null;
   /** Pre-discount total for the cached `min_stay` window (nights only). */
   baseTotalCents: number | null;
   /** Subtotal after discounts for the same window (`villa_price_cache.discounted_total_cents`). */
@@ -387,6 +393,12 @@ export async function getVillaListing(
             )}
         ) = ${featureIdList.length}`
       : undefined,
+    filters.checkIn !== undefined && filters.checkOut !== undefined
+      ? villaBookableForStaySql(
+          filters.checkIn as DateString,
+          filters.checkOut as DateString,
+        )
+      : undefined,
   ].filter(Boolean);
 
   const whereClause = and(...predicates);
@@ -419,6 +431,7 @@ export async function getVillaListing(
       mainImageUrl: villaImages.url,
       mainImageAlt: villaImages.altI18n,
       locationName: locationTranslations.name,
+      locationSlug: locationTranslations.slug,
       baseTotalCents: villaPriceCache.baseTotalCents,
       priceFromCents: villaPriceCache.discountedTotalCents,
       avgNightlyCents: villaPriceCache.avgNightlyCents,

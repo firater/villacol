@@ -50,6 +50,10 @@ export type VillaCardProps = {
   showVillaOfTheDay?: boolean;
   /** From `villas.editor_rating` when wired; hidden when null. */
   editorRating?: number | null;
+  /** Listing with URL stay dates: show trip total heading instead of cache copy. */
+  listingSelectedStay?: boolean;
+  hideTripTotalPrice?: boolean;
+  minStayBadgeLabel?: string | null;
 };
 
 const DEFAULT_PROMO_RATING_LABELS = {
@@ -87,6 +91,9 @@ export function VillaCard({
   promoRatingLabels,
   showVillaOfTheDay = false,
   editorRating = null,
+  listingSelectedStay = false,
+  hideTripTotalPrice = false,
+  minStayBadgeLabel = null,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -209,43 +216,58 @@ export function VillaCard({
   }
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-stone-200/60 bg-white hover:border-stone-300">
-      <Link
-        href={{ pathname: "/villas/[slug]", params: { slug } }}
-        className="relative block"
+    <Link
+      href={{ pathname: "/villas/[slug]", params: { slug } }}
+      className="group flex h-full flex-col overflow-hidden rounded-3xl border border-stone-200/60 bg-white transition-colors hover:border-stone-300"
+    >
+      <div
+        className="relative aspect-[4/3] w-full overflow-hidden rounded-t-3xl bg-neutral-100"
+        style={{ aspectRatio: "4 / 3" }}
       >
-        <div
-          className="relative aspect-[4/3] w-full overflow-hidden rounded-t-3xl bg-neutral-100"
-          style={{ aspectRatio: "4 / 3" }}
-        >
-          <Image
-            src={imageUrl}
-            alt={imageAlt}
-            fill
-            sizes="(max-width: 640px) 100vw, 33vw"
-            className="object-cover"
-          />
-          {badgeLabel ? <PromoBadge text={badgeLabel} className="left-6 top-6" /> : null}
-        </div>
-      </Link>
+        <Image
+          src={imageUrl}
+          alt={imageAlt}
+          fill
+          sizes="(max-width: 640px) 100vw, 33vw"
+          className="object-cover"
+        />
+        {badgeLabel ? <PromoBadge text={badgeLabel} className="left-6 top-6" /> : null}
+        {minStayBadgeLabel ? (
+          <span className="absolute bottom-4 left-6 z-20 rounded-full border border-stone-200/90 bg-white/95 px-3 py-1 text-[10px] font-medium uppercase tracking-wide text-stone-600 shadow-sm backdrop-blur-sm">
+            {minStayBadgeLabel}
+          </span>
+        ) : null}
+      </div>
       <div className="flex min-h-0 flex-1 flex-col p-5">
-        <h3 className="min-h-[3rem] text-base font-black leading-snug text-neutral-900">
-          <Link href={{ pathname: "/villas/[slug]", params: { slug } }} className="line-clamp-2">
-            {title}
-          </Link>
+        <h3 className="min-h-[3rem] text-base font-black leading-snug text-neutral-900 line-clamp-2">
+          {title}
         </h3>
-        <p className="mt-1 min-h-5 truncate text-sm text-neutral-500">{location ?? "\u00A0"}</p>
+        <p className="mt-1 min-h-5 truncate text-sm text-neutral-500">
+          {location ?? "\u00A0"}
+        </p>
         <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} />
         <div className="mt-4 min-h-[8rem] border-t border-neutral-100 pt-3">
           <p className="min-h-4 text-xs text-neutral-500">{availabilityLabel ?? "\u00A0"}</p>
+          {listingSelectedStay ? (
+            <p className="mt-1 min-h-4 text-xs font-medium text-neutral-600">
+              {hideTripTotalPrice ? "\u00A0" : priceStartingAtLabel}
+            </p>
+          ) : null}
           <p className="mt-1 min-h-5 text-sm text-neutral-400 line-through" aria-hidden={priceWas === null}>
             {priceWas ?? "\u00A0"}
           </p>
-          <p className="text-lg font-semibold text-stone-900">{priceMain}</p>
-          <p className="min-h-4 text-xs text-neutral-500">{stayLabel ?? "\u00A0"}</p>
+          <p
+            className="text-lg font-semibold text-stone-900"
+            aria-hidden={hideTripTotalPrice}
+          >
+            {hideTripTotalPrice ? "\u00A0" : priceMain}
+          </p>
+          <p className="min-h-4 text-xs text-neutral-500">
+            {listingSelectedStay ? "\u00A0" : (stayLabel ?? "\u00A0")}
+          </p>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
 

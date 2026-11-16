@@ -84,7 +84,7 @@ export function VillaStayPoliciesSection({
 
   return (
     <section aria-labelledby="rules-policies-heading" className="space-y-8">
-      <header className="max-w-3xl">
+      <header className="w-full">
         <div aria-hidden className="mb-6 h-px w-full bg-stone-300/80" />
         <p className="mb-3 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-500">
           {copy.eyebrow}
@@ -97,7 +97,7 @@ export function VillaStayPoliciesSection({
         </h2>
       </header>
 
-      <div className="max-w-3xl border border-stone-300/90 bg-white dark:border-stone-700 dark:bg-stone-950">
+      <div className="w-full border border-stone-300/90 bg-white dark:border-stone-700 dark:bg-stone-950">
         <h3 className="border-b border-stone-200 bg-stone-50/90 px-6 py-4 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-500 dark:border-stone-800 dark:bg-stone-950/90">
           {copy.houseRulesTitle}
         </h3>
@@ -120,7 +120,7 @@ export function VillaStayPoliciesSection({
         </ul>
       </div>
 
-      <div className="grid max-w-3xl gap-px border border-stone-300/90 bg-stone-300/90 dark:border-stone-700 dark:bg-stone-700 sm:grid-cols-2">
+      <div className="grid w-full gap-px border border-stone-300/90 bg-stone-300/90 dark:border-stone-700 dark:bg-stone-700 sm:grid-cols-2">
           <article className="bg-stone-50/90 px-6 py-7 dark:bg-stone-950/90 sm:min-h-[11rem]">
             <h3 className="font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-500">
               {copy.guestPolicyTitle}

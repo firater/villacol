@@ -12,6 +12,9 @@ import {
   type Locale,
 } from "@/lib/locales";
 import type { ExchangeRateRow } from "@/db/queries/rates.queries";
+import type { ListingStayCardMeta } from "@/lib/listing-stay-quote";
+import { selectedStayNightCount } from "@/lib/listing-stay-quote";
+import type { DateString } from "@/lib/dates";
 
 const PLACEHOLDER_IMAGE =
   "https://placehold.co/800x600/e4e4e7/3f3f46/png?text=Villa";
@@ -36,6 +39,17 @@ type CardCopy = {
   perNight: string;
   specialOffer: string;
   editorsChoice: string;
+  totalForTrip?: (values: { nights: number }) => string;
+  selectedStayDates?: (values: { range: string }) => string;
+  minStayBadge?: (values: { nights: number }) => string;
+};
+
+export type VillaCardMapContext = {
+  selectedStay?: {
+    checkIn: DateString;
+    checkOut: DateString;
+    meta?: ListingStayCardMeta;
+  };
 };
 
 /**
@@ -63,6 +77,7 @@ export function mapVillaCardRowToProps(
   currency: Currency,
   rates: ExchangeRateMap,
   tCard: CardCopy,
+  context: VillaCardMapContext = {},
 ): Omit<VillaCardProps, never> {
   const discounted =
     row.priceFromCents !== null
@@ -79,24 +94,63 @@ export function mapVillaCardRowToProps(
     discounted !== null &&
     row.baseTotalCents !== row.priceFromCents;
 
-  const priceMain = discounted?.formatted ?? "—";
+  const selectedStay =
+    context.selectedStay?.meta !== undefined ? context.selectedStay : undefined;
+  const minStayUnmet =
+    selectedStay?.meta?.mode === "min_stay" ? selectedStay.meta : null;
+
+  const priceMain =
+    minStayUnmet !== null ? "—" : (discounted?.formatted ?? "—");
   const nightlyFormatted =
     row.avgNightlyCents !== null
       ? toDisplayAmount(row.avgNightlyCents, currency, locale, rates).formatted
       : null;
   const priceWas =
-    showStrike && base ? tCard.wasPrice({ price: base.formatted }) : null;
-
-  const stayLabel =
-    row.cacheNightCount !== null && row.cacheNightCount > 0
-      ? tCard.perStay({ nights: row.cacheNightCount })
+    minStayUnmet === null && showStrike && base
+      ? tCard.wasPrice({ price: base.formatted })
       : null;
 
+  const stayLabel =
+    selectedStay !== undefined
+      ? null
+      : row.cacheNightCount !== null && row.cacheNightCount > 0
+        ? tCard.perStay({ nights: row.cacheNightCount })
+        : null;
+
   const availabilityLabel =
-    row.cacheCheckIn !== null && row.cacheCheckOut !== null
-      ? tCard.nextAvailable({
-          range: formatStayRange(row.cacheCheckIn, row.cacheCheckOut, locale),
-        })
+    selectedStay !== undefined
+      ? (tCard.selectedStayDates?.({
+          range: formatStayRange(
+            selectedStay.checkIn,
+            selectedStay.checkOut,
+            locale,
+          ),
+        }) ??
+        formatStayRange(selectedStay.checkIn, selectedStay.checkOut, locale))
+      : row.cacheCheckIn !== null && row.cacheCheckOut !== null
+        ? tCard.nextAvailable({
+            range: formatStayRange(row.cacheCheckIn, row.cacheCheckOut, locale),
+          })
+        : null;
+
+  const tripNights =
+    selectedStay !== undefined
+      ? (row.cacheNightCount ??
+        selectedStayNightCount(selectedStay.checkIn, selectedStay.checkOut))
+      : 0;
+
+  const priceStartingAtLabel =
+    selectedStay !== undefined && minStayUnmet === null
+      ? (tCard.totalForTrip?.({ nights: tripNights }) ??
+        tCard.priceStartingAt)
+      : tCard.priceStartingAt;
+
+  const listingSelectedStay = selectedStay !== undefined;
+  const hideTripTotalPrice = minStayUnmet !== null;
+  const minStayBadgeLabel =
+    minStayUnmet !== null
+      ? (tCard.minStayBadge?.({ nights: minStayUnmet.requiredNights }) ??
+        `Min stay: ${minStayUnmet.requiredNights}`)
       : null;
 
   const promotionLabels = row.appliedPromotions.map((promotion) =>
@@ -114,8 +168,11 @@ export function mapVillaCardRowToProps(
     promotionLabels,
     priceMain,
     nightlyPrice: nightlyFormatted,
-    priceStartingAtLabel: tCard.priceStartingAt,
+    priceStartingAtLabel,
     perNightLabel: tCard.perNight,
+    listingSelectedStay,
+    hideTripTotalPrice,
+    minStayBadgeLabel,
     firstAvailabilityTitle: tCard.firstAvailability,
     priceWas,
     showOfferBadge: row.hasActiveDiscount,

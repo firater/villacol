@@ -86,7 +86,7 @@ export default async function LocaleLayout({ children }: { children: ReactNode }
           </Suspense>
           <div className="flex flex-1 flex-col">{children}</div>
           <Suspense fallback={null}>
-            <PublicSiteFooter />
+            <PublicSiteFooter locale={locale} />
           </Suspense>
         </NextIntlClientProvider>
       </body>

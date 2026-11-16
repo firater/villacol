@@ -2,7 +2,7 @@
  * Regroups `similar_villas` so the detail page reads alternatives with one
  * indexed lookup instead of scoring every villa on request.
  */
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
 
 import { db } from "@/db";
@@ -57,9 +57,26 @@ async function loadCandidates(): Promise<SimilarityCandidate[]> {
  * who villa B should recommend, and skipping that would leave the mapping
  * disagreeing with itself until the next full sweep.
  */
+async function purgeSimilarRowsReferencingInactiveVillas(): Promise<number> {
+  const purge = await dbPool.execute(sql`
+    DELETE FROM similar_villas sv
+    WHERE EXISTS (
+      SELECT 1 FROM villas v
+      WHERE v.id = sv.villa_id AND v.is_active = false
+    )
+    OR EXISTS (
+      SELECT 1 FROM villas v
+      WHERE v.id = sv.similar_villa_id AND v.is_active = false
+    )
+  `);
+  return purge.rowCount ?? 0;
+}
+
 export async function rebuildSimilarVillas(
   villaIds?: readonly number[],
 ): Promise<CronJobResult> {
+  const inactiveSimilarRowsPurged = await purgeSimilarRowsReferencingInactiveVillas();
+
   const candidates = await loadCandidates();
   const byId = new Map(candidates.map((candidate) => [candidate.id, candidate]));
 
@@ -150,6 +167,7 @@ export async function rebuildSimilarVillas(
       targetCount: targetIds.length,
       candidateCount: candidates.length,
       limit: SIMILAR_VILLAS_LIMIT,
+      inactiveSimilarRowsPurged,
     },
   };
 }

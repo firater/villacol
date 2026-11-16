@@ -6,7 +6,6 @@ import { getExchangeRates } from "@/db/queries/rates.queries";
 import { getPublishedGuestReviewsForVilla } from "@/db/queries/guest-reviews.queries";
 import { getVillaPublicCalendarSnapshot } from "@/db/queries/public.calendar.queries";
 import { getVillaDetailBundle } from "@/db/queries/villas.queries";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/lib/locales";
 import { generateVillaJsonLd } from "@/lib/seo/json-ld";
 import { absoluteLocalizedUrl } from "@/lib/seo/urls";
@@ -19,6 +18,11 @@ import { VillaCalendarLegend } from "./calendar/VillaCalendarLegend";
 import { VillaDetailGallery } from "./VillaDetailGallery";
 import { VillaEditorScore } from "./VillaEditorScore";
 import { VillaGuestReviewsSection } from "./VillaGuestReviewsSection";
+import { VillaDetailFloatingWidget } from "./VillaDetailFloatingWidget";
+import { VillaDetailPricingProvider } from "./VillaDetailPricingContext";
+import { VillaDetailScrollProvider } from "./VillaDetailScrollContext";
+import { VILLA_AVAILABILITY_SECTION_ID } from "./villa-detail-ids";
+import { VillaDetailSidebarColumn } from "./VillaDetailSidebarColumn";
 import { VillaPricingSidebar } from "./VillaPricingSidebar";
 import { VillaStayPoliciesSection } from "./VillaStayPoliciesSection";
 
@@ -68,35 +72,28 @@ export async function VillaDetailView({ villaId, locale }: Props) {
     <>
       <JsonLd data={villaJsonLd} />
       <CalendarProvider
-      villaId={villa.id}
-      villaSlug={villa.slug}
-      capacity={villa.capacity}
-      snapshot={calendarSnapshot}
-    >
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        villaId={villa.id}
+        villaSlug={villa.slug}
+        capacity={villa.capacity}
+        snapshot={calendarSnapshot}
+      >
+        <VillaDetailPricingProvider
+          villaId={villa.id}
+          capacity={villa.capacity}
+        >
+          <VillaDetailScrollProvider>
+            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
         <div className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-12 xl:grid-cols-[1fr_24rem]">
           <div className="min-w-0 space-y-10">
             <VillaDetailGallery title={villa.title} images={images} />
 
             <header className="min-h-[8rem] space-y-4">
-              <h1 className="max-w-3xl font-serif text-[clamp(2rem,4.5vw,2.75rem)] font-semibold leading-[1.05] tracking-tight text-stone-900 dark:text-stone-50">
+              <h1 className="font-serif text-[clamp(2rem,4.5vw,2.75rem)] font-semibold leading-[1.05] tracking-tight text-stone-900 dark:text-stone-50">
                 {villa.title}
               </h1>
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="space-y-2">
-                  {villa.locationName !== null && villa.locationSlug !== null ? (
-                    <p className="font-sans text-base text-stone-600 dark:text-stone-400">
-                      <Link
-                        href={{
-                          pathname: "/locations/[slug]",
-                          params: { slug: villa.locationSlug },
-                        }}
-                        className="hover:text-stone-900 hover:underline dark:hover:text-stone-200"
-                      >
-                        {villa.locationName}
-                      </Link>
-                    </p>
-                  ) : villa.locationName !== null ? (
+                  {villa.locationName !== null ? (
                     <p className="font-sans text-base text-stone-600 dark:text-stone-400">
                       {villa.locationName}
                     </p>
@@ -126,13 +123,13 @@ export async function VillaDetailView({ villaId, locale }: Props) {
             </header>
 
             {villa.summary ? (
-              <p className="max-w-3xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
                 {villa.summary}
               </p>
             ) : null}
 
             {villa.description ? (
-              <div className="max-w-3xl font-sans text-sm leading-[1.85] text-stone-700 dark:text-stone-300">
+              <div className="font-sans text-sm leading-[1.85] text-stone-700 dark:text-stone-300">
                 {villa.description.split("\n").map((paragraph, index) =>
                   paragraph.trim() === "" ? null : (
                     <p key={index} className={index > 0 ? "mt-4" : undefined}>
@@ -199,7 +196,11 @@ export async function VillaDetailView({ villaId, locale }: Props) {
               </ul>
             </section>
 
-            <section aria-labelledby="availability-heading" className="space-y-4">
+            <section
+              id={VILLA_AVAILABILITY_SECTION_ID}
+              aria-labelledby="availability-heading"
+              className="space-y-4 scroll-mt-28"
+            >
               <h2
                 id="availability-heading"
                 className="font-serif text-xl font-semibold text-zinc-900 dark:text-zinc-50"
@@ -232,14 +233,15 @@ export async function VillaDetailView({ villaId, locale }: Props) {
             />
           </div>
 
-          <div className="min-h-[32rem] lg:min-h-0">
-            <div className="lg:sticky lg:top-24">
-              <VillaPricingSidebar />
-            </div>
-          </div>
+          <VillaDetailSidebarColumn>
+            <VillaPricingSidebar />
+          </VillaDetailSidebarColumn>
         </div>
-      </div>
-    </CalendarProvider>
+            </div>
+            <VillaDetailFloatingWidget />
+          </VillaDetailScrollProvider>
+        </VillaDetailPricingProvider>
+      </CalendarProvider>
     </>
   );
 }

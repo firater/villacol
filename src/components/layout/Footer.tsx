@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
+import type { CategoryNavLink } from "@/db/queries/categories.queries";
+import type { LocationNavLink } from "@/db/queries/locations.queries";
 
 const UTILITY_FOOTER_LINKS = [
   { messageKey: "userAgreement", href: "/terms" },
@@ -16,7 +18,7 @@ const UTILITY_FOOTER_LINKS = [
 ] as const;
 
 const FOOTER_NAV_LINK =
-  "inline-block text-[15px] font-light leading-[1.55] text-stone-400 transition-colors duration-200 hover:text-white";
+  "inline-block text-[15px] font-light leading-[1.65] text-stone-400 transition-colors duration-200 hover:text-white";
 
 const FOOTER_UTILITY_LINK =
   "text-sm font-light leading-snug text-stone-500 transition-colors duration-200 hover:text-stone-200";
@@ -33,9 +35,19 @@ type FooterHref =
   | "/journal"
   | "/journal/best-beaches"
   | "/journal/travel-safety-guide"
-  | { pathname: "/"; hash: string };
+  | { pathname: "/"; hash: string }
+  | { pathname: "/locations/[slug]"; params: { slug: string } }
+  | { pathname: "/categories/[slug]"; params: { slug: string } };
 
-export function Footer() {
+type FooterProps = {
+  destinations?: readonly LocationNavLink[];
+  featuredCategories?: readonly CategoryNavLink[];
+};
+
+export function Footer({
+  destinations = [],
+  featuredCategories = [],
+}: FooterProps) {
   const t = useTranslations("layout.footer");
   const tNav = useTranslations("layout.nav");
   const tCommon = useTranslations("common");
@@ -50,56 +62,91 @@ export function Footer() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-400/25 to-transparent"
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="flex flex-col gap-14 lg:flex-row lg:items-start lg:justify-between lg:gap-16 xl:gap-24">
-          <div className="max-w-[22rem] shrink-0">
-            <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-stone-500">
-              {t("colophon")}
-            </p>
-            <Link
-              href="/"
-              className="mt-3.5 inline-block font-serif text-[clamp(2rem,4.2vw,2.35rem)] font-normal leading-none tracking-[-0.03em] text-white transition-colors duration-200 hover:text-stone-100"
-            >
-              <span className="text-orange-500">.</span>
-              {tCommon("brand")}
-            </Link>
-            <p className="mt-4 text-[15px] font-light leading-[1.65] text-stone-400">
-              {t("intro")}
-            </p>
-            <FooterSocial />
-          </div>
-
-          <div className="flex flex-col gap-12 sm:flex-row sm:gap-14 md:gap-16 lg:gap-20 lg:pt-1 xl:gap-28">
-            <FooterColumn title={t("exploreTitle")}>
-              <FooterLink href="/">{tNav("home")}</FooterLink>
-              <FooterLink href="/find-villa">{tNav("findVilla")}</FooterLink>
-              <FooterLink href={{ pathname: "/", hash: "help" }}>{t("faq")}</FooterLink>
-              <FooterLink href="/contact">{tNav("contact")}</FooterLink>
-              <FooterLink href="/villas">{tNav("villas")}</FooterLink>
-            </FooterColumn>
-            <FooterColumn title={t("legal")}>
-              <FooterLink href="/terms">{t("terms")}</FooterLink>
-              <FooterLink href="/privacy">{t("privacy")}</FooterLink>
-              <FooterLink href="/about">{tNav("about")}</FooterLink>
-            </FooterColumn>
-            <FooterColumn title={t("journalTitle")}>
-              <FooterLink href="/journal">{tJournal("title")}</FooterLink>
-              <FooterLink href="/journal/best-beaches">
-                {tJournalArticles("bestBeaches.title")}
-              </FooterLink>
-              <FooterLink href="/journal/travel-safety-guide">
-                {tJournalArticles("travelSafety.title")}
-              </FooterLink>
-            </FooterColumn>
-          </div>
+      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28 xl:py-32">
+        <div className="max-w-[26rem]">
+          <p className="text-[11px] font-medium uppercase tracking-[0.26em] text-stone-500">
+            {t("colophon")}
+          </p>
+          <Link
+            href="/"
+            className="mt-4 inline-block font-serif text-[clamp(2.15rem,4.2vw,2.5rem)] font-normal leading-none tracking-[-0.03em] text-white transition-colors duration-200 hover:text-stone-100"
+          >
+            <span className="text-orange-500">.</span>
+            {tCommon("brand")}
+          </Link>
+          <p className="mt-5 text-[15px] font-light leading-[1.7] text-stone-400">
+            {t("intro")}
+          </p>
+          <FooterSocial />
         </div>
 
-        <div className="mt-14 border-t border-stone-800 pt-9 lg:mt-16 lg:pt-10">
+        <nav
+          className="mt-16 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:mt-20 lg:grid-cols-3 xl:grid-cols-5 xl:gap-x-12"
+          aria-label={t("columnsNavAria")}
+        >
+          <FooterColumn title={t("exploreTitle")}>
+            <FooterLink href="/">{tNav("home")}</FooterLink>
+            <FooterLink href="/find-villa">{tNav("findVilla")}</FooterLink>
+            <FooterLink href={{ pathname: "/", hash: "help" }}>{t("faq")}</FooterLink>
+            <FooterLink href="/contact">{tNav("contact")}</FooterLink>
+            <FooterLink href="/villas">{tNav("villas")}</FooterLink>
+          </FooterColumn>
+
+          <FooterColumn title={t("legal")}>
+            <FooterLink href="/terms">{t("terms")}</FooterLink>
+            <FooterLink href="/privacy">{t("privacy")}</FooterLink>
+            <FooterLink href="/about">{tNav("about")}</FooterLink>
+          </FooterColumn>
+
+          {destinations.length > 0 ? (
+            <FooterColumn title={t("destinationsTitle")}>
+              {destinations.map((destination) => (
+                <FooterLink
+                  key={destination.slug}
+                  href={{
+                    pathname: "/locations/[slug]",
+                    params: { slug: destination.slug },
+                  }}
+                >
+                  {destination.name}
+                </FooterLink>
+              ))}
+            </FooterColumn>
+          ) : null}
+
+          {featuredCategories.length > 0 ? (
+            <FooterColumn title={t("categoriesTitle")}>
+              {featuredCategories.map((category) => (
+                <FooterLink
+                  key={category.slug}
+                  href={{
+                    pathname: "/categories/[slug]",
+                    params: { slug: category.slug },
+                  }}
+                >
+                  {category.name}
+                </FooterLink>
+              ))}
+            </FooterColumn>
+          ) : null}
+
+          <FooterColumn title={t("journalTitle")}>
+            <FooterLink href="/journal">{tJournal("title")}</FooterLink>
+            <FooterLink href="/journal/best-beaches">
+              {tJournalArticles("bestBeaches.title")}
+            </FooterLink>
+            <FooterLink href="/journal/travel-safety-guide">
+              {tJournalArticles("travelSafety.title")}
+            </FooterLink>
+          </FooterColumn>
+        </nav>
+
+        <div className="mt-20 border-t border-stone-800 pt-12 lg:mt-24 lg:pt-14">
           <p className="text-[11px] font-light uppercase tracking-[0.2em] text-stone-500">
             {tHomeFooter("paymentsNote")}
           </p>
 
-          <nav className="mt-7 lg:mt-8" aria-label={t("utilityNavAria")}>
+          <nav className="mt-8 lg:mt-9" aria-label={t("utilityNavAria")}>
             <ul className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-1 sm:gap-y-2">
               {UTILITY_FOOTER_LINKS.map(({ messageKey, href }, index) => (
                 <li key={messageKey} className="flex items-center">
@@ -126,11 +173,11 @@ export function Footer() {
 
 function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="min-w-[10rem] sm:min-w-[11rem]">
+    <div className="min-w-0">
       <h3 className="text-base font-medium tracking-[0.02em] text-white sm:text-[1.0625rem]">
         {title}
       </h3>
-      <ul role="list" className="mt-5 space-y-3 sm:space-y-3.5">
+      <ul role="list" className="mt-6 space-y-3.5 sm:space-y-4">
         {children}
       </ul>
     </div>
@@ -149,7 +196,7 @@ function FooterLink({ href, children }: { href: FooterHref; children: ReactNode 
 
 function FooterSocial() {
   return (
-    <div className="mt-7 flex flex-wrap items-center gap-1 sm:gap-1.5">
+    <div className="mt-8 flex flex-wrap items-center gap-1 sm:gap-1.5">
       <SocialIcon label="Facebook">
         <path
           fillRule="evenodd"

@@ -5,7 +5,7 @@
  * of running the pricing engine per card. The engine still produces every
  * number here, so the cached total and a live quote come from the same code.
  */
-import { and, asc, eq, notInArray } from "drizzle-orm";
+import { and, asc, eq, notInArray, sql } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
 
 import { db } from "@/db";
@@ -144,7 +144,11 @@ async function rebuildOneVilla(
     PRICE_CACHE_HORIZON_DAYS,
   );
 
-  if (sources === null) return "skipped";
+  if (sources === null) {
+    // Inactive or missing villa: drop cache so listings and aggregates cannot read stale prices.
+    await dbPool.delete(villaPriceCache).where(eq(villaPriceCache.villaId, villaId));
+    return "skipped";
+  }
 
   const rows = buildCacheRows(sources, today);
 
@@ -208,7 +212,7 @@ async function rebuildOneVilla(
  */
 export async function rebuildVillaPriceCache(
   villaIds?: readonly number[],
-  options: { today?: DateString } = {},
+  options: { today?: DateString; skipRevalidate?: boolean } = {},
 ): Promise<CronJobResult> {
   const today = options.today ?? getBusinessToday();
 
@@ -253,9 +257,21 @@ export async function rebuildVillaPriceCache(
   }
 
   // Stale-while-revalidate: pages keep serving the previous price until the
-  // next request pulls the row that was just written.
-  revalidateTag("villa-price-cache", "max");
-  revalidateTag("villas", "max");
+  // next request pulls the row that was just written. CLI seeds run outside the
+  // Next.js request context, so they opt out of tag revalidation.
+  let inactiveCacheRowsPurged = 0;
+  if (villaIds === undefined) {
+    const purge = await dbPool.execute(sql`
+      DELETE FROM villa_price_cache
+      WHERE villa_id IN (SELECT id FROM villas WHERE is_active = false)
+    `);
+    inactiveCacheRowsPurged = purge.rowCount ?? 0;
+  }
+
+  if (!options.skipRevalidate) {
+    revalidateTag("villa-price-cache", "max");
+    revalidateTag("villas", "max");
+  }
 
   return {
     processedCount,
@@ -266,6 +282,7 @@ export async function rebuildVillaPriceCache(
       batchSize: CRON_BATCH_SIZE,
       targetCount: targets.length,
       skippedCount,
+      inactiveCacheRowsPurged,
       // Bounded so one catastrophic run cannot write a megabyte of jsonb.
       failures: failures.slice(0, 25),
     },

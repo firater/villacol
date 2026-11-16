@@ -230,6 +230,15 @@ function buildDocuments(
  * argument. Each villa's documents are replaced in one transaction so a search
  * can never read a half-written set.
  */
+async function purgeInactiveVillaSearchDocuments(): Promise<number> {
+  const purge = await dbPool.execute(sql`
+    DELETE FROM villa_search_documents d
+    USING villas v
+    WHERE d.villa_id = v.id AND v.is_active = false
+  `);
+  return purge.rowCount ?? 0;
+}
+
 export async function rebuildVillaSearchDocuments(
   villaIds?: readonly number[],
 ): Promise<SearchIndexResult> {
@@ -327,6 +336,10 @@ export async function rebuildVillaSearchDocuments(
         outcome.reason,
       );
     });
+  }
+
+  if (villaIds === undefined) {
+    await purgeInactiveVillaSearchDocuments();
   }
 
   return { processedCount, failedCount, documentCount };

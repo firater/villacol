@@ -65,7 +65,7 @@ export function VillaGuestReviewsSection({
 }: Props) {
   return (
     <section aria-labelledby="guest-reviews-heading" className="space-y-8">
-      <header className="max-w-3xl">
+      <header className="w-full">
         <div aria-hidden className="mb-6 h-px w-full bg-stone-300/80" />
         <p className="mb-3 font-sans text-[10px] font-medium uppercase tracking-[0.32em] text-stone-500">
           {copy.eyebrow}
@@ -79,13 +79,13 @@ export function VillaGuestReviewsSection({
       </header>
 
       {reviews.length === 0 ? (
-        <div className="max-w-xl border border-stone-300/90 bg-stone-50/60 px-6 py-8 dark:border-stone-700 dark:bg-stone-950/40">
+        <div className="w-full border border-stone-300/90 bg-stone-50/60 px-6 py-8 dark:border-stone-700 dark:bg-stone-950/40">
           <p className="font-serif text-lg text-stone-700 dark:text-stone-300">
             {copy.empty}
           </p>
         </div>
       ) : (
-        <ul className="grid max-w-3xl gap-6">
+        <ul className="grid w-full gap-6">
           {reviews.map((review, index) => {
             const stayLabel = formatStayRange(
               locale,

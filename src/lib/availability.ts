@@ -150,3 +150,22 @@ export function findNextAvailableWindows(
 
   return windows;
 }
+
+/**
+ * Earliest consecutive bookable stay whose length is at least
+ * `max(desiredNights, min_stay at check-in)` — concierge cards use this.
+ */
+export function findEarliestWindowForDesiredNights(
+  nights: readonly NightRate[],
+  desiredNights: number,
+  options: FindWindowsOptions,
+): AvailabilityWindow | null {
+  if (!Number.isInteger(desiredNights) || desiredNights < 1) return null;
+
+  const run = findEarliestRun(nights, (startIndex) =>
+    Math.max(desiredNights, requiredNightsAt(nights, startIndex, options)),
+  );
+
+  if (run === null) return null;
+  return toWindow("min_stay", nights, run);
+}

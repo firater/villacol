@@ -8,7 +8,7 @@ import {
  */
 export function VillaDetailSkeleton() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
       <div className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-12 xl:grid-cols-[1fr_24rem]">
         <div className="min-w-0 space-y-10">
           <div className="space-y-3">
@@ -34,7 +34,7 @@ export function VillaDetailSkeleton() {
               <div className="h-4 w-28 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
             </div>
           </div>
-          <div className="h-20 w-full max-w-3xl animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
+          <div className="h-20 w-full animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
           <div className="min-h-[6rem] space-y-4">
             <div className="h-7 w-40 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
             <div className="flex flex-wrap gap-2">

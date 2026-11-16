@@ -10,11 +10,16 @@ import {
   buildVillaFilterQuery,
   DEFAULT_PAGE_SIZE,
   normalizeVillaFilters,
+  getFilterStay,
   parseVillaFilters,
   toListingFilters,
   type SearchParamsInput,
   type VillaFilters,
 } from "@/lib/search-params";
+import {
+  applyListingStayQuotes,
+  type ListingStayCardMeta,
+} from "@/lib/listing-stay-quote";
 import { resolvePreferences } from "@/lib/preferences";
 import type { Locale } from "@/lib/locales";
 import { generateVillaListJsonLd } from "@/lib/seo/json-ld";
@@ -64,6 +69,23 @@ export async function VillaListingGrid({
 
   const listing = await getVillaListing(listingFilters);
 
+  const filterStay = getFilterStay(parsed);
+  const guestCount = listingFilters.guests ?? 2;
+
+  let displayRows = listing.rows;
+  let stayMetaByVillaId = new Map<number, ListingStayCardMeta>();
+
+  if (filterStay !== null) {
+    const quoted = await applyListingStayQuotes(listing.rows, {
+      checkIn: filterStay.checkIn,
+      checkOut: filterStay.checkOut,
+      guestCount,
+      locale,
+    });
+    displayRows = quoted.rows;
+    stayMetaByVillaId = quoted.metaByVillaId;
+  }
+
   const rates = buildExchangeRateMap(ratesRows);
   const currency = preferences.currency;
   const pageSize = listingFilters.pageSize ?? DEFAULT_PAGE_SIZE;
@@ -82,6 +104,12 @@ export async function VillaListingGrid({
     perNight: tCard("perNight"),
     specialOffer: tCard("specialOffer"),
     editorsChoice: tCard("editorsChoice"),
+    totalForTrip: (values: { nights: number }) =>
+      tCard("totalForTrip", { nights: values.nights }),
+    selectedStayDates: (values: { range: string }) =>
+      tCard("selectedStayDates", { range: values.range }),
+    minStayBadge: (values: { nights: number }) =>
+      tCard("minStayBadge", { nights: values.nights }),
   };
 
   const baseFilters: VillaFilters = lockOffersOnly
@@ -104,9 +132,9 @@ export async function VillaListingGrid({
   const nextHref = page < totalPages ? pageHref(page + 1) : null;
 
   const listJsonLd =
-    listing.rows.length > 0
+    displayRows.length > 0
       ? generateVillaListJsonLd(
-          listing.rows.map((row) => ({ name: row.title, slug: row.slug })),
+          displayRows.map((row) => ({ name: row.title, slug: row.slug })),
           locale,
           listingPath,
         )
@@ -119,16 +147,25 @@ export async function VillaListingGrid({
         {t("resultCount", { count: listing.total })}
       </p>
 
-      {listing.rows.length === 0 ? (
+      {displayRows.length === 0 ? (
         <p className="mt-8 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 px-6 py-12 text-center text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/40 dark:text-zinc-400">
           {tListing("empty")}
         </p>
       ) : (
         <div className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {listing.rows.map((row) => (
+          {displayRows.map((row) => (
             <VillaCard
               key={row.id}
-              {...mapVillaCardRowToProps(row, locale, currency, rates, cardCopy)}
+              {...mapVillaCardRowToProps(row, locale, currency, rates, cardCopy, {
+                selectedStay:
+                  filterStay !== null
+                    ? {
+                        checkIn: filterStay.checkIn,
+                        checkOut: filterStay.checkOut,
+                        meta: stayMetaByVillaId.get(row.id),
+                      }
+                    : undefined,
+              })}
             />
           ))}
         </div>

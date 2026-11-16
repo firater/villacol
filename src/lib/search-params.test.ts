@@ -241,6 +241,15 @@ describe("toListingFilters", () => {
   it("caps the page size", () => {
     expect(toListingFilters({}, "en", { pageSize: 500 }).pageSize).toBe(48);
   });
+
+  it("passes selected stay dates to the listing query", () => {
+    const listing = toListingFilters(
+      parse("check_in=2026-07-01&check_out=2026-07-08"),
+      "en",
+    );
+    expect(listing.checkIn).toBe("2026-07-01");
+    expect(listing.checkOut).toBe("2026-07-08");
+  });
 });
 
 describe("getFilterStay", () => {

@@ -32,6 +32,9 @@
     "footer": {
       "tagline": "Ausgewählte Villen an der türkischen Mittelmeerküste.",
       "exploreTitle": "Entdecken",
+      "destinationsTitle": "Beliebte Regionen",
+      "categoriesTitle": "Beliebte Kategorien",
+      "columnsNavAria": "Footer-Navigation",
       "colophon": "Villa Journal",
       "intro": "Handverlesene Villen mit Live-Preisen finden, vergleichen und buchen.",
       "socialLabel": "Folgen",
@@ -224,6 +227,9 @@
       "viewVilla": "Ansehen",
       "firstAvailability": "Nächste Verfügbarkeit",
       "priceStartingAt": "Preis ab",
+      "totalForTrip": "Gesamt für {nights, plural, one {# Nacht} other {# Nächte}}",
+      "selectedStayDates": "{range}",
+      "minStayBadge": "Mind. {nights, plural, one {# Nacht} other {# Nächte}}",
       "perNight": "/ Nacht",
       "statGuests": "Gäste",
       "statBedrooms": "Schlafzimmer",
@@ -366,40 +372,67 @@
     }
   },
   "concierge": {
-    "eyebrow": "Kuratierte Villa-Beratung",
+    "eyebrow": "Persönlicher Concierge",
     "title": "Villa finden",
-    "intro": "Drei kurze Fragen — wir schlagen bis zu drei Editor's-Choice-Villen vor.",
-    "progressLabel": "Schritte",
-    "steps": { "group": "Gruppe", "vibe": "Stimmung", "budget": "Budget" },
-    "group": {
-      "heading": "Wer reist mit?",
-      "hint": "Für passende Schlafzimmer und Kapazität.",
-      "couple": "Paar",
-      "family": "Familie",
-      "friends": "Freunde"
+    "intro": "Fünf kurze Fragen — dann eine Shortlist mit Live-Preisen aus unserer Kollektion.",
+    "progressLabel": "Schritt {step} von {total}",
+    "steps": {
+      "where": "Region",
+      "type": "Villentyp",
+      "duration": "Dauer",
+      "guests": "Gäste",
+      "budget": "Budget"
     },
-    "vibe": {
-      "heading": "Welche Stimmung?",
-      "hint": "Entspricht den Merkmalen unserer Redaktion.",
-      "secludedLuxury": "Abgeschiedener Luxus",
-      "closeToTown": "Nah am Ort",
-      "beachfront": "Strandnähe"
+    "where": {
+      "heading": "Wo möchten Sie übernachten?",
+      "hint": "Wählen Sie eine Region oder „Überall“ für die gesamte Küste.",
+      "anywhere": "Überall",
+      "viewAll": "Alle Regionen",
+      "showLess": "Nur Highlights"
+    },
+    "type": {
+      "heading": "Welche Art Villa passt?",
+      "hint": "Redaktionelle Kollektionen — oder „Beliebig“.",
+      "any": "Beliebig",
+      "viewAll": "Alle Kategorien",
+      "showLess": "Nur Highlights"
+    },
+    "duration": {
+      "heading": "Wie lange bleiben Sie?",
+      "hint": "Für Ihre persönliche Zusammenfassung.",
+      "nights": "{count, plural, one {# Nacht} other {# Nächte}}",
+      "decrease": "Weniger Nächte",
+      "increase": "Mehr Nächte"
+    },
+    "guests": {
+      "heading": "Wie viele Gäste?",
+      "hint": "Nur Villen, die Ihre Gruppe aufnehmen.",
+      "count": "{count, plural, one {# Gast} other {# Gäste}}",
+      "decrease": "Weniger Gäste",
+      "increase": "Mehr Gäste"
     },
     "budget": {
-      "heading": "Durchschnittliches Nachtbudget",
-      "hint": "Verglichen mit dem gecachten Durchschnittspreis pro Nacht (EUR, ohne Gebühren).",
-      "upTo200": "≤ 200 € / Nacht",
-      "mid": "200 – 500 € / Nacht",
-      "above500": "> 500 € / Nacht"
+      "heading": "Gesamtbudget?",
+      "hint": "Gesamtaufenthalt in Euro, verglichen mit dem gecachten Preis für die nächsten freien Daten.",
+      "tiers": {
+        "any": "Flexibel",
+        "up_to_2500": "Bis 2.500 €",
+        "up_to_5000": "Bis 5.000 €",
+        "up_to_10000": "Bis 10.000 €",
+        "above_10000": "Ab 10.000 €"
+      }
     },
     "continue": "Weiter",
     "back": "Zurück",
-    "submit": "Meine perfekte Villa finden",
-    "finding": "Kuratiere…",
+    "submit": "Shortlist anzeigen",
     "results": {
-      "heading": "Ihre Auswahl",
-      "subtitle": "Editor's-Choice-Villen nach Ihren Antworten.",
-      "empty": "Keine passenden Editor's-Choice-Villen. Bitte Stimmung oder Budget anpassen.",
+      "eyebrow": "Ihre Shortlist",
+      "headline": "{count, plural, one {Wir haben # passende Villa für Sie} other {Wir haben # passende Villen für Sie}}",
+      "headlineEmpty": "Keine exakte Übereinstimmung — wir erweitern die Suche",
+      "subtitle": "Für {guests, plural, one {# Gast} other {# Gäste}} · {nights, plural, one {# Nacht} other {# Nächte}}",
+      "empty": "Heute keine Treffer. Antworten anpassen oder den Katalog mit denselben Filtern öffnen.",
+      "seeAll": "Alle {count, plural, one {# Villa} other {# Villen}} mit diesen Kriterien",
+      "browseAll": "Alle Villen",
       "startOver": "Neu starten"
     }
   },
@@ -465,6 +498,20 @@
       }
     }
   },
+  "categoryDetail": {
+    "eyebrow": "Kollektion",
+    "descriptionFallback": "Villen für diesen Aufenthaltstyp — mit Live-Preisen ab dem nächsten verfügbaren Datum.",
+    "empty": "Wir ergänzen diese Kollektion. Schauen Sie bald wieder vorbei oder durchstöbern Sie den gesamten Katalog.",
+    "viewAll": "Alle Villen: {category}"
+  },
+  "locationDetail": {
+    "eyebrow": "Reiseziel",
+    "heroSubtitleFallback": "Ein kuratierter Führer zu Villen und Küstenleben an der lykischen Küste.",
+    "featuredHeading": "Ausgewählte Villen",
+    "featuredSubtitle": "Eine Auswahl unserer Lieblingshäuser in {location}.",
+    "featuredEmpty": "Weitere Villen folgen — unten die gesamte Kollektion durchsuchen.",
+    "viewAll": "Alle Villen in {location}"
+  },
   "villaDetail": {
     "capacity": "Kapazität",
     "bedrooms": "Schlafzimmer",
@@ -519,6 +566,11 @@
       "grandTotal": "Geschätzte Gesamtsumme",
       "footnote": "{nights, plural, one {# Nacht} other {# Nächte}} · {guests, plural, one {# Gast} other {# Gäste}}",
       "bookNow": "Reservieren"
+    },
+    "floatingWidget": {
+      "selectDatesPrompt": "Daten wählen, um die Verfügbarkeit zu prüfen",
+      "selectDates": "Daten wählen",
+      "totalSummary": "{range} · Gesamt: {total}"
     }
   },
   "booking": {

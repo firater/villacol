@@ -288,6 +288,67 @@ export function generateHomeVillaListJsonLd(
   });
 }
 
+export type LocationJsonLdInput = {
+  name: string;
+  description: string | null;
+  pageUrl: string;
+  latitude: number | null;
+  longitude: number | null;
+  imageUrl: string | null;
+};
+
+export function generateLocationJsonLd(
+  input: LocationJsonLdInput,
+): JsonLdGraph {
+  const node: Record<string, unknown> = {
+    "@type": "TouristDestination",
+    "@id": `${input.pageUrl}#destination`,
+    name: input.name,
+    url: input.pageUrl,
+  };
+
+  const description = input.description?.trim();
+  if (description) node.description = description;
+
+  if (input.imageUrl) {
+    node.image = input.imageUrl.startsWith("http")
+      ? input.imageUrl
+      : toAbsoluteUrl(input.imageUrl);
+  }
+
+  if (input.latitude !== null && input.longitude !== null) {
+    node.geo = {
+      "@type": "GeoCoordinates",
+      latitude: input.latitude,
+      longitude: input.longitude,
+    };
+  }
+
+  return withContext(node);
+}
+
+export type CategoryJsonLdInput = {
+  name: string;
+  description: string | null;
+  pageUrl: string;
+};
+
+export function generateCategoryJsonLd(
+  input: CategoryJsonLdInput,
+): JsonLdGraph {
+  const node: Record<string, unknown> = {
+    "@type": "CollectionPage",
+    "@id": `${input.pageUrl}#category`,
+    name: input.name,
+    url: input.pageUrl,
+  };
+
+  const description = input.description?.trim();
+  if (description) node.description = description;
+
+  return withContext(node);
+}
+
 export function generateWebsiteJsonLd(locale: Locale): JsonLdGraph {
   const siteUrl = absoluteHomeUrl(locale);
   const searchTarget = absoluteLocalizedUrl(locale, "/villas").concat(

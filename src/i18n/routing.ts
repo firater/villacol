@@ -53,6 +53,11 @@ export const pathnames = {
     de: "/villa-finden",
     ru: "/podobrat-villu",
   },
+  "/find-villa/results": {
+    en: "/find-villa/results",
+    de: "/villa-finden/ergebnisse",
+    ru: "/podobrat-villu/rezultaty",
+  },
 
   // Landing pages.
   "/locations/[slug]": {
