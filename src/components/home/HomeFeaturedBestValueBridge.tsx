@@ -88,7 +88,13 @@ export async function HomeFeaturedBestValueBridge({
                 {t("title")}
               </p>
               <p className="mx-auto mt-2 max-w-xl text-sm font-light leading-relaxed text-stone-600 sm:mx-0">
-                {t("body")}
+                {preset.messageKey === "featuredBestValueBridge"
+                  ? t.rich("body", {
+                      bold: (chunks) => (
+                        <span className="font-bold text-stone-800">{chunks}</span>
+                      ),
+                    })
+                  : t("body")}
               </p>
             </div>
 

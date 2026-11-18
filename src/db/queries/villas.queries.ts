@@ -36,6 +36,7 @@ import {
 import type { GuestPolicy } from "@/db/tables/enums";
 import { localize, type Locale, type LocalizedText } from "@/lib/locales";
 import { villaBookableForStaySql } from "@/lib/listing-stay-availability";
+import { listingMinStaySortTierSql } from "@/lib/listing-stay-sort";
 import type { DateString } from "@/lib/dates";
 
 /** Sort keys aligned with the universal English `sort` query param (Phase 8). */
@@ -290,6 +291,14 @@ export async function getVillaListing(
   const villaIds = filters.villaIds?.filter(Number.isInteger) ?? [];
 
   const sort: VillaListingSort = filters.sort ?? "default";
+  const stayDates =
+    filters.checkIn !== undefined && filters.checkOut !== undefined
+      ? {
+          checkIn: filters.checkIn as DateString,
+          checkOut: filters.checkOut as DateString,
+        }
+      : null;
+
   const orderByClause =
     sort === "price_asc"
       ? asc(villaPriceCache.discountedTotalCents)
@@ -303,6 +312,11 @@ export async function getVillaListing(
               // array to rank against.
               sql`array_position(ARRAY[${sql.raw(villaIds.join(","))}]::int[], ${villas.id})`
             : asc(villas.orderValue);
+
+  const minStaySortTier =
+    stayDates !== null
+      ? listingMinStaySortTierSql(stayDates.checkIn, stayDates.checkOut)
+      : null;
 
   const [locationId, categoryId, amenityIdList, featureIdList] =
     await Promise.all([
@@ -466,7 +480,11 @@ export async function getVillaListing(
       and(eq(villaImages.villaId, villas.id), eq(villaImages.isMain, true)),
     )
     .where(whereClause)
-    .orderBy(orderByClause, asc(villas.id))
+    .orderBy(
+      ...(minStaySortTier !== null
+        ? [asc(minStaySortTier), orderByClause, asc(villas.id)]
+        : [orderByClause, asc(villas.id)]),
+    )
     .limit(pageSize)
     .offset(offset);
 

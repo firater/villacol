@@ -1,5 +1,10 @@
 import type { ReactNode } from "react";
 
+import {
+  HOME_SECTION_SUBTITLE_CLASS,
+  HOME_SECTION_SUBTITLE_WIDE_CLASS,
+} from "./home-section-subtitle";
+
 const LEADING_GRADIENT_RULE_CLASS =
   "mb-14 h-px w-full bg-gradient-to-r from-stone-300/85 from-0% via-stone-300/45 via-55% to-transparent to-100% lg:mb-16";
 
@@ -55,11 +60,7 @@ export function HomeSectionHeader({
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:gap-16">
           <div className="min-w-0 max-w-2xl">
             {titleCluster}
-            {subtitle ? (
-              <p className="mt-5 max-w-md font-sans text-[15px] leading-[1.65] text-stone-600">
-                {subtitle}
-              </p>
-            ) : null}
+            {subtitle ? <p className={HOME_SECTION_SUBTITLE_CLASS}>{subtitle}</p> : null}
           </div>
           {action ? <div className="shrink-0 lg:pb-1">{action}</div> : null}
         </div>
@@ -80,11 +81,7 @@ export function HomeSectionHeader({
         </h2>
         {action}
       </div>
-      {subtitle ? (
-        <p className="mt-5 max-w-2xl font-sans text-base leading-relaxed text-stone-600 md:text-lg">
-          {subtitle}
-        </p>
-      ) : null}
+      {subtitle ? <p className={HOME_SECTION_SUBTITLE_WIDE_CLASS}>{subtitle}</p> : null}
     </header>
   );
 }

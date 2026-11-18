@@ -92,7 +92,6 @@ export function VillaCard({
   showVillaOfTheDay = false,
   editorRating = null,
   listingSelectedStay = false,
-  hideTripTotalPrice = false,
   minStayBadgeLabel = null,
 }: VillaCardProps) {
   const badgeLabel =
@@ -232,11 +231,6 @@ export function VillaCard({
           className="object-cover"
         />
         {badgeLabel ? <PromoBadge text={badgeLabel} className="left-6 top-6" /> : null}
-        {minStayBadgeLabel ? (
-          <span className="absolute bottom-4 left-6 z-20 rounded-full border border-stone-200/90 bg-white/95 px-3 py-1 text-[10px] font-medium uppercase tracking-wide text-stone-600 shadow-sm backdrop-blur-sm">
-            {minStayBadgeLabel}
-          </span>
-        ) : null}
       </div>
       <div className="flex flex-col px-5 pt-5 pb-5">
         <h3 className="min-h-[3rem] text-base font-black leading-snug text-neutral-900 line-clamp-2">
@@ -248,25 +242,30 @@ export function VillaCard({
         <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} />
         <div className="mt-2.5">
           <p className="text-xs text-neutral-500">{availabilityLabel ?? "\u00A0"}</p>
-          {listingSelectedStay ? (
-            <p className="mt-1 text-xs font-medium text-neutral-600">
-              {hideTripTotalPrice ? "\u00A0" : priceStartingAtLabel}
+          {minStayBadgeLabel ? (
+            <p className="mt-2 text-xs font-normal leading-snug text-red-500 dark:text-red-400/90">
+              {minStayBadgeLabel}
             </p>
-          ) : null}
-          <div className="mt-2 space-y-0.5">
-            {priceWas ? (
-              <p className="text-sm text-neutral-400 line-through">{priceWas}</p>
-            ) : null}
-            <p
-              className="text-lg font-semibold leading-tight text-stone-900"
-              aria-hidden={hideTripTotalPrice}
-            >
-              {hideTripTotalPrice ? "\u00A0" : priceMain}
-            </p>
-            <p className="text-xs text-neutral-500">
-              {listingSelectedStay ? "\u00A0" : (stayLabel ?? "\u00A0")}
-            </p>
-          </div>
+          ) : (
+            <>
+              {listingSelectedStay ? (
+                <p className="mt-1 text-xs font-medium text-neutral-600">
+                  {priceStartingAtLabel}
+                </p>
+              ) : null}
+              <div className="mt-2 space-y-0.5">
+                {priceWas ? (
+                  <p className="text-sm text-neutral-400 line-through">{priceWas}</p>
+                ) : null}
+                <p className="text-lg font-semibold leading-tight text-stone-900">
+                  {priceMain}
+                </p>
+                <p className="text-xs text-neutral-500">
+                  {listingSelectedStay ? "\u00A0" : (stayLabel ?? "\u00A0")}
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </Link>

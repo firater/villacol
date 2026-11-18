@@ -15,6 +15,7 @@ import { formatBusinessLongDate } from "@/lib/dates";
 import type { Locale } from "@/lib/locales";
 
 import { CarouselArrow } from "./CarouselArrow";
+import { HOME_SECTION_SUBTITLE_CLASS } from "./home-section-subtitle";
 import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoryConstants";
 
 export type HomeCategoryCarouselItem = {
@@ -115,7 +116,7 @@ export function HomeCategoriesCarousel({
             <h2 className="font-serif text-[clamp(2.75rem,6.5vw,4.25rem)] font-normal leading-[0.95] tracking-[-0.02em] text-stone-900">
               {heading}
             </h2>
-            <p className="mt-5 max-w-md font-sans text-[15px] leading-[1.65] text-stone-600">{subtitle}</p>
+            <p className={HOME_SECTION_SUBTITLE_CLASS}>{subtitle}</p>
           </div>
 
           <div className="flex items-center gap-3 lg:pb-1">
