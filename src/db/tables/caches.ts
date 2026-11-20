@@ -30,6 +30,9 @@ export type AppliedPromotionSnapshot = {
   displayNameI18n: LocalizedText;
   discountType: DiscountType;
   discountCents: number;
+  /** From the promotion row; labels and tooltips only. */
+  percentBp?: number | null;
+  freeNights?: number | null;
 };
 
 /**

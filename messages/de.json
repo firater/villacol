@@ -243,6 +243,9 @@
       "statBedrooms": "Schlafzimmer",
       "statBathrooms": "Badezimmer",
       "editorScoreLabel": "Redaktionsscore",
+      "editorBadgeLabel": "Redaktion",
+      "editorScorePopoverTitle": "Redaktionsscore",
+      "editorScorePopoverBody": "Kuratiert für Lage, Aussicht und Architektur — keine Gästebewertungen.",
       "guestReviewAria": "{rating} von 5 Sternen",
       "editorScoreAria": "Redaktionsscore: {score} von 10"
     },

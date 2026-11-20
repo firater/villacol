@@ -79,6 +79,9 @@ export async function HomeVillaSection({
   };
 
   const promoEditorScoreLabel = tCard("editorScoreLabel");
+  const promoEditorBadgeLabel = tCard("editorBadgeLabel");
+  const promoEditorScorePopoverTitle = tCard("editorScorePopoverTitle");
+  const promoEditorScorePopoverBody = tCard("editorScorePopoverBody");
 
   return (
     <VillaCarousel
@@ -97,6 +100,9 @@ export async function HomeVillaSection({
           cardLayout,
           carouselDensity,
           promoEditorScoreLabel,
+          promoEditorBadgeLabel,
+          promoEditorScorePopoverTitle,
+          promoEditorScorePopoverBody,
           statLabels:
             cardLayout === "recommended" || carouselDensity === "promo"
               ? {
@@ -122,6 +128,9 @@ function buildVillaCardNode({
   cardLayout,
   carouselDensity,
   promoEditorScoreLabel,
+  promoEditorBadgeLabel,
+  promoEditorScorePopoverTitle,
+  promoEditorScorePopoverBody,
   statLabels,
 }: {
   row: VillaCardRow;
@@ -134,6 +143,9 @@ function buildVillaCardNode({
   cardLayout: VillaCardLayout;
   carouselDensity: "default" | "promo";
   promoEditorScoreLabel: string;
+  promoEditorBadgeLabel: string;
+  promoEditorScorePopoverTitle: string;
+  promoEditorScorePopoverBody: string;
   statLabels?: {
     guests: string;
     bedrooms: string;
@@ -148,6 +160,9 @@ function buildVillaCardNode({
       viewLabel={viewLabel}
       promoStatLabels={statLabels}
       promoEditorScoreLabel={promoEditorScoreLabel}
+      promoEditorBadgeLabel={promoEditorBadgeLabel}
+      promoEditorScorePopoverTitle={promoEditorScorePopoverTitle}
+      promoEditorScorePopoverBody={promoEditorScorePopoverBody}
       promoImageRatingAria={
         carouselDensity === "promo" || cardLayout === "promo"
           ? buildPromoImageRatingAria(row, tCard)

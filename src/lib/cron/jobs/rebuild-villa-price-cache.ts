@@ -68,6 +68,8 @@ function toSnapshot(
       displayNames.get(applied.promotionId) ?? { en: applied.displayName },
     discountType: applied.discountType,
     discountCents: applied.discountCents,
+    percentBp: applied.percentBp,
+    freeNights: applied.freeNights,
   }));
 }
 

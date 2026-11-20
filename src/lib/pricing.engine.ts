@@ -550,6 +550,7 @@ export function calculateQuote(input: PricingInput): PriceQuote {
       discountType: step.discountType,
       discountCents: step.discountCents,
       percentBp: rule.percentBp,
+      freeNights: rule.freeNights,
     };
   });
 

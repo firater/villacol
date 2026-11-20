@@ -106,6 +106,8 @@ function toPromotionSnapshots(
       displayNameI18n,
       discountType: applied.discountType,
       discountCents: applied.discountCents,
+      percentBp: applied.percentBp,
+      freeNights: applied.freeNights,
     };
   });
 }

@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { Bath, BedDouble, Gem, Star, Users, type LucideIcon } from "lucide-react";
+import { Bath, BedDouble, Star, Users, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
 import { VillaPromoOfTheDayBadge } from "@/components/villa/VillaPromoOfTheDayBadge";
 import type { PromotionBadgeItem } from "@/lib/promo-badge-labels";
+import { PromoEditorRatingBadge } from "@/components/villa/PromoEditorRatingBadge";
 import { PromoPromotionPills } from "@/components/villa/PromoPromotionPills";
 import { formatPromoCardScore } from "@/lib/promo-card-rating";
 
@@ -44,8 +45,11 @@ export type VillaCardProps = {
     bedrooms: string;
     bathrooms: string;
   };
-  /** Promo image overlay: editor label (sr-only) and precomputed aria (server). */
+  /** Promo image overlay: editor label (sr-only), badge text, and precomputed aria (server). */
   promoEditorScoreLabel?: string;
+  promoEditorBadgeLabel?: string;
+  promoEditorScorePopoverTitle?: string;
+  promoEditorScorePopoverBody?: string;
   promoImageRatingAria?: string | null;
   /** Promo list card: show “category of the day” pill on the image (e.g. rail index === 1). */
   showVillaOfTheDay?: boolean;
@@ -62,6 +66,11 @@ export type VillaCardProps = {
 };
 
 const DEFAULT_PROMO_EDITOR_SCORE_LABEL = "Editor score";
+const DEFAULT_PROMO_EDITOR_BADGE_LABEL = "Editor";
+const DEFAULT_PROMO_EDITOR_POPOVER = {
+  title: "Editor score",
+  body: "Curated for location, views, and architecture — not guest reviews.",
+} as const;
 
 export function VillaCard({
   slug,
@@ -92,6 +101,9 @@ export function VillaCard({
   viewLabel = "View",
   promoStatLabels,
   promoEditorScoreLabel = DEFAULT_PROMO_EDITOR_SCORE_LABEL,
+  promoEditorBadgeLabel = DEFAULT_PROMO_EDITOR_BADGE_LABEL,
+  promoEditorScorePopoverTitle = DEFAULT_PROMO_EDITOR_POPOVER.title,
+  promoEditorScorePopoverBody = DEFAULT_PROMO_EDITOR_POPOVER.body,
   promoImageRatingAria = null,
   showVillaOfTheDay = false,
   editorRating = null,
@@ -128,6 +140,8 @@ export function VillaCard({
             savingsFormatted: null,
             savingsAmountFormatted: null,
             percentageLabel: null,
+            percentBp: null,
+            freeNights: null,
           }));
 
     const promoLocation = location ?? "Kalkan";
@@ -152,6 +166,9 @@ export function VillaCard({
           {showVillaOfTheDay ? <VillaPromoOfTheDayBadge /> : null}
           <PromoImageRatingOverlay
             editorScoreLabel={promoEditorScoreLabel}
+            editorBadgeLabel={promoEditorBadgeLabel}
+            editorScorePopoverTitle={promoEditorScorePopoverTitle}
+            editorScorePopoverBody={promoEditorScorePopoverBody}
             imageRatingAria={promoImageRatingAria}
             editorRating={editorRating ?? null}
             guestReviewCount={guestReviewCount}
@@ -333,12 +350,18 @@ function StatsRow({
 
 function PromoImageRatingOverlay({
   editorScoreLabel,
+  editorBadgeLabel,
+  editorScorePopoverTitle,
+  editorScorePopoverBody,
   imageRatingAria,
   editorRating,
   guestReviewCount,
   guestReviewAverage,
 }: {
   editorScoreLabel: string;
+  editorBadgeLabel: string;
+  editorScorePopoverTitle: string;
+  editorScorePopoverBody: string;
   imageRatingAria: string | null;
   editorRating: number | null;
   guestReviewCount: number;
@@ -381,39 +404,37 @@ function PromoImageRatingOverlay({
   }
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-end justify-start p-2.5 md:p-3">
-      <div
-        className="inline-flex items-center gap-1 rounded-sm bg-white/92 px-2 py-1 shadow-sm backdrop-blur-[2px]"
-        aria-label={imageRatingAria ?? undefined}
-      >
-        <Gem
-          className="size-3.5 shrink-0 fill-amber-400/90 text-amber-500"
-          strokeWidth={1.75}
-          aria-hidden
-        />
-        <span className="font-sans text-[11px] font-bold tracking-tight text-stone-900">
-          {editorScore}
-          <span className="font-semibold text-stone-600">/10</span>
-        </span>
-        <span className="sr-only">{editorScoreLabel}</span>
-      </div>
-    </div>
+    <PromoEditorRatingBadge
+      editorBadgeLabel={editorBadgeLabel}
+      editorScore={editorScore}
+      editorScoreLabel={editorScoreLabel}
+      imageRatingAria={imageRatingAria}
+      popoverTitle={editorScorePopoverTitle}
+      popoverBody={editorScorePopoverBody}
+    />
   );
 }
 
 function PromoStatIconItem({
   icon: Icon,
   value,
+  suffixLabel,
   ariaLabel,
 }: {
   icon: LucideIcon;
   value: number;
+  suffixLabel?: string;
   ariaLabel: string;
 }) {
   return (
     <div className="flex items-center gap-1" aria-label={ariaLabel}>
       <Icon className="size-3.5 shrink-0 text-stone-400" strokeWidth={1.75} aria-hidden />
-      <span className="text-[11px] font-semibold text-stone-700">{value}</span>
+      <span className="text-[11px] font-semibold text-stone-700">
+        {value}
+        {suffixLabel ? (
+          <span className="font-normal text-stone-400"> {suffixLabel}</span>
+        ) : null}
+      </span>
     </div>
   );
 }
@@ -437,14 +458,25 @@ function PromoStatsTwoRow({
 
   if (iconStyle) {
     return (
-      <div className="flex flex-col gap-1.5">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-          <PromoStatIconItem icon={Users} value={capacity} ariaLabel={guestsLabel} />
-          <PromoStatIconItem icon={BedDouble} value={bedrooms} ariaLabel={bedroomsLabel} />
-        </div>
-        <div className="flex items-center">
-          <PromoStatIconItem icon={Bath} value={bathrooms} ariaLabel={bathroomsLabel} />
-        </div>
+      <div className="grid grid-cols-2 items-center justify-items-start gap-x-4 gap-y-2">
+        <PromoStatIconItem
+          icon={Users}
+          value={capacity}
+          suffixLabel={promoStatLabels.guests}
+          ariaLabel={guestsLabel}
+        />
+        <PromoStatIconItem
+          icon={BedDouble}
+          value={bedrooms}
+          suffixLabel={promoStatLabels.bedrooms}
+          ariaLabel={bedroomsLabel}
+        />
+        <PromoStatIconItem
+          icon={Bath}
+          value={bathrooms}
+          suffixLabel={promoStatLabels.bathrooms}
+          ariaLabel={bathroomsLabel}
+        />
       </div>
     );
   }
@@ -545,10 +577,10 @@ function PromoCardBody({
             {priceWas ? `, ${priceWas}` : ""}
           </p>
           <p
-            className={`mb-0.5 font-serif tracking-wide ${
+            className={`tracking-wide ${
               cacheStayRangeLabel
-                ? "text-[15px] font-normal text-stone-500"
-                : "text-xs font-normal text-stone-500"
+                ? "mb-1 font-serif text-xs font-normal text-stone-800"
+                : "mb-0.5 font-serif text-xs font-normal text-stone-500"
             }`}
           >
             {cacheStayRangeLabel ? (
@@ -570,7 +602,7 @@ function PromoCardBody({
             {displayNightly} {perNightLabel}
           </p>
           {priceWas ? (
-            <p className="mt-0.5 text-xs font-normal text-stone-500 line-through">{priceWas}</p>
+            <p className="mt-2 text-[10px] font-normal text-stone-400 line-through">{priceWas}</p>
           ) : null}
         </div>
       </div>

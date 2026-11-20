@@ -169,6 +169,7 @@ export type AppliedPromotion = {
   discountCents: Cents;
   /** From the promotion row; used for guest-facing labels only. */
   percentBp: number | null;
+  freeNights: number | null;
 };
 
 /**

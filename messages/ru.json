@@ -243,6 +243,9 @@
       "statBedrooms": "Спален",
       "statBathrooms": "Ванных",
       "editorScoreLabel": "Оценка редакции",
+      "editorBadgeLabel": "Редакция",
+      "editorScorePopoverTitle": "Оценка редакции",
+      "editorScorePopoverBody": "Курируется по локации, видам и архитектуре — не по отзывам гостей.",
       "guestReviewAria": "{rating} из 5 звёзд",
       "editorScoreAria": "Оценка редакции: {score} из 10"
     },

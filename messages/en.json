@@ -252,6 +252,9 @@
       "statBedrooms": "Bedrooms",
       "statBathrooms": "Bathrooms",
       "editorScoreLabel": "Editor score",
+      "editorBadgeLabel": "Editor",
+      "editorScorePopoverTitle": "Editor score",
+      "editorScorePopoverBody": "Curated for location, views, and architecture — not guest reviews.",
       "guestReviewAria": "{rating} out of 5 stars",
       "editorScoreAria": "Editor score: {score} out of 10"
     },
