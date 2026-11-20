@@ -140,7 +140,7 @@
       },
       "findMyVillaBridge": {
         "kicker": "Villa concierge",
-        "title": "Find your villa in five steps",
+        "title": "Find your villa in few steps",
         "body": "Live availability, real prices — applied promotions within seconds!",
         "cta": "Start villa finder"
       },
@@ -219,7 +219,7 @@
         "title": "Found a better rate?",
         "bodyLead": "Send us a quote from another agency for the same villa, dates, and inclusions.",
         "bodyReimburseLine": "If their price is lower than ours, we will reimburse the difference.",
-        "bodyBeatLine": "When we can, we will try to beat the competitor's price.",
+        "bodyBeatLine": "When we can, <bold>we will try to beat the competitor's price.</bold>",
         "guarantee": "The best available price on any villa in our collection, summer or winter — guaranteed.",
         "whatsapp": "WhatsApp",
         "whatsappUrl": "https://wa.me/905551234567",
@@ -774,6 +774,7 @@
       "successTitle": "Thank you",
       "successBody": "Our team will get back to you shortly — usually within one working day.",
       "subjects": {
+        "priceMatch": "Claim your price match",
         "general": "General enquiry",
         "booking": "Booking a villa",
         "longStay": "Long stay",

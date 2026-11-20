@@ -74,7 +74,7 @@ export async function WhyUsSection() {
         })}
       </ul>
 
-      <div className="mx-auto mt-14 max-w-xl border border-stone-300/80 bg-stone-50/60 px-8 py-8 text-center lg:mt-16 lg:px-10 lg:py-9">
+      <div className="mx-auto mt-14 max-w-xl border border-stone-200/80 bg-stone-50/40 px-8 py-8 text-center lg:mt-16 lg:px-10 lg:py-9">
         <p className="font-serif text-[clamp(1.25rem,2.5vw,1.5rem)] font-normal text-stone-900">
           {t("trustPillTitle")}
         </p>

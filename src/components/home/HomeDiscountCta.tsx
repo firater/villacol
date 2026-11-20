@@ -24,7 +24,11 @@ export async function HomeDiscountCta() {
               <p className="mt-5 text-[clamp(1.1rem,2.25vw,1.42rem)] font-normal leading-[1.65] lg:mt-6">
                 {t("bodyReimburseLine")}
                 <br />
-                {t("bodyBeatLine")}
+                {t.rich("bodyBeatLine", {
+                  bold: (chunks) => (
+                    <span className="font-semibold text-stone-900">{chunks}</span>
+                  ),
+                })}
               </p>
             </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">

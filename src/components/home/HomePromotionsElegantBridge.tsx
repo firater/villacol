@@ -3,6 +3,11 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/i18n/navigation";
 
+import {
+  homeViewAllLinkArrowClass,
+  homeViewAllLinkClass,
+} from "@/components/home/homeViewAllLinkClass";
+
 const COLLAGE_IMAGES = ["/smr4.webp", "/smr3.jpg", "/smr9.jpg"] as const;
 
 const COLLAGE_OFFSETS = ["0px", "1.35rem", "2.5rem"] as const;
@@ -12,7 +17,7 @@ export async function HomePromotionsElegantBridge() {
   const titleId = "home-promotions-elegant-bridge-title";
 
   return (
-    <section className="w-full bg-white" aria-labelledby={titleId}>
+    <section className="my-12 w-full bg-white lg:my-16" aria-labelledby={titleId}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative border-y border-stone-200/80 py-4 lg:py-5">
           <div
@@ -57,15 +62,9 @@ export async function HomePromotionsElegantBridge() {
               </p>
             </div>
 
-            <Link
-              href="/villa-offers"
-              className="group shrink-0 font-sans text-[10px] font-semibold uppercase tracking-[0.24em] text-stone-800 underline-offset-[5px] transition hover:text-brand hover:underline"
-            >
+            <Link href="/villa-offers" className={homeViewAllLinkClass}>
               {t("cta")}
-              <span
-                aria-hidden
-                className="ml-1.5 text-[11px] font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
-              >
+              <span aria-hidden className={homeViewAllLinkArrowClass}>
                 →
               </span>
             </Link>

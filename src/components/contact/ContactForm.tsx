@@ -7,6 +7,7 @@ import { submitContactForm } from "@/actions/public/contact.actions";
 import type { Locale } from "@/lib/locales";
 
 const SUBJECT_KEYS = [
+  "priceMatch",
   "general",
   "booking",
   "longStay",

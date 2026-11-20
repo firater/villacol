@@ -51,7 +51,7 @@ export async function HomeFeaturedBestValueBridge({
 
   const ctaClassName =
     preset.messageKey === "findMyVillaBridge"
-      ? "group inline-flex items-center gap-2 border border-orange-500 px-5 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-orange-600 transition hover:border-orange-600 hover:bg-orange-500 hover:text-white"
+      ? "group inline-flex items-center gap-2 border border-brand bg-brand px-5 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-white transition hover:border-brand-dark hover:bg-brand-dark"
       : "group inline-flex items-center gap-2 border border-stone-900 px-5 py-2.5 font-sans text-[10px] font-semibold uppercase tracking-[0.26em] text-stone-900 transition hover:bg-stone-900 hover:text-white";
 
   const shellClassName = embedded

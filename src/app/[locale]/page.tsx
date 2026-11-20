@@ -17,6 +17,10 @@ import { HomeBestValueFallback } from "@/components/home/HomeBestValueFallback";
 import { HomeBestValueSection } from "@/components/home/HomeBestValueSection";
 import { HomeFeaturedBestValueBridge } from "@/components/home/HomeFeaturedBestValueBridge";
 import { HomePromotionsElegantBridge } from "@/components/home/HomePromotionsElegantBridge";
+import {
+  homeViewAllLinkArrowClass,
+  homeViewAllLinkClass,
+} from "@/components/home/homeViewAllLinkClass";
 import { HomePageVillaItemListJsonLd } from "@/components/home/HomePageVillaItemListJsonLd";
 import { HomePromoOffersSection } from "@/components/home/HomePromoOffersSection";
 import { WhyUsSection } from "@/components/home/WhyUsSection";
@@ -60,15 +64,9 @@ export default async function Home() {
               title={t("offersHeading")}
               subtitle={t("offersSubtitle")}
               action={
-                <Link
-                  href="/villa-offers"
-                  className="group inline-flex shrink-0 items-center gap-2 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-900 underline-offset-4 transition hover:text-brand hover:underline"
-                >
+                <Link href="/villa-offers" className={homeViewAllLinkClass}>
                   {t("viewAllOffers")}
-                  <span
-                    aria-hidden
-                    className="text-xs font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
-                  >
+                  <span aria-hidden className={homeViewAllLinkArrowClass}>
                     →
                   </span>
                 </Link>
@@ -92,15 +90,9 @@ export default async function Home() {
               title={t("featuredHeading")}
               subtitle={t("featuredSubtitle")}
               action={
-                <Link
-                  href="/villas"
-                  className="group inline-flex shrink-0 items-center gap-2 font-sans text-[11px] font-semibold uppercase tracking-[0.22em] text-stone-900 underline-offset-4 transition hover:text-brand hover:underline"
-                >
+                <Link href="/villas" className={homeViewAllLinkClass}>
                   {t("viewAllVillas")}
-                  <span
-                    aria-hidden
-                    className="text-xs font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
-                  >
+                  <span aria-hidden className={homeViewAllLinkArrowClass}>
                     →
                   </span>
                 </Link>

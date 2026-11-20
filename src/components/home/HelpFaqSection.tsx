@@ -1,11 +1,12 @@
 import { getTranslations } from "next-intl/server";
 
-import { Link } from "@/i18n/navigation";
-
 const FAQ_KEYS = ["booking", "payment", "cancellation", "concierge"] as const;
 
 export async function HelpFaqSection() {
-  const t = await getTranslations("layout.home.help");
+  const [t, tDiscount] = await Promise.all([
+    getTranslations("layout.home.help"),
+    getTranslations("layout.home.discountCta"),
+  ]);
 
   return (
     <div id="help" className="scroll-mt-28 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -20,12 +21,14 @@ export async function HelpFaqSection() {
           <p className="mt-5 font-sans text-sm leading-[1.75] text-stone-300 md:text-[15px]">
             {t("body")}
           </p>
-          <Link
-            href="/find-villa"
+          <a
+            href={tDiscount("whatsappUrl")}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-8 inline-flex items-center justify-center bg-white px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-950 transition-colors hover:bg-stone-100"
           >
             {t("cta")}
-          </Link>
+          </a>
           <p className="mt-8 border-t border-white/15 pt-6 font-sans text-[10px] font-semibold uppercase tracking-[0.22em] text-stone-500">
             {t("responseNote")}
           </p>
@@ -54,10 +57,11 @@ export async function HelpFaqSection() {
                     </span>
                   </div>
                   <span
-                    className="flex size-9 shrink-0 items-center justify-center border border-stone-300/90 text-stone-500 transition-colors group-open:border-stone-900 group-open:bg-stone-900 group-open:text-white"
+                    className="relative flex size-9 shrink-0 items-center justify-center border border-stone-300/90 text-stone-500 transition-colors group-open:border-stone-900 group-open:bg-stone-900 group-open:text-white"
                     aria-hidden
                   >
-                    <FaqToggleIcon className="transition-transform duration-300 group-open:rotate-45" />
+                    <FaqPlusIcon className="absolute opacity-100 transition-opacity duration-200 ease-out group-open:opacity-0" />
+                    <FaqCloseIcon className="absolute opacity-0 transition-opacity duration-200 ease-out group-open:opacity-100" />
                   </span>
                 </summary>
                 <div className="pb-7 pe-4 ps-10 sm:pe-14">
@@ -74,10 +78,33 @@ export async function HelpFaqSection() {
   );
 }
 
-function FaqToggleIcon({ className }: { className?: string }) {
+function FaqPlusIcon({ className }: { className?: string }) {
   return (
-    <svg className={`size-4 ${className ?? ""}`} viewBox="0 0 16 16" fill="none" aria-hidden>
+    <svg
+      className={`size-4 ${className ?? ""}`}
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+    >
       <path d="M8 3.5v9M3.5 8h9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FaqCloseIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={`size-4 ${className ?? ""}`}
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M4.25 4.25l7.5 7.5M11.75 4.25l-7.5 7.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
