@@ -33,12 +33,14 @@ import {
   villas,
   villaTranslations,
   guestReviews,
+  villaPromotions,
 } from "@/db/schema";
 import type { GuestPolicy } from "@/db/tables/enums";
 import { localize, type Locale, type LocalizedText } from "@/lib/locales";
 import { villaBookableForStaySql } from "@/lib/listing-stay-availability";
 import { listingMinStaySortTierSql } from "@/lib/listing-stay-sort";
-import type { DateString } from "@/lib/dates";
+import { getBusinessToday, type DateString } from "@/lib/dates";
+import { resolveCotdListingContext } from "@/lib/category-of-the-day";
 
 /** Sort keys aligned with the universal English `sort` query param (Phase 8). */
 export type VillaListingSort =
@@ -113,6 +115,7 @@ export type VillaCardRow = {
   editorRating: number | null;
   guestReviewCount: number;
   guestReviewAverage: number | null;
+  isCategoryOfTheDay: boolean;
 };
 
 export type VillaDetailRow = {
@@ -280,7 +283,9 @@ export async function getVillaListing(
   cacheLife("hours");
   // Listings read `villa_price_cache`, so the nightly rebuild invalidates them
   // through `villa-price-cache` without having to touch every villa tag.
-  cacheTag("villas", "villa-price-cache");
+  cacheTag("villas", "villa-price-cache", "category-of-the-day");
+
+  const cotdContext = await resolveCotdListingContext(getBusinessToday());
 
   const page = Math.max(1, filters.page ?? 1);
   const pageSize = Math.min(48, Math.max(1, filters.pageSize ?? 24));
@@ -474,6 +479,20 @@ export async function getVillaListing(
         WHERE ${guestReviews.villaId} = ${villas.id}
           AND ${guestReviews.isPublished} = true
       )`,
+      isCategoryOfTheDay:
+        cotdContext !== null
+          ? sql<boolean>`(
+              EXISTS (
+                SELECT 1
+                FROM ${villaCategories} vc
+                INNER JOIN ${villaPromotions} vp
+                  ON vp.villa_id = vc.villa_id
+                 AND vp.promotion_id = ${cotdContext.promotionId}
+                WHERE vc.villa_id = ${villas.id}
+                  AND vc.category_id = ${cotdContext.categoryId}
+              )
+            )`
+          : sql<boolean>`false`,
     })
     .from(villas)
     .innerJoin(
@@ -523,6 +542,7 @@ export async function getVillaListing(
       appliedPromotions: row.appliedPromotions ?? [],
       guestReviewCount: Number(row.guestReviewCount) || 0,
       guestReviewAverage: parseGuestReviewAverage(row.guestReviewAverage),
+      isCategoryOfTheDay: Boolean(row.isCategoryOfTheDay),
     })),
   };
 }

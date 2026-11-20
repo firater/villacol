@@ -13,6 +13,8 @@ import {
   villaPriceCache,
   villas,
 } from "@/db/schema";
+import { getBusinessToday } from "@/lib/dates";
+import { getCategoryOfTheDay } from "@/lib/category-of-the-day";
 import type { Locale } from "@/lib/locales";
 
 const PLACEHOLDER_CATEGORY_IMAGE =
@@ -25,6 +27,7 @@ export type HomeCategoryCarouselRow = {
   villaCount: number;
   startingFromEurCents: number | null;
   isGoodDeal: boolean;
+  isCategoryOfTheDay: boolean;
 };
 
 export type HomeEditorsChoiceSummary = {
@@ -44,7 +47,9 @@ export async function getHomeCategoriesCarouselData(
 ): Promise<HomeCategoriesCarouselData> {
   "use cache";
   cacheLife("hours");
-  cacheTag("taxonomy", "villas", "villa-price-cache");
+  cacheTag("taxonomy", "villas", "villa-price-cache", "category-of-the-day");
+
+  const cotd = await getCategoryOfTheDay(getBusinessToday());
 
   const categoryMeta = await db
     .select({
@@ -146,6 +151,7 @@ export async function getHomeCategoriesCarouselData(
       villaCount: stats?.villaCount ?? 0,
       startingFromEurCents: stats?.minNightlyCents ?? null,
       isGoodDeal: dealByCategoryId.get(meta.categoryId) ?? false,
+      isCategoryOfTheDay: meta.categoryId === cotd.id,
     };
   });
 

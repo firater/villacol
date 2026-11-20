@@ -194,5 +194,6 @@ export function mapVillaCardRowToProps(
     editorRating: row.editorRating,
     guestReviewCount: row.guestReviewCount,
     guestReviewAverage: row.guestReviewAverage,
+    isCategoryOfTheDay: row.isCategoryOfTheDay,
   };
 }

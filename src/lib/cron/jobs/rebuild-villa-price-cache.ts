@@ -28,6 +28,8 @@ import {
   type PricingContext,
 } from "@/lib/pricing.types";
 
+import { applyCategoryOfTheDay } from "@/lib/category-of-the-day";
+
 import type { CronJobResult } from "../types";
 
 /** 18 months: long enough to cover next season's bookings. */
@@ -291,9 +293,19 @@ export async function rebuildVillaPriceCache(
   };
 }
 
-/** Registry entry: a full nightly sweep. */
+/** Registry entry: CotD links first, then full price-cache sweep. */
 export async function dailyRebuildJob(context: {
   today: DateString;
 }): Promise<CronJobResult> {
-  return rebuildVillaPriceCache(undefined, { today: context.today });
+  const cotd = await applyCategoryOfTheDay(context.today);
+  const cache = await rebuildVillaPriceCache(undefined, { today: context.today });
+
+  return {
+    processedCount: cotd.processedCount + cache.processedCount,
+    failedCount: cache.failedCount,
+    payload: {
+      categoryOfTheDay: cotd.payload,
+      priceCache: cache.payload,
+    },
+  };
 }

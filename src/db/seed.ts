@@ -737,27 +737,18 @@ const PROMOTION_MATRIX: SeedPromotion[] = [
     isStackable: true,
     isActive: true,
   },
-  // ---- commission_waiver ----
-  /**
-   * Direct booking. Coupon-triggered on purpose: an always-on waiver attached to
-   * a seeded villa would override that villa's other promotions in the cache and
-   * flatten the fixtures the drift check reads. Behind a code it stays inert
-   * until a quote supplies `DIRECT20`, which is exactly the override to demo.
-   *
-   * `percentBp` is omitted, so the waiver tracks `COMMISSION_RATE_BP` (20%).
-   */
+  // ---- commission_waiver (category of the day — linked only by cron) ----
   {
-    name: "Commission waiver · coupon · DIRECT20",
+    name: "Category of the Day · always · 20%",
     displayNameI18n: {
-      en: "Book direct, we waive our commission",
-      de: "Direkt buchen — wir verzichten auf unsere Provision",
-      ru: "Бронируйте напрямую — мы не берём комиссию",
+      en: "Category of the day — 20% commission waived",
+      de: "Kategorie des Tages — 20 % Provision erlassen",
+      ru: "Категория дня — комиссия 20% не взимается",
     },
     discountType: "commission_waiver",
-    triggerType: "coupon",
-    code: "DIRECT20",
-    priorityOrder: 5,
-    // Non-stackable: the waiver replaces every other discount, wherever it sorts.
+    triggerType: "always",
+    percentBp: 2_000,
+    priorityOrder: -1_000,
     isStackable: false,
     isActive: true,
   },
@@ -823,9 +814,6 @@ const VILLA_PROMOTION_LINKS: Record<string, string[]> = {
     "Percentage · coupon · WELCOME8",
     "Free days · coupon · FREENIGHT",
     "Percentage · exit intent · STAY7",
-    // Quoting VS-003 with `DIRECT20` is the one place the non-stackable waiver
-    // beats a coupon that would otherwise apply.
-    "Commission waiver · coupon · DIRECT20",
   ],
 };
 

@@ -45,6 +45,7 @@ export async function HomeCategoriesSection({ locale }: Props) {
     villaCount: category.villaCount,
     priceFormatted: formatFromEur(category.startingFromEurCents),
     isGoodDeal: category.isGoodDeal,
+    isCategoryOfTheDay: category.isCategoryOfTheDay,
   }));
 
   return (

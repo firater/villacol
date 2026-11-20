@@ -88,15 +88,10 @@ export function PromoOffersRail({ items, carouselLabel, sectionEmptyLabel }: Pro
           <VillaCarousel
             label={carouselLabel}
             density="promo"
-            items={filtered.map((item, index) => ({
+            items={filtered.map((item) => ({
               key: item.key,
               node: (
-                <VillaCard
-                  layout="promo"
-                  borderless
-                  showVillaOfTheDay={index === 1}
-                  {...item.card}
-                />
+                <VillaCard layout="promo" borderless {...item.card} />
               ),
             }))}
           />

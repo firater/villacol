@@ -51,7 +51,9 @@ export type VillaCardProps = {
   promoEditorScorePopoverTitle?: string;
   promoEditorScorePopoverBody?: string;
   promoImageRatingAria?: string | null;
-  /** Promo list card: show “category of the day” pill on the image (e.g. rail index === 1). */
+  /** Promo list card: today's category waiver — badge on the image. */
+  isCategoryOfTheDay?: boolean;
+  /** @deprecated Use `isCategoryOfTheDay` from listing data. */
   showVillaOfTheDay?: boolean;
   /** From `villas.editor_rating`; shown on promo image when there are no guest reviews. */
   editorRating?: number | null;
@@ -105,6 +107,7 @@ export function VillaCard({
   promoEditorScorePopoverTitle = DEFAULT_PROMO_EDITOR_POPOVER.title,
   promoEditorScorePopoverBody = DEFAULT_PROMO_EDITOR_POPOVER.body,
   promoImageRatingAria = null,
+  isCategoryOfTheDay = false,
   showVillaOfTheDay = false,
   editorRating = null,
   guestReviewCount = 0,
@@ -163,7 +166,7 @@ export function VillaCard({
             sizes="(max-width: 768px) 100vw, 45vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
-          {showVillaOfTheDay ? <VillaPromoOfTheDayBadge /> : null}
+          {isCategoryOfTheDay || showVillaOfTheDay ? <VillaPromoOfTheDayBadge /> : null}
           <PromoImageRatingOverlay
             editorScoreLabel={promoEditorScoreLabel}
             editorBadgeLabel={promoEditorBadgeLabel}

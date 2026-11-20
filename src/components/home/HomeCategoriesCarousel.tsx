@@ -16,7 +16,6 @@ import type { Locale } from "@/lib/locales";
 
 import { CarouselArrow } from "./CarouselArrow";
 import { HOME_SECTION_SUBTITLE_CLASS } from "./home-section-subtitle";
-import { HOME_CATEGORY_OF_THE_DAY_INDEX } from "./homeCategoryConstants";
 
 export type HomeCategoryCarouselItem = {
   slug: string;
@@ -25,6 +24,7 @@ export type HomeCategoryCarouselItem = {
   villaCount: number;
   priceFormatted: string;
   isGoodDeal: boolean;
+  isCategoryOfTheDay?: boolean;
 };
 
 export type HomeEditorsChoiceCarouselItem = {
@@ -95,10 +95,8 @@ export function HomeCategoriesCarousel({
     railRef.current?.scrollBy({ left: delta, behavior: "smooth" });
   };
 
-  const categoryOfTheDay = categories[HOME_CATEGORY_OF_THE_DAY_INDEX];
-  const categoriesAfterDay = categories.filter(
-    (_, index) => index !== HOME_CATEGORY_OF_THE_DAY_INDEX,
-  );
+  const categoryOfTheDay = categories.find((category) => category.isCategoryOfTheDay);
+  const categoriesAfterDay = categories.filter((category) => !category.isCategoryOfTheDay);
 
   const villaCountBadge = (count: number) => t("categoriesVillaCount", { count });
 

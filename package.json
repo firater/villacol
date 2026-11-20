@@ -16,7 +16,9 @@
     "db:seed": "tsx scripts/seed.ts",
     "db:seed-mock-villas": "tsx scripts/seed-mock-villas.ts",
     "db:studio": "drizzle-kit studio",
-    "create-admin": "tsx scripts/create-admin.ts"
+    "create-admin": "tsx scripts/create-admin.ts",
+    "db:migrate-cotd": "tsx scripts/migrate-cotd-promotion.ts",
+    "cotd:dry-run": "tsx scripts/cotd-dry-run.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.9.0",
