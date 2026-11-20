@@ -24,6 +24,9 @@ export type VillaCardProps = {
   priceStartingAtLabel: string;
   perNightLabel: string;
   firstAvailabilityTitle: string;
+  /** Cached min-stay window as `18 Nov – 25 Nov` (promo price line). */
+  cacheStayRangeLabel?: string | null;
+  availableBeforeDates?: string;
   priceWas: string | null;
   showOfferBadge: boolean;
   offerBadgeLabel: string;
@@ -54,6 +57,8 @@ export type VillaCardProps = {
   listingSelectedStay?: boolean;
   hideTripTotalPrice?: boolean;
   minStayBadgeLabel?: string | null;
+  /** Promo layout: hide the outer card border (home promotions rail). */
+  borderless?: boolean;
 };
 
 const DEFAULT_PROMO_RATING_LABELS = {
@@ -77,6 +82,8 @@ export function VillaCard({
   priceStartingAtLabel,
   perNightLabel,
   firstAvailabilityTitle,
+  cacheStayRangeLabel = null,
+  availableBeforeDates,
   priceWas,
   showOfferBadge,
   offerBadgeLabel,
@@ -93,6 +100,7 @@ export function VillaCard({
   editorRating = null,
   listingSelectedStay = false,
   minStayBadgeLabel = null,
+  borderless = false,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -125,10 +133,14 @@ export function VillaCard({
 
     const promoLocation = location ?? "Kalkan";
 
+    const promoShellClass = borderless
+      ? "group relative flex flex-col overflow-hidden bg-white transition-colors md:flex-row md:items-stretch"
+      : "group relative flex flex-col overflow-hidden border border-stone-200/70 bg-white transition-colors md:flex-row md:items-stretch md:hover:border-stone-300";
+
     return (
       <Link
         href={{ pathname: "/villas/[slug]", params: { slug } }}
-        className="group relative flex flex-col overflow-hidden border border-stone-200/70 bg-white transition-colors md:flex-row md:items-stretch md:hover:border-stone-300"
+        className={promoShellClass}
       >
         <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-neutral-100 md:aspect-auto md:w-[45%] md:max-w-[48%] md:min-h-0 md:self-stretch">
           <Image
@@ -139,23 +151,6 @@ export function VillaCard({
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
           {showVillaOfTheDay ? <VillaPromoOfTheDayBadge /> : null}
-          {availabilityLabel ? (
-            <div
-              className={`absolute left-3 z-20 ${showVillaOfTheDay ? "top-[3.35rem]" : "top-3"}`}
-            >
-              <div className="flex max-w-[min(100%,14rem)] items-center gap-2 border border-stone-200/60 bg-white/95 px-3 py-1.5 shadow-sm backdrop-blur-sm">
-                <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-hidden />
-                <span className="flex min-w-0 flex-col leading-none">
-                  <span className="text-[9px] font-medium uppercase tracking-tighter text-stone-500">
-                    {firstAvailabilityTitle}
-                  </span>
-                  <span className="truncate text-[11px] font-medium text-stone-900">
-                    {availabilityLabel}
-                  </span>
-                </span>
-              </div>
-            </div>
-          ) : null}
         </div>
         <PromoCardBody
           title={title}
@@ -168,6 +163,8 @@ export function VillaCard({
           promoRatingLabels={promoRatingLabels ?? DEFAULT_PROMO_RATING_LABELS}
           editorRating={editorRating ?? null}
           priceStartingAtLabel={priceStartingAtLabel}
+          cacheStayRangeLabel={cacheStayRangeLabel}
+          availableBeforeDates={availableBeforeDates}
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
           priceWas={priceWas}
@@ -388,6 +385,65 @@ function PromoStatIconItem({
   );
 }
 
+function PromoStatsTwoRow({
+  capacity,
+  bedrooms,
+  bathrooms,
+  promoStatLabels,
+  iconStyle,
+}: {
+  capacity: number;
+  bedrooms: number;
+  bathrooms: number;
+  promoStatLabels: NonNullable<VillaCardProps["promoStatLabels"]>;
+  iconStyle: boolean;
+}) {
+  const guestsLabel = `${capacity} ${promoStatLabels.guests}`;
+  const bedroomsLabel = `${bedrooms} ${promoStatLabels.bedrooms}`;
+  const bathroomsLabel = `${bathrooms} ${promoStatLabels.bathrooms}`;
+
+  if (iconStyle) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+          <PromoStatIconItem icon={Users} value={capacity} ariaLabel={guestsLabel} />
+          <PromoStatIconItem icon={BedDouble} value={bedrooms} ariaLabel={bedroomsLabel} />
+        </div>
+        <div className="flex items-center">
+          <PromoStatIconItem icon={Bath} value={bathrooms} ariaLabel={bathroomsLabel} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2.5 border-y border-neutral-100 py-3">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5">
+        <RecommendedStatItem
+          icon={Users}
+          value={capacity}
+          label={promoStatLabels.guests}
+          ariaLabel={guestsLabel}
+        />
+        <RecommendedStatItem
+          icon={BedDouble}
+          value={bedrooms}
+          label={promoStatLabels.bedrooms}
+          ariaLabel={bedroomsLabel}
+        />
+      </div>
+      <div className="flex items-center">
+        <RecommendedStatItem
+          icon={Bath}
+          value={bathrooms}
+          label={promoStatLabels.bathrooms}
+          ariaLabel={bathroomsLabel}
+        />
+      </div>
+    </div>
+  );
+}
+
 function PromoCardBody({
   title,
   location,
@@ -395,6 +451,8 @@ function PromoCardBody({
   bedrooms,
   bathrooms,
   priceStartingAtLabel,
+  cacheStayRangeLabel,
+  availableBeforeDates,
   displayNightly,
   perNightLabel,
   priceWas,
@@ -415,12 +473,20 @@ function PromoCardBody({
   promoRatingLabels: NonNullable<VillaCardProps["promoRatingLabels"]>;
   editorRating: number | null;
   priceStartingAtLabel: string;
+  cacheStayRangeLabel: string | null;
+  availableBeforeDates?: string;
   displayNightly: string;
   perNightLabel: string;
   priceWas: string | null;
   priceMain: string;
   stayLabel: string | null;
 }) {
+  const promoLeadLabel = cacheStayRangeLabel ?? priceStartingAtLabel;
+  const promoLeadAria =
+    cacheStayRangeLabel !== null
+      ? [availableBeforeDates, cacheStayRangeLabel].filter(Boolean).join(" ")
+      : priceStartingAtLabel;
+
   return (
     <div className="flex min-w-0 flex-1 flex-col px-2 py-4 md:px-3.5 md:py-5 lg:px-4 lg:py-[22px]">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -429,40 +495,41 @@ function PromoCardBody({
       </div>
 
       <div className="mt-2">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-          {promoStatLabels ? (
-            <>
-              <PromoStatIconItem
-                icon={Users}
-                value={capacity}
-                ariaLabel={`${capacity} ${promoStatLabels.guests}`}
-              />
-              <PromoStatIconItem
-                icon={BedDouble}
-                value={bedrooms}
-                ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
-              />
-              <PromoStatIconItem
-                icon={Bath}
-                value={bathrooms}
-                ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
-              />
-            </>
-          ) : (
-            <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} seamless />
-          )}
-        </div>
+        {promoStatLabels ? (
+          <PromoStatsTwoRow
+            capacity={capacity}
+            bedrooms={bedrooms}
+            bathrooms={bathrooms}
+            promoStatLabels={promoStatLabels}
+            iconStyle
+          />
+        ) : (
+          <StatsRow capacity={capacity} bedrooms={bedrooms} bathrooms={bathrooms} seamless />
+        )}
       </div>
 
       <div className="mt-5 flex items-end justify-between gap-4">
         <div className="min-w-0 flex-1 text-left">
           <p className="sr-only">
-            {priceStartingAtLabel} {displayNightly} {perNightLabel}, {priceMain}
+            {promoLeadAria} {displayNightly} {perNightLabel}, {priceMain}
             {stayLabel ? `, ${stayLabel}` : ""}
             {priceWas ? `, ${priceWas}` : ""}
           </p>
-          <p className="mb-0.5 font-serif text-[10px] font-normal tracking-wide text-stone-400">
-            {priceStartingAtLabel}
+          <p
+            className={`mb-0.5 font-serif tracking-wide ${
+              cacheStayRangeLabel
+                ? "text-[15px] font-normal text-stone-500"
+                : "text-xs font-normal text-stone-500"
+            }`}
+          >
+            {cacheStayRangeLabel ? (
+              <span>
+                {availableBeforeDates ? `${availableBeforeDates} ` : ""}
+                {cacheStayRangeLabel}
+              </span>
+            ) : (
+              promoLeadLabel
+            )}
           </p>
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-sm font-semibold text-stone-900">{priceMain}</span>
@@ -552,12 +619,12 @@ function PromoTitleRow({
   location: string | null;
 }) {
   return (
-    <h3 className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-      <span className="min-w-0 truncate font-serif text-lg font-semibold leading-tight text-stone-900 md:text-xl">
+    <h3 className="flex min-w-0 flex-col gap-0.5">
+      <span className="min-w-0 font-serif text-lg font-semibold leading-tight text-stone-900 line-clamp-2 md:text-xl">
         {title}
       </span>
       {location ? (
-        <span className="shrink-0 text-xs font-normal text-stone-400">{location}</span>
+        <span className="truncate text-xs font-normal text-stone-400">{location}</span>
       ) : null}
     </h3>
   );
@@ -576,26 +643,13 @@ function RecommendedStats({
 }) {
   if (promoStatLabels) {
     return (
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 border-y border-neutral-100 py-3">
-        <RecommendedStatItem
-          icon={Users}
-          value={capacity}
-          label={promoStatLabels.guests}
-          ariaLabel={`${capacity} ${promoStatLabels.guests}`}
-        />
-        <RecommendedStatItem
-          icon={BedDouble}
-          value={bedrooms}
-          label={promoStatLabels.bedrooms}
-          ariaLabel={`${bedrooms} ${promoStatLabels.bedrooms}`}
-        />
-        <RecommendedStatItem
-          icon={Bath}
-          value={bathrooms}
-          label={promoStatLabels.bathrooms}
-          ariaLabel={`${bathrooms} ${promoStatLabels.bathrooms}`}
-        />
-      </div>
+      <PromoStatsTwoRow
+        capacity={capacity}
+        bedrooms={bedrooms}
+        bathrooms={bathrooms}
+        promoStatLabels={promoStatLabels}
+        iconStyle={false}
+      />
     );
   }
 

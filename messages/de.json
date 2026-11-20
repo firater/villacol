@@ -233,6 +233,8 @@
       "viewVilla": "Ansehen",
       "firstAvailability": "Nächste Verfügbarkeit",
       "priceStartingAt": "Preis ab",
+      "openStayRange": "Offen: {range}",
+      "availableBeforeDates": "Verfügbar",
       "totalForTrip": "Gesamt für {nights, plural, one {# Nacht} other {# Nächte}}",
       "selectedStayDates": "{range}",
       "minStayBadge": "Mind. {nights, plural, one {# Nacht} other {# Nächte}}",

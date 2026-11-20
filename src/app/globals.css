@@ -104,6 +104,16 @@ body {
   width: 100%;
 }
 
+/* Multi-month grids: let each month table use the full column width. */
+.villa-day-picker .rdp-month {
+  width: 100%;
+}
+
+.villa-day-picker .rdp-month_grid {
+  width: 100%;
+  table-layout: fixed;
+}
+
 /* Hero search bar — field values and custom menus. */
 .hero-search-bar .hero-search-value {
   font-size: 1.25rem;

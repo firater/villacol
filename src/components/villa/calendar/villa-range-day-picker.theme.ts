@@ -36,11 +36,18 @@ export const VILLA_RANGE_SINGLE_MONTH_CLASS_NAMES: Partial<ClassNames> = {
   months: "relative flex justify-center",
 };
 
+export const VILLA_RANGE_TWO_MONTH_CLASS_NAMES: Partial<ClassNames> = {
+  ...SHARED_CLASS_NAMES,
+  months:
+    "relative grid w-full grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2 sm:items-start",
+  month: "w-full min-w-0",
+};
+
 export const VILLA_RANGE_MULTI_MONTH_CLASS_NAMES: Partial<ClassNames> = {
   ...SHARED_CLASS_NAMES,
   months:
-    "relative grid grid-cols-1 justify-items-center gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3",
-  month: "w-full max-w-[19rem]",
+    "relative grid w-full grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 lg:items-start",
+  month: "w-full min-w-0 lg:max-w-[22rem]",
 };
 
 export const VILLA_RANGE_DAY_PICKER_COMPONENTS: Partial<CustomComponents> = {
@@ -48,7 +55,11 @@ export const VILLA_RANGE_DAY_PICKER_COMPONENTS: Partial<CustomComponents> = {
 };
 
 export function villaRangeClassNames(numberOfMonths: number): Partial<ClassNames> {
-  return numberOfMonths > 1
-    ? VILLA_RANGE_MULTI_MONTH_CLASS_NAMES
-    : VILLA_RANGE_SINGLE_MONTH_CLASS_NAMES;
+  if (numberOfMonths <= 1) {
+    return VILLA_RANGE_SINGLE_MONTH_CLASS_NAMES;
+  }
+  if (numberOfMonths === 2) {
+    return VILLA_RANGE_TWO_MONTH_CLASS_NAMES;
+  }
+  return VILLA_RANGE_MULTI_MONTH_CLASS_NAMES;
 }

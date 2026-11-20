@@ -242,6 +242,8 @@
       "viewVilla": "View",
       "firstAvailability": "Next availability",
       "priceStartingAt": "Starting from",
+      "openStayRange": "Open: {range}",
+      "availableBeforeDates": "Available",
       "totalForTrip": "Total for {nights, plural, one {# night} other {# nights}}",
       "selectedStayDates": "{range}",
       "minStayBadge": "Min stay: {nights, plural, one {# night} other {# nights}}",

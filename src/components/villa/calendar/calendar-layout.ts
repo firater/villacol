@@ -10,11 +10,18 @@
  */
 export const CALENDAR_SINGLE_MIN_HEIGHT = "min-h-[21.5rem]";
 
+export const CALENDAR_DOUBLE_MIN_HEIGHT =
+  "min-h-[44rem] sm:min-h-[24rem]";
+
 export const CALENDAR_TRIPLE_MIN_HEIGHT =
   "min-h-[68rem] sm:min-h-[44rem] lg:min-h-[22.5rem]";
 
 export function calendarMinHeightClass(numberOfMonths: number): string {
-  return numberOfMonths > 1
-    ? CALENDAR_TRIPLE_MIN_HEIGHT
-    : CALENDAR_SINGLE_MIN_HEIGHT;
+  if (numberOfMonths <= 1) {
+    return CALENDAR_SINGLE_MIN_HEIGHT;
+  }
+  if (numberOfMonths === 2) {
+    return CALENDAR_DOUBLE_MIN_HEIGHT;
+  }
+  return CALENDAR_TRIPLE_MIN_HEIGHT;
 }

@@ -42,6 +42,8 @@ type CardCopy = {
   totalForTrip?: (values: { nights: number }) => string;
   selectedStayDates?: (values: { range: string }) => string;
   minStayBadge?: (values: { nights: number }) => string;
+  openStayRange?: (values: { range: string }) => string;
+  availableBeforeDates?: string;
 };
 
 export type VillaCardMapContext = {
@@ -157,6 +159,11 @@ export function mapVillaCardRowToProps(
     localize(promotion.displayNameI18n, locale),
   );
 
+  const cacheStayRangeLabel =
+    row.cacheCheckIn !== null && row.cacheCheckOut !== null
+      ? formatStayRange(row.cacheCheckIn, row.cacheCheckOut, locale)
+      : null;
+
   return {
     slug: row.slug,
     title: row.title,
@@ -174,6 +181,8 @@ export function mapVillaCardRowToProps(
     hideTripTotalPrice,
     minStayBadgeLabel,
     firstAvailabilityTitle: tCard.firstAvailability,
+    cacheStayRangeLabel,
+    availableBeforeDates: tCard.availableBeforeDates,
     priceWas,
     showOfferBadge: row.hasActiveDiscount,
     offerBadgeLabel: tCard.specialOffer,

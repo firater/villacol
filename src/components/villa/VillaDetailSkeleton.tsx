@@ -1,6 +1,6 @@
 import {
+  CALENDAR_DOUBLE_MIN_HEIGHT,
   CALENDAR_SINGLE_MIN_HEIGHT,
-  CALENDAR_TRIPLE_MIN_HEIGHT,
 } from "./calendar/calendar-layout";
 
 /**
@@ -50,7 +50,7 @@ export function VillaDetailSkeleton() {
             <div className="h-7 w-44 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
             <div className="h-5 w-72 max-w-full animate-pulse rounded bg-zinc-100 dark:bg-zinc-900" />
             <div
-              className={`${CALENDAR_TRIPLE_MIN_HEIGHT} animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900`}
+              className={`${CALENDAR_DOUBLE_MIN_HEIGHT} animate-pulse rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900`}
             />
             <div className="h-4 w-80 max-w-full animate-pulse rounded bg-zinc-100 dark:bg-zinc-900" />
           </div>

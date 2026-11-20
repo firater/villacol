@@ -38,6 +38,9 @@ export async function HomePromoOffersSection({ locale }: Props) {
       tCard("nextAvailable", { range: values.range }),
     firstAvailability: tCard("firstAvailability"),
     priceStartingAt: tCard("priceStartingAt"),
+    openStayRange: (values: { range: string }) =>
+      tCard("openStayRange", { range: values.range }),
+    availableBeforeDates: tCard("availableBeforeDates"),
     perNight: tCard("perNight"),
     specialOffer: tCard("specialOffer"),
     editorsChoice: tCard("editorsChoice"),

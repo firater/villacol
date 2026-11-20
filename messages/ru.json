@@ -233,6 +233,8 @@
       "viewVilla": "Смотреть",
       "firstAvailability": "Ближайшие даты",
       "priceStartingAt": "Цена от",
+      "openStayRange": "Свободно: {range}",
+      "availableBeforeDates": "Доступно",
       "totalForTrip": "Итого за {nights, plural, one {# ночь} few {# ночи} many {# ночей} other {# ночи}}",
       "selectedStayDates": "{range}",
       "minStayBadge": "Мин. {nights, plural, one {# ночь} few {# ночи} many {# ночей} other {# ночи}}",

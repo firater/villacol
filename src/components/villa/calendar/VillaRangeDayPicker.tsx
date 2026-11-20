@@ -57,6 +57,7 @@ export function VillaRangeDayPicker({
     <div className={rootClass}>
       <DayPicker
         mode="range"
+        resetOnSelect
         excludeDisabled={excludeDisabled}
         numberOfMonths={numberOfMonths}
         defaultMonth={defaultMonth}
