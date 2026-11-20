@@ -748,6 +748,7 @@ const PROMOTION_MATRIX: SeedPromotion[] = [
     discountType: "commission_waiver",
     triggerType: "always",
     percentBp: 2_000,
+    code: "COTD20",
     priorityOrder: -1_000,
     isStackable: false,
     isActive: true,

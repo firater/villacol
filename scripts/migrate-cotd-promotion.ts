@@ -13,6 +13,7 @@ async function main() {
   const { dbPool } = await import("@/db/pool");
   const { promotions, villaPromotions } = await import("@/db/schema");
   const {
+    CATEGORY_OF_THE_DAY_PROMOTION_CODE,
     CATEGORY_OF_THE_DAY_PROMOTION_NAME,
     LEGACY_COTD_PROMOTION_NAME,
   } = await import("@/lib/category-of-the-day");
@@ -49,7 +50,7 @@ async function main() {
       fixedAmountCents: null,
       freeNights: null,
       freeNightsThreshold: null,
-      code: null,
+      code: CATEGORY_OF_THE_DAY_PROMOTION_CODE,
       priorityOrder: -1_000,
       isStackable: false,
       isActive: true,
@@ -65,6 +66,7 @@ async function main() {
     JSON.stringify(
       {
         promotionId: row.id,
+        code: CATEGORY_OF_THE_DAY_PROMOTION_CODE,
         previousName: row.name,
         villaLinksRemoved: removed.rowCount ?? 0,
       },

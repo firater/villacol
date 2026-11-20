@@ -26,6 +26,9 @@ import type { CronJobResult } from "@/lib/cron/types";
 export const CATEGORY_OF_THE_DAY_PROMOTION_NAME =
   "Category of the Day · always · 20%";
 
+/** Stable lookup key; not guest-facing (trigger remains `always`). */
+export const CATEGORY_OF_THE_DAY_PROMOTION_CODE = "COTD20";
+
 /** Legacy seed name; migration script renames the live row. */
 export const LEGACY_COTD_PROMOTION_NAME = "Commission waiver · coupon · DIRECT20";
 
@@ -127,12 +130,12 @@ export async function getCategoryOfTheDayPromotionId(): Promise<number> {
   const [row] = await db
     .select({ id: promotions.id })
     .from(promotions)
-    .where(eq(promotions.name, CATEGORY_OF_THE_DAY_PROMOTION_NAME))
+    .where(eq(promotions.code, CATEGORY_OF_THE_DAY_PROMOTION_CODE))
     .limit(1);
 
   if (row === undefined) {
     throw new Error(
-      `Promotion "${CATEGORY_OF_THE_DAY_PROMOTION_NAME}" is missing; run seed or migration`,
+      `Promotion code "${CATEGORY_OF_THE_DAY_PROMOTION_CODE}" is missing; run seed or migration`,
     );
   }
 
