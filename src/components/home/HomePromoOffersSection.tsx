@@ -1,11 +1,11 @@
 import { getTranslations } from "next-intl/server";
 
 import { getOfferLandingVillas } from "@/db/queries/landing.queries";
-import type { VillaCardRow } from "@/db/queries/villas.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
 import { formatPromotionBadges } from "@/lib/promo-badge-labels";
+import { buildPromoImageRatingAria } from "@/lib/promo-card-rating";
 import {
   buildExchangeRateMap,
   mapVillaCardRowToProps,
@@ -59,18 +59,14 @@ export async function HomePromoOffersSection({ locale }: Props) {
         preferences.currency,
         rates,
       ),
-      editorRating: readEditorRating(row),
       viewLabel: cardCopy.view,
       promoStatLabels: {
         guests: tCard("statGuests"),
         bedrooms: tCard("statBedrooms"),
         bathrooms: tCard("statBathrooms"),
       },
-      promoRatingLabels: {
-        noUserReviews: tCard("noUserReviews"),
-        noUserReviewsAria: tCard("noUserReviewsAria"),
-        editorScoreLabel: tCard("editorScoreLabel"),
-      },
+      promoEditorScoreLabel: tCard("editorScoreLabel"),
+      promoImageRatingAria: buildPromoImageRatingAria(row, tCard),
     },
   }));
 
@@ -83,10 +79,3 @@ export async function HomePromoOffersSection({ locale }: Props) {
   );
 }
 
-function readEditorRating(row: VillaCardRow): number | null {
-  const extended = row as VillaCardRow & { editorRating?: number | null };
-  if (extended.editorRating == null || !Number.isFinite(extended.editorRating)) {
-    return null;
-  }
-  return extended.editorRating;
-}

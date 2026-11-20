@@ -251,9 +251,9 @@
       "statGuests": "Guests",
       "statBedrooms": "Bedrooms",
       "statBathrooms": "Bathrooms",
-      "noUserReviews": "No reviews yet",
-      "noUserReviewsAria": "No user reviews yet",
-      "editorScoreLabel": "Editor score"
+      "editorScoreLabel": "Editor score",
+      "guestReviewAria": "{rating} out of 5 stars",
+      "editorScoreAria": "Editor score: {score} out of 10"
     },
     "listing": {
       "allVillas": "All villas",

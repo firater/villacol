@@ -12,6 +12,10 @@ import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
 import { formatPromotionBadges } from "@/lib/promo-badge-labels";
 import {
+  buildPromoImageRatingAria,
+  type PromoRatingT,
+} from "@/lib/promo-card-rating";
+import {
   buildExchangeRateMap,
   mapVillaCardRowToProps,
 } from "@/lib/villa-listing-cards";
@@ -74,11 +78,7 @@ export async function HomeVillaSection({
     view: tCard("viewVilla"),
   };
 
-  const promoRatingLabels = {
-    noUserReviews: tCard("noUserReviews"),
-    noUserReviewsAria: tCard("noUserReviewsAria"),
-    editorScoreLabel: tCard("editorScoreLabel"),
-  };
+  const promoEditorScoreLabel = tCard("editorScoreLabel");
 
   return (
     <VillaCarousel
@@ -92,10 +92,11 @@ export async function HomeVillaSection({
           currency: preferences.currency,
           rates,
           cardCopy,
+          tCard,
           viewLabel: cardCopy.view,
           cardLayout,
           carouselDensity,
-          promoRatingLabels,
+          promoEditorScoreLabel,
           statLabels:
             cardLayout === "recommended" || carouselDensity === "promo"
               ? {
@@ -116,10 +117,11 @@ function buildVillaCardNode({
   currency,
   rates,
   cardCopy,
+  tCard,
   viewLabel,
   cardLayout,
   carouselDensity,
-  promoRatingLabels,
+  promoEditorScoreLabel,
   statLabels,
 }: {
   row: VillaCardRow;
@@ -127,14 +129,11 @@ function buildVillaCardNode({
   currency: Parameters<typeof mapVillaCardRowToProps>[2];
   rates: Parameters<typeof mapVillaCardRowToProps>[3];
   cardCopy: Parameters<typeof mapVillaCardRowToProps>[4];
+  tCard: PromoRatingT;
   viewLabel: string;
   cardLayout: VillaCardLayout;
   carouselDensity: "default" | "promo";
-  promoRatingLabels: {
-    noUserReviews: string;
-    noUserReviewsAria: string;
-    editorScoreLabel: string;
-  };
+  promoEditorScoreLabel: string;
   statLabels?: {
     guests: string;
     bedrooms: string;
@@ -148,25 +147,21 @@ function buildVillaCardNode({
       layout={carouselDensity === "promo" ? "promo" : cardLayout}
       viewLabel={viewLabel}
       promoStatLabels={statLabels}
-      promoRatingLabels={promoRatingLabels}
+      promoEditorScoreLabel={promoEditorScoreLabel}
+      promoImageRatingAria={
+        carouselDensity === "promo" || cardLayout === "promo"
+          ? buildPromoImageRatingAria(row, tCard)
+          : null
+      }
       promotionBadges={formatPromotionBadges(
         row.appliedPromotions,
         locale,
         currency,
         rates,
       )}
-      editorRating={readEditorRating(row)}
       {...cardProps}
     />
   );
-}
-
-function readEditorRating(row: VillaCardRow): number | null {
-  const extended = row as VillaCardRow & { editorRating?: number | null };
-  if (extended.editorRating == null || !Number.isFinite(extended.editorRating)) {
-    return null;
-  }
-  return extended.editorRating;
 }
 
 const HEADING_KEYS = {

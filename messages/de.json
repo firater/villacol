@@ -242,9 +242,9 @@
       "statGuests": "Gäste",
       "statBedrooms": "Schlafzimmer",
       "statBathrooms": "Badezimmer",
-      "noUserReviews": "Noch keine Bewertungen",
-      "noUserReviewsAria": "Noch keine Gästebewertungen",
-      "editorScoreLabel": "Redaktionsscore"
+      "editorScoreLabel": "Redaktionsscore",
+      "guestReviewAria": "{rating} von 5 Sternen",
+      "editorScoreAria": "Redaktionsscore: {score} von 10"
     },
     "listing": {
       "allVillas": "Alle Villen",

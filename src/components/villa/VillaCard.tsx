@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { VillaPromoOfTheDayBadge } from "@/components/villa/VillaPromoOfTheDayBadge";
 import type { PromotionBadgeItem } from "@/lib/promo-badge-labels";
 import { PromoPromotionPills } from "@/components/villa/PromoPromotionPills";
+import { formatPromoCardScore } from "@/lib/promo-card-rating";
 
 export type VillaCardLayout = "default" | "promo" | "recommended";
 
@@ -43,16 +44,15 @@ export type VillaCardProps = {
     bedrooms: string;
     bathrooms: string;
   };
-  /** Promo layout: user vs editor rating copy (UI-only until review data exists). */
-  promoRatingLabels?: {
-    noUserReviews: string;
-    noUserReviewsAria: string;
-    editorScoreLabel: string;
-  };
+  /** Promo image overlay: editor label (sr-only) and precomputed aria (server). */
+  promoEditorScoreLabel?: string;
+  promoImageRatingAria?: string | null;
   /** Promo list card: show “category of the day” pill on the image (e.g. rail index === 1). */
   showVillaOfTheDay?: boolean;
-  /** From `villas.editor_rating` when wired; hidden when null. */
+  /** From `villas.editor_rating`; shown on promo image when there are no guest reviews. */
   editorRating?: number | null;
+  guestReviewCount?: number;
+  guestReviewAverage?: number | null;
   /** Listing with URL stay dates: show trip total heading instead of cache copy. */
   listingSelectedStay?: boolean;
   hideTripTotalPrice?: boolean;
@@ -61,11 +61,7 @@ export type VillaCardProps = {
   borderless?: boolean;
 };
 
-const DEFAULT_PROMO_RATING_LABELS = {
-  noUserReviews: "No reviews yet",
-  noUserReviewsAria: "No user reviews yet",
-  editorScoreLabel: "Editor score",
-} as const;
+const DEFAULT_PROMO_EDITOR_SCORE_LABEL = "Editor score";
 
 export function VillaCard({
   slug,
@@ -95,9 +91,12 @@ export function VillaCard({
   layout = "default",
   viewLabel = "View",
   promoStatLabels,
-  promoRatingLabels,
+  promoEditorScoreLabel = DEFAULT_PROMO_EDITOR_SCORE_LABEL,
+  promoImageRatingAria = null,
   showVillaOfTheDay = false,
   editorRating = null,
+  guestReviewCount = 0,
+  guestReviewAverage = null,
   listingSelectedStay = false,
   minStayBadgeLabel = null,
   borderless = false,
@@ -151,6 +150,13 @@ export function VillaCard({
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02]"
           />
           {showVillaOfTheDay ? <VillaPromoOfTheDayBadge /> : null}
+          <PromoImageRatingOverlay
+            editorScoreLabel={promoEditorScoreLabel}
+            imageRatingAria={promoImageRatingAria}
+            editorRating={editorRating ?? null}
+            guestReviewCount={guestReviewCount}
+            guestReviewAverage={guestReviewAverage}
+          />
         </div>
         <PromoCardBody
           title={title}
@@ -160,8 +166,6 @@ export function VillaCard({
           bathrooms={bathrooms}
           promotionBadges={promoBadgeItems}
           promoStatLabels={promoStatLabels}
-          promoRatingLabels={promoRatingLabels ?? DEFAULT_PROMO_RATING_LABELS}
-          editorRating={editorRating ?? null}
           priceStartingAtLabel={priceStartingAtLabel}
           cacheStayRangeLabel={cacheStayRangeLabel}
           availableBeforeDates={availableBeforeDates}
@@ -327,43 +331,72 @@ function StatsRow({
   );
 }
 
-function PromoRatingsBlock({
-  labels,
+function PromoImageRatingOverlay({
+  editorScoreLabel,
+  imageRatingAria,
   editorRating,
+  guestReviewCount,
+  guestReviewAverage,
 }: {
-  labels: NonNullable<VillaCardProps["promoRatingLabels"]>;
+  editorScoreLabel: string;
+  imageRatingAria: string | null;
   editorRating: number | null;
+  guestReviewCount: number;
+  guestReviewAverage: number | null;
 }) {
-  const editorScore =
-    editorRating !== null && Number.isFinite(editorRating)
-      ? editorRating.toLocaleString(undefined, {
-          minimumFractionDigits: editorRating % 1 === 0 ? 0 : 1,
-          maximumFractionDigits: 1,
-        })
-      : null;
+  const hasGuestReviews =
+    guestReviewCount > 0 &&
+    guestReviewAverage !== null &&
+    Number.isFinite(guestReviewAverage);
 
-  return (
-    <div className="flex flex-col items-end gap-0.5 leading-none">
-      <div className="inline-flex items-center gap-1" aria-label={labels.noUserReviewsAria}>
-        <Star className="size-3 shrink-0 text-stone-300" strokeWidth={1.75} aria-hidden />
-        <span className="text-[10px] font-normal text-stone-400">{labels.noUserReviews}</span>
-      </div>
-      {editorScore !== null ? (
-        <div className="inline-flex flex-wrap items-center justify-end gap-x-1 gap-y-0.5">
-          <Gem
-            className="size-3 shrink-0 fill-amber-400/90 text-amber-500"
+  if (hasGuestReviews) {
+    const guestScore = formatPromoCardScore(guestReviewAverage);
+    return (
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-end justify-start p-2.5 md:p-3">
+        <div
+          className="inline-flex items-center gap-1 rounded-sm bg-white/92 px-2 py-1 shadow-sm backdrop-blur-[2px]"
+          aria-label={imageRatingAria ?? undefined}
+        >
+          <Star
+            className="size-3.5 shrink-0 fill-amber-400 text-amber-500"
             strokeWidth={1.75}
             aria-hidden
           />
-          <span className="font-sans text-[10px] font-bold tracking-tight text-stone-900">
-            {editorScore}
-            <span className="font-semibold text-stone-600">/10</span>
-          </span>
-          <span className="text-[8px] font-medium uppercase tracking-widest text-stone-500">
-            {labels.editorScoreLabel}
+          <span className="font-sans text-[11px] font-bold tracking-tight text-stone-900">
+            {guestScore}
+            <span className="font-semibold text-stone-600">/5</span>
           </span>
         </div>
-      ) : null}
+      </div>
+    );
+  }
+
+  const editorScore =
+    editorRating !== null && Number.isFinite(editorRating)
+      ? formatPromoCardScore(editorRating)
+      : null;
+
+  if (editorScore === null) {
+    return null;
+  }
+
+  return (
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-end justify-start p-2.5 md:p-3">
+      <div
+        className="inline-flex items-center gap-1 rounded-sm bg-white/92 px-2 py-1 shadow-sm backdrop-blur-[2px]"
+        aria-label={imageRatingAria ?? undefined}
+      >
+        <Gem
+          className="size-3.5 shrink-0 fill-amber-400/90 text-amber-500"
+          strokeWidth={1.75}
+          aria-hidden
+        />
+        <span className="font-sans text-[11px] font-bold tracking-tight text-stone-900">
+          {editorScore}
+          <span className="font-semibold text-stone-600">/10</span>
+        </span>
+        <span className="sr-only">{editorScoreLabel}</span>
+      </div>
     </div>
   );
 }
@@ -460,8 +493,6 @@ function PromoCardBody({
   stayLabel,
   promotionBadges,
   promoStatLabels,
-  promoRatingLabels,
-  editorRating,
 }: {
   title: string;
   location: string | null;
@@ -470,8 +501,6 @@ function PromoCardBody({
   bathrooms: number;
   promotionBadges: PromotionBadgeItem[];
   promoStatLabels?: VillaCardProps["promoStatLabels"];
-  promoRatingLabels: NonNullable<VillaCardProps["promoRatingLabels"]>;
-  editorRating: number | null;
   priceStartingAtLabel: string;
   cacheStayRangeLabel: string | null;
   availableBeforeDates?: string;
@@ -508,8 +537,8 @@ function PromoCardBody({
         )}
       </div>
 
-      <div className="mt-5 flex items-end justify-between gap-4">
-        <div className="min-w-0 flex-1 text-left">
+      <div className="mt-5">
+        <div className="min-w-0 text-left">
           <p className="sr-only">
             {promoLeadAria} {displayNightly} {perNightLabel}, {priceMain}
             {stayLabel ? `, ${stayLabel}` : ""}
@@ -543,10 +572,6 @@ function PromoCardBody({
           {priceWas ? (
             <p className="mt-0.5 text-xs font-normal text-stone-500 line-through">{priceWas}</p>
           ) : null}
-        </div>
-
-        <div className="shrink-0">
-          <PromoRatingsBlock labels={promoRatingLabels} editorRating={editorRating} />
         </div>
       </div>
     </div>

@@ -242,9 +242,9 @@
       "statGuests": "Гостей",
       "statBedrooms": "Спален",
       "statBathrooms": "Ванных",
-      "noUserReviews": "Отзывов пока нет",
-      "noUserReviewsAria": "Пока нет отзывов гостей",
-      "editorScoreLabel": "Оценка редакции"
+      "editorScoreLabel": "Оценка редакции",
+      "guestReviewAria": "{rating} из 5 звёзд",
+      "editorScoreAria": "Оценка редакции: {score} из 10"
     },
     "listing": {
       "allVillas": "Все виллы",

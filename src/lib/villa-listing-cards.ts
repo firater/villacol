@@ -191,5 +191,8 @@ export function mapVillaCardRowToProps(
     bedrooms: row.bedrooms,
     bathrooms: row.bathrooms,
     capacity: row.capacity,
+    editorRating: row.editorRating,
+    guestReviewCount: row.guestReviewCount,
+    guestReviewAverage: row.guestReviewAverage,
   };
 }

@@ -32,6 +32,7 @@ import {
   villaRules,
   villas,
   villaTranslations,
+  guestReviews,
 } from "@/db/schema";
 import type { GuestPolicy } from "@/db/tables/enums";
 import { localize, type Locale, type LocalizedText } from "@/lib/locales";
@@ -109,6 +110,9 @@ export type VillaCardRow = {
   cacheCheckOut: string | null;
   discountedTotalCents: number | null;
   appliedPromotions: AppliedPromotionSnapshot[];
+  editorRating: number | null;
+  guestReviewCount: number;
+  guestReviewAverage: number | null;
 };
 
 export type VillaDetailRow = {
@@ -457,6 +461,19 @@ export async function getVillaListing(
       cacheCheckOut: villaPriceCache.checkOut,
       discountedTotalCents: villaPriceCache.discountedTotalCents,
       appliedPromotions: villaPriceCache.appliedPromotions,
+      editorRating: villas.editorRating,
+      guestReviewCount: sql<number>`(
+        SELECT count(*)::int
+        FROM ${guestReviews}
+        WHERE ${guestReviews.villaId} = ${villas.id}
+          AND ${guestReviews.isPublished} = true
+      )`,
+      guestReviewAverage: sql<string | null>`(
+        SELECT round(avg(${guestReviews.rating})::numeric, 1)::text
+        FROM ${guestReviews}
+        WHERE ${guestReviews.villaId} = ${villas.id}
+          AND ${guestReviews.isPublished} = true
+      )`,
     })
     .from(villas)
     .innerJoin(
@@ -504,8 +521,17 @@ export async function getVillaListing(
       cacheCheckOut:
         row.cacheCheckOut != null ? String(row.cacheCheckOut) : null,
       appliedPromotions: row.appliedPromotions ?? [],
+      guestReviewCount: Number(row.guestReviewCount) || 0,
+      guestReviewAverage: parseGuestReviewAverage(row.guestReviewAverage),
     })),
   };
+}
+
+function parseGuestReviewAverage(raw: string | number | null | undefined): number | null {
+  if (raw === null || raw === undefined) return null;
+  const n = typeof raw === "number" ? raw : Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n;
 }
 
 export type VillaDetailBundle = {
