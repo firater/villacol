@@ -125,7 +125,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
       <div className="mx-auto max-w-7xl px-4 transition-all duration-300 sm:px-6 lg:px-8">
         <div
           className={`flex flex-wrap items-center gap-y-4 border-b border-stone-200/90 transition-all duration-300 ${
-            isCompact ? "py-3 lg:py-4" : "py-6 lg:py-8"
+            isCompact ? "py-2 lg:py-2.5" : "py-6 lg:py-8"
           }`}
         >
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 sm:gap-x-8 lg:gap-x-10">

@@ -133,16 +133,16 @@
       "offersSubtitle": "Live-Rabatte inklusive. Keine Codes nötig.",
       "offersEmpty": "Derzeit laufen keine Angebote. Neue Rabatte erscheinen jede Saison.",
       "featuredBestValueBridge": {
-        "kicker": "Zwischen den Kapiteln",
-        "title": "Wenn das Angebot endet, bleibt der Wert.",
-        "body": "Sondertarife wechseln. Best-Value-Villen behalten großzügigen Raum, Pool und Aussicht — Nacht für Nacht.",
-        "cta": "Villen entdecken"
+        "kicker": "THE DAILY EDIT",
+        "title": "Jeden Tag eine neue Kategorie. 100 % provisionsfrei.",
+        "body": "Entdecken Sie die Kategorie des Tages <bold>category</bold>. Wir erlassen die Standard-Agenturprovision von 20 % — die Ersparnis kommt direkt zu Ihnen.",
+        "cta": "{category} entdecken"
       },
       "findMyVillaBridge": {
-        "kicker": "Bespoke Concierge",
-        "title": "Kurzliste anfragen",
-        "body": "Kein passendes Datum gefunden? Nennen Sie uns Reisedaten und Gruppengröße — innerhalb von 2 Stunden erhalten Sie eine private Kurzliste.",
-        "cta": "Kurzliste anfragen"
+        "kicker": "Villa-Concierge",
+        "title": "Ihre Villa in fünf Schritten",
+        "body": "Live-Verfügbarkeit, echte Preise — Aktionen in Sekunden angewendet!",
+        "cta": "Villa-Finder starten"
       },
       "promotionsElegantBridge": {
         "kicker": "Ihr Zeitfenster",
@@ -166,11 +166,11 @@
         "cta": "Meine Villa finden"
       },
       "help": {
-        "eyebrow": "Gästeservice",
-        "title": "Hilfe bei der Planung?",
-        "body": "Unser Team antwortet innerhalb eines Werktags, auf Deutsch, Englisch oder Russisch. Fragen Sie zu einer Villa, einem Langzeitaufenthalt oder allem, was im Inserat fehlt.",
-        "responseNote": "Antwort innerhalb eines Werktags",
-        "cta": "Kontakt aufnehmen",
+        "eyebrow": "Bespoke Concierge",
+        "title": "Kurzliste anfragen",
+        "body": "Kein passendes Datum gefunden? Nennen Sie uns Reisedaten und Gruppengröße — innerhalb von 2 Arbeitsstunden erhalten Sie eine private Kurzliste.",
+        "responseNote": "Private Kurzliste innerhalb von 2 Arbeitsstunden",
+        "cta": "Kurzliste anfragen",
         "faqTitle": "Häufige Fragen",
         "questions": {
           "booking": {

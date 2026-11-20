@@ -118,7 +118,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="w-full bg-white pb-16 pt-10 lg:pb-20 lg:pt-12">
+        <section className="mt-12 w-full pb-16 pt-20 lg:mt-16 lg:pb-20 lg:pt-24">
           <div className={sectionInner}>
             <Suspense fallback={<HomeBestValueFallback />}>
               <HomeBestValueSection locale={locale} />

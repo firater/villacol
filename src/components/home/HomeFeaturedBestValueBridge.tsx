@@ -10,28 +10,44 @@ const BRIDGE_IMAGE_OFFSETS = ["0px", "1.65rem", "3.1rem"] as const;
 
 type BridgeMessageKey = "featuredBestValueBridge" | "findMyVillaBridge";
 
-const BRIDGE_BY_INSTANCE: Record<
-  string,
-  { messageKey: BridgeMessageKey; href: ComponentProps<typeof Link>["href"] }
-> = {
-  categories: { messageKey: "featuredBestValueBridge", href: "/villas" },
-  "featured-best-value": { messageKey: "findMyVillaBridge", href: "/find-villa" },
+const BRIDGE_BY_INSTANCE: Record<string, { messageKey: BridgeMessageKey }> = {
+  categories: { messageKey: "featuredBestValueBridge" },
+  "featured-best-value": { messageKey: "findMyVillaBridge" },
+};
+
+type CategoryOfTheDayRef = {
+  slug: string;
+  label: string;
 };
 
 type Props = {
   instanceId?: string;
   /** When nested inside another section container (e.g. categories). */
   embedded?: boolean;
+  /** Today's category for the Daily Edit banner (`instanceId: categories`). */
+  categoryOfTheDay?: CategoryOfTheDayRef;
 };
 
 export async function HomeFeaturedBestValueBridge({
   instanceId = "featured-best-value",
   embedded = false,
+  categoryOfTheDay,
 }: Props) {
   const preset =
     BRIDGE_BY_INSTANCE[instanceId] ?? BRIDGE_BY_INSTANCE["featured-best-value"]!;
   const t = await getTranslations(`layout.home.${preset.messageKey}`);
   const titleId = `home-section-bridge-title-${instanceId}`;
+
+  let linkHref: ComponentProps<typeof Link>["href"] =
+    preset.messageKey === "findMyVillaBridge" ? "/find-villa" : "/villas";
+  const categoryOfTheDayLabel = categoryOfTheDay?.label ?? null;
+
+  if (preset.messageKey === "featuredBestValueBridge" && categoryOfTheDay) {
+    linkHref = {
+      pathname: "/villas",
+      query: { category: categoryOfTheDay.slug },
+    };
+  }
 
   const ctaClassName =
     preset.messageKey === "findMyVillaBridge"
@@ -88,10 +104,12 @@ export async function HomeFeaturedBestValueBridge({
                 {t("title")}
               </p>
               <p className="mx-auto mt-2 max-w-xl text-sm font-light leading-relaxed text-stone-600 sm:mx-0">
-                {preset.messageKey === "featuredBestValueBridge"
+                {preset.messageKey === "featuredBestValueBridge" && categoryOfTheDayLabel
                   ? t.rich("body", {
-                      bold: (chunks) => (
-                        <span className="font-bold text-stone-800">{chunks}</span>
+                      bold: () => (
+                        <span className="font-bold text-stone-800">
+                          {categoryOfTheDayLabel}
+                        </span>
                       ),
                     })
                   : t("body")}
@@ -103,11 +121,10 @@ export async function HomeFeaturedBestValueBridge({
                 className="mb-3 hidden h-px w-16 bg-stone-300 sm:block lg:w-24"
                 aria-hidden
               />
-              <Link
-                href={preset.href}
-                className={ctaClassName}
-              >
-                {t("cta")}
+              <Link href={linkHref} className={ctaClassName}>
+                {categoryOfTheDayLabel
+                  ? t("cta", { category: categoryOfTheDayLabel })
+                  : t("cta")}
                 <span
                   aria-hidden
                   className="text-xs font-normal normal-case tracking-normal transition-transform group-hover:translate-x-0.5"
@@ -129,7 +146,7 @@ export async function HomeFeaturedBestValueBridge({
   }
 
   return (
-    <section className="w-full bg-white" aria-labelledby={titleId}>
+    <section className="mt-12 w-full bg-white lg:mt-20" aria-labelledby={titleId}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">{inner}</div>
     </section>
   );

@@ -21,7 +21,7 @@ export async function HelpFaqSection() {
             {t("body")}
           </p>
           <Link
-            href="/contact"
+            href="/find-villa"
             className="mt-8 inline-flex items-center justify-center bg-white px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-stone-950 transition-colors hover:bg-stone-100"
           >
             {t("cta")}

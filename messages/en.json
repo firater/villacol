@@ -135,14 +135,14 @@
       "featuredBestValueBridge": {
         "kicker": "THE DAILY EDIT",
         "title": "Every day, a new category. 100% Commission-Free.",
-        "body": "Discover our category of the day <bold>Family villas</bold>. We completely waive the standard agency commission of 20% — passing the savings straight to you.",
-        "cta": "Explore family villas category"
+        "body": "Discover our category of the day <bold>category</bold>. We completely waive the standard agency commission of 20% — passing the savings straight to you.",
+        "cta": "Explore {category}"
       },
       "findMyVillaBridge": {
-        "kicker": "Bespoke Concierge",
-        "title": "Request a shortlist",
-        "body": "Can't find your exact dates? Tell us your dates and group size—we'll send a private shortlist within 2 hours.",
-        "cta": "Request Shortlist"
+        "kicker": "Villa concierge",
+        "title": "Find your villa in five steps",
+        "body": "Live availability, real prices — applied promotions within seconds!",
+        "cta": "Start villa finder"
       },
       "promotionsElegantBridge": {
         "kicker": "Your window",
@@ -166,11 +166,11 @@
         "cta": "Find my villa"
       },
       "help": {
-        "eyebrow": "Guest services",
-        "title": "Need help planning?",
-        "body": "Our team answers within one working day, in English, German, or Russian. Ask about a specific villa, a long stay, or anything the listing does not cover.",
-        "responseNote": "Replies within one working day",
-        "cta": "Contact us",
+        "eyebrow": "Bespoke Concierge",
+        "title": "Request a shortlist",
+        "body": "Can't find your exact dates? Tell us your dates and group size—we'll send a private shortlist within 2 working hours.",
+        "responseNote": "Private shortlist within 2 working hours",
+        "cta": "Request Shortlist",
         "faqTitle": "Frequently asked",
         "questions": {
           "booking": {

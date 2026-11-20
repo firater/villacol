@@ -48,10 +48,20 @@ export async function HomeCategoriesSection({ locale }: Props) {
     isCategoryOfTheDay: category.isCategoryOfTheDay,
   }));
 
+  const categoryOfTheDay = categories.find((category) => category.isCategoryOfTheDay);
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="mb-8 lg:mb-10">
-        <HomeFeaturedBestValueBridge instanceId="categories" embedded />
+        <HomeFeaturedBestValueBridge
+          instanceId="categories"
+          embedded
+          categoryOfTheDay={
+            categoryOfTheDay
+              ? { slug: categoryOfTheDay.slug, label: categoryOfTheDay.label }
+              : undefined
+          }
+        />
       </div>
 
       <HomeCategoriesCarousel

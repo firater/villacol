@@ -2,16 +2,19 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { VillaCard, type VillaCardProps } from "@/components/villa/VillaCard";
+import {
+  BestValueVillaCard,
+  type BestValueVillaCardProps,
+} from "@/components/villa/BestValueVillaCard";
 
 import { CarouselArrow } from "./CarouselArrow";
 
-/** Recommended card width (~272px) + gap. */
-const SCROLL_STEP_PX = 288;
+/** Best value card width (~304px) + gap. */
+const SCROLL_STEP_PX = 320;
 
 export type HomeBestValueRailItem = {
   key: string;
-  card: VillaCardProps;
+  card: BestValueVillaCardProps;
 };
 
 type Props = {
@@ -65,11 +68,7 @@ export function HomeBestValueRail({
 
   return (
     <div>
-      <div className="relative border-b border-stone-200/90 py-2.5 lg:py-3">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-8 bottom-0 h-px bg-gradient-to-r from-transparent via-stone-300/70 to-transparent sm:inset-x-12 lg:inset-x-16"
-        />
+      <div className="relative border-y border-stone-200/90 py-2.5 lg:py-3">
         <div className="relative flex min-h-11 items-center justify-end gap-3">
           <p className="pointer-events-none absolute left-1/2 top-1/2 w-full max-w-[min(100%,calc(100%-6.5rem))] -translate-x-1/2 -translate-y-1/2 px-2 text-center font-serif text-xl font-normal uppercase tracking-[0.14em] text-stone-950 sm:text-2xl">
             {bannerTitle}
@@ -101,8 +100,8 @@ export function HomeBestValueRail({
             aria-label={carouselLabel}
           >
             {items.map((item) => (
-              <li key={item.key} className="w-[17rem] shrink-0 snap-start sm:w-[18.5rem]">
-                <VillaCard layout="recommended" {...item.card} />
+              <li key={item.key} className="w-[19rem] shrink-0 snap-start sm:w-[21rem]">
+                <BestValueVillaCard {...item.card} />
               </li>
             ))}
           </ul>

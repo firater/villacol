@@ -1,7 +1,7 @@
 export function HomeBestValueFallback() {
   return (
     <div>
-      <div className="relative flex min-h-11 animate-pulse items-center justify-end gap-3 border-b border-stone-200 py-2.5 lg:py-3">
+      <div className="relative flex min-h-11 animate-pulse items-center justify-end gap-3 border-y border-stone-200 py-2.5 lg:py-3">
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-4 w-40 -translate-x-1/2 -translate-y-1/2 bg-stone-200" />
         <div className="flex gap-3">
           <div className="size-11 border border-stone-200 bg-stone-100" />

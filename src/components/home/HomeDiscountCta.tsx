@@ -39,7 +39,7 @@ export async function HomeDiscountCta() {
             </a>
             <Link
               href="/contact"
-              className="inline-flex w-full items-center justify-center bg-orange-500 px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-orange-600 sm:w-auto"
+              className="inline-flex w-full items-center justify-center bg-stone-950 px-7 py-3 font-sans text-[10px] font-semibold uppercase tracking-[0.28em] text-white transition-colors hover:bg-stone-800 sm:w-auto"
             >
               {t("contactCta")}
             </Link>
