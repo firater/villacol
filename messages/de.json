@@ -139,10 +139,10 @@
         "cta": "Villen entdecken"
       },
       "findMyVillaBridge": {
-        "kicker": "Persönlicher Concierge",
-        "title": "Noch unsicher, welche Villa zu Ihnen passt?",
-        "body": "Vier kurze Fragen — wer reist mit, welche Stimmung Sie suchen und Ihr Budget — und wir schlagen drei passende Villen vor.",
-        "cta": "Villa finden"
+        "kicker": "Bespoke Concierge",
+        "title": "Kurzliste anfragen",
+        "body": "Kein passendes Datum gefunden? Nennen Sie uns Reisedaten und Gruppengröße — innerhalb von 2 Stunden erhalten Sie eine private Kurzliste.",
+        "cta": "Kurzliste anfragen"
       },
       "promotionsElegantBridge": {
         "kicker": "Ihr Zeitfenster",

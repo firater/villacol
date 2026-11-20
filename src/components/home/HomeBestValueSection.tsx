@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { VillaCard } from "@/components/villa/VillaCard";
 import { getBestValueLandingVillas } from "@/db/queries/landing.queries";
 import { getExchangeRates } from "@/db/queries/rates.queries";
-import type { VillaCardRow } from "@/db/queries/villas.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
 import { formatPromotionBadges } from "@/lib/promo-badge-labels";
@@ -65,12 +64,13 @@ export async function HomeBestValueSection({ locale }: Props) {
           preferences.currency,
           rates,
         ),
-        editorRating: readEditorRating(row),
         promoStatLabels: {
           guests: tCard("statGuests"),
           bedrooms: tCard("statBedrooms"),
           bathrooms: tCard("statBathrooms"),
         },
+        hideRecommendedViewButton: true,
+        recommendedCardCompact: true,
       },
     };
   });
@@ -85,12 +85,4 @@ export async function HomeBestValueSection({ locale }: Props) {
       items={items}
     />
   );
-}
-
-function readEditorRating(row: VillaCardRow): number | null {
-  const extended = row as VillaCardRow & { editorRating?: number | null };
-  if (extended.editorRating == null || !Number.isFinite(extended.editorRating)) {
-    return null;
-  }
-  return extended.editorRating;
 }

@@ -67,6 +67,8 @@ export type VillaCardProps = {
   borderless?: boolean;
   /** Recommended layout: hide the footer View pill (home special offers). */
   hideRecommendedViewButton?: boolean;
+  /** Recommended layout: denser copy and inline stats (home best value). */
+  recommendedCardCompact?: boolean;
 };
 
 const DEFAULT_PROMO_EDITOR_SCORE_LABEL = "Editor score";
@@ -118,6 +120,7 @@ export function VillaCard({
   minStayBadgeLabel = null,
   borderless = false,
   hideRecommendedViewButton = false,
+  recommendedCardCompact = false,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -231,7 +234,8 @@ export function VillaCard({
           priceMain={priceMain}
           stayLabel={stayLabel}
           viewLabel={viewLabel}
-          hideViewButton={hideRecommendedViewButton}
+          hideViewButton={hideRecommendedViewButton || recommendedCardCompact}
+          compact={recommendedCardCompact}
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
         />
@@ -628,6 +632,7 @@ function RecommendedCardBody({
   stayLabel,
   viewLabel,
   hideViewButton,
+  compact,
   displayNightly,
   perNightLabel,
 }: {
@@ -641,31 +646,52 @@ function RecommendedCardBody({
   stayLabel: string | null;
   viewLabel: string;
   hideViewButton?: boolean;
+  compact?: boolean;
   displayNightly: string;
   perNightLabel: string;
 }) {
   return (
-    <div className="flex flex-1 flex-col p-6">
-      <h3 className="mb-2 truncate font-serif text-xl leading-snug text-stone-900">{title}</h3>
-      <p className="mb-3 text-sm text-stone-500">{location ?? "\u00A0"}</p>
-      <p className="mb-4 font-serif text-2xl text-stone-900">
+    <div className={`flex flex-1 flex-col ${compact ? "p-4 sm:p-5" : "p-6"}`}>
+      <h3
+        className={`truncate font-serif leading-snug text-stone-900 ${
+          compact ? "mb-1.5 text-lg" : "mb-2 text-xl"
+        }`}
+      >
+        {title}
+      </h3>
+      <p className={`text-stone-500 ${compact ? "mb-2 text-xs" : "mb-3 text-sm"}`}>
+        {location ?? "\u00A0"}
+      </p>
+      <p className={`font-serif text-stone-900 ${compact ? "mb-2.5 text-lg" : "mb-4 text-2xl"}`}>
         {displayNightly}
-        <span className="font-sans text-sm text-stone-500"> {perNightLabel}</span>
+        <span
+          className={`font-sans text-stone-500 ${compact ? "text-[10px]" : "text-sm"}`}
+        >
+          {" "}
+          {perNightLabel}
+        </span>
       </p>
       <RecommendedStats
         capacity={capacity}
         bedrooms={bedrooms}
         bathrooms={bathrooms}
         promoStatLabels={promoStatLabels}
+        compact={compact}
       />
       <div
-        className={`mt-6 flex items-center gap-4 ${hideViewButton ? "" : "justify-between"}`}
+        className={`flex items-center gap-4 ${compact ? "mt-4" : "mt-6"} ${hideViewButton ? "" : "justify-between"}`}
       >
-        <p className="min-w-0 flex-1 text-xs leading-snug text-stone-500">
+        <p
+          className={`min-w-0 flex-1 leading-snug text-stone-500 ${compact ? "text-[10px]" : "text-xs"}`}
+        >
           {stayLabel ? (
             <span className="inline-flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
               {priceMain !== "—" ? (
-                <span className="font-sans text-sm font-semibold text-stone-900">{priceMain}</span>
+                <span
+                  className={`font-sans font-semibold text-stone-900 ${compact ? "text-xs" : "text-sm"}`}
+                >
+                  {priceMain}
+                </span>
               ) : null}
               <span>{stayLabel}</span>
             </span>
@@ -702,7 +728,7 @@ function PromoTitleRow({
   );
 }
 
-function RecommendedStats({
+function RecommendedStatsInline({
   capacity,
   bedrooms,
   bathrooms,
@@ -711,8 +737,40 @@ function RecommendedStats({
   capacity: number;
   bedrooms: number;
   bathrooms: number;
-  promoStatLabels?: VillaCardProps["promoStatLabels"];
+  promoStatLabels: NonNullable<VillaCardProps["promoStatLabels"]>;
 }) {
+  const line = `${capacity} ${promoStatLabels.guests} · ${bedrooms} ${promoStatLabels.bedrooms} · ${bathrooms} ${promoStatLabels.bathrooms}`;
+  return (
+    <p className="text-[10px] font-medium leading-snug text-stone-500" aria-label={line}>
+      {line}
+    </p>
+  );
+}
+
+function RecommendedStats({
+  capacity,
+  bedrooms,
+  bathrooms,
+  promoStatLabels,
+  compact = false,
+}: {
+  capacity: number;
+  bedrooms: number;
+  bathrooms: number;
+  promoStatLabels?: VillaCardProps["promoStatLabels"];
+  compact?: boolean;
+}) {
+  if (promoStatLabels && compact) {
+    return (
+      <RecommendedStatsInline
+        capacity={capacity}
+        bedrooms={bedrooms}
+        bathrooms={bathrooms}
+        promoStatLabels={promoStatLabels}
+      />
+    );
+  }
+
   if (promoStatLabels) {
     return (
       <PromoStatsTwoRow
