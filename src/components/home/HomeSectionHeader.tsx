@@ -58,7 +58,7 @@ export function HomeSectionHeader({
     return (
       <header className="mb-12 w-full lg:mb-16">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:gap-16">
-          <div className="min-w-0 max-w-2xl">
+          <div className="min-w-0 max-w-4xl">
             {titleCluster}
             {subtitle ? <p className={HOME_SECTION_SUBTITLE_CLASS}>{subtitle}</p> : null}
           </div>
