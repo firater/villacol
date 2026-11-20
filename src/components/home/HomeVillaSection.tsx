@@ -26,6 +26,7 @@ import { VillaCarousel } from "./VillaCarousel";
 export type HomeSectionVariant = "featured" | "offers" | "bestValue";
 
 const RAIL_SIZE = 6;
+const FEATURED_RAIL_SIZE = 3;
 
 type Props = {
   locale: Locale;
@@ -97,6 +98,7 @@ export async function HomeVillaSection({
           cardCopy,
           tCard,
           viewLabel: cardCopy.view,
+          variant,
           cardLayout,
           carouselDensity,
           promoEditorScoreLabel,
@@ -125,6 +127,7 @@ function buildVillaCardNode({
   cardCopy,
   tCard,
   viewLabel,
+  variant,
   cardLayout,
   carouselDensity,
   promoEditorScoreLabel,
@@ -140,6 +143,7 @@ function buildVillaCardNode({
   cardCopy: Parameters<typeof mapVillaCardRowToProps>[4];
   tCard: PromoRatingT;
   viewLabel: string;
+  variant: HomeSectionVariant;
   cardLayout: VillaCardLayout;
   carouselDensity: "default" | "promo";
   promoEditorScoreLabel: string;
@@ -157,6 +161,7 @@ function buildVillaCardNode({
   return (
     <VillaCard
       layout={carouselDensity === "promo" ? "promo" : cardLayout}
+      hideRecommendedViewButton={variant === "featured" && cardLayout === "recommended"}
       viewLabel={viewLabel}
       promoStatLabels={statLabels}
       promoEditorScoreLabel={promoEditorScoreLabel}
@@ -193,7 +198,7 @@ const EMPTY_KEYS = {
 
 function loadVillas(locale: Locale, variant: HomeSectionVariant) {
   if (variant === "featured") {
-    return getFeaturedLandingVillas(locale, RAIL_SIZE);
+    return getFeaturedLandingVillas(locale, FEATURED_RAIL_SIZE);
   }
   if (variant === "offers") {
     return getOfferLandingVillas(locale, RAIL_SIZE);

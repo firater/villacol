@@ -65,6 +65,8 @@ export type VillaCardProps = {
   minStayBadgeLabel?: string | null;
   /** Promo layout: hide the outer card border (home promotions rail). */
   borderless?: boolean;
+  /** Recommended layout: hide the footer View pill (home special offers). */
+  hideRecommendedViewButton?: boolean;
 };
 
 const DEFAULT_PROMO_EDITOR_SCORE_LABEL = "Editor score";
@@ -115,6 +117,7 @@ export function VillaCard({
   listingSelectedStay = false,
   minStayBadgeLabel = null,
   borderless = false,
+  hideRecommendedViewButton = false,
 }: VillaCardProps) {
   const badgeLabel =
     promotionLabels[0] ??
@@ -228,6 +231,7 @@ export function VillaCard({
           priceMain={priceMain}
           stayLabel={stayLabel}
           viewLabel={viewLabel}
+          hideViewButton={hideRecommendedViewButton}
           displayNightly={displayNightly}
           perNightLabel={perNightLabel}
         />
@@ -623,6 +627,7 @@ function RecommendedCardBody({
   priceMain,
   stayLabel,
   viewLabel,
+  hideViewButton,
   displayNightly,
   perNightLabel,
 }: {
@@ -635,6 +640,7 @@ function RecommendedCardBody({
   priceMain: string;
   stayLabel: string | null;
   viewLabel: string;
+  hideViewButton?: boolean;
   displayNightly: string;
   perNightLabel: string;
 }) {
@@ -652,7 +658,9 @@ function RecommendedCardBody({
         bathrooms={bathrooms}
         promoStatLabels={promoStatLabels}
       />
-      <div className="mt-6 flex items-center justify-between gap-4">
+      <div
+        className={`mt-6 flex items-center gap-4 ${hideViewButton ? "" : "justify-between"}`}
+      >
         <p className="min-w-0 flex-1 text-xs leading-snug text-stone-500">
           {stayLabel ? (
             <span className="inline-flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
@@ -665,7 +673,11 @@ function RecommendedCardBody({
             "\u00A0"
           )}
         </p>
-        <span className="shrink-0 bg-stone-900 px-6 py-2.5 font-sans text-xs text-white">{viewLabel}</span>
+        {hideViewButton ? null : (
+          <span className="shrink-0 bg-stone-900 px-6 py-2.5 font-sans text-xs text-white">
+            {viewLabel}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -13,15 +13,19 @@ import {
 
 import { VillaCarousel } from "./VillaCarousel";
 
+/** Homepage promotions rail only — max villas shown per tab. */
+const PROMO_TAB_VILLA_CAP = 2;
+
 const TAB_I18N_KEY = {
   all: "all",
   last_minute: "lastMinute",
   early_bird: "earlyBird",
   long_stay: "longStay",
   coupon: "coupon",
+  commission_waiver: "commissionWaiver",
 } as const satisfies Record<
   PromoOfferTabKey,
-  "all" | "lastMinute" | "earlyBird" | "longStay" | "coupon"
+  "all" | "lastMinute" | "earlyBird" | "longStay" | "coupon" | "commissionWaiver"
 >;
 
 export type PromoOfferRailItem = {
@@ -42,7 +46,10 @@ export function PromoOffersRail({ items, carouselLabel, sectionEmptyLabel }: Pro
   const [activeTab, setActiveTab] = useState<PromoOfferTabKey>("all");
 
   const filtered = useMemo(
-    () => items.filter((item) => villaMatchesPromoOfferTab(item, activeTab)),
+    () =>
+      items
+        .filter((item) => villaMatchesPromoOfferTab(item, activeTab))
+        .slice(0, PROMO_TAB_VILLA_CAP),
     [activeTab, items],
   );
 

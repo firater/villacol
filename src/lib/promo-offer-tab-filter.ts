@@ -6,6 +6,7 @@ export const PROMO_OFFER_TAB_KEYS = [
   "early_bird",
   "long_stay",
   "coupon",
+  "commission_waiver",
 ] as const;
 
 export type PromoOfferTabKey = (typeof PROMO_OFFER_TAB_KEYS)[number];
@@ -43,6 +44,8 @@ function promotionMatchesTab(
           text,
         ) && !/exit intent|parting offer|exclusive web|last-chance|stay7|abschiedsangebot/i.test(text)
       );
+    case "commission_waiver":
+      return promotion.discountType === "commission_waiver";
     default:
       return false;
   }
