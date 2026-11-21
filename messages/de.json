@@ -224,7 +224,8 @@
         "discoverTitle": "Entdecken",
         "supportTitle": "Support",
         "concierge": "Concierge-Quiz",
-        "paymentsNote": "Preise in EUR · Anzeigewährung beim Checkout"
+        "paymentsNote": "Preise in EUR · Anzeigewährung beim Checkout",
+        "paymentMethodsAria": "Akzeptierte Zahlungsmittel: Visa, Mastercard, American Express und Stripe"
       }
     },
     "villaCard": {

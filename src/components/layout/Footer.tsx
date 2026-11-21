@@ -4,18 +4,10 @@ import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
+
+import { FooterPaymentMarks } from "./FooterPaymentMarks";
 import type { CategoryNavLink } from "@/db/queries/categories.queries";
 import type { LocationNavLink } from "@/db/queries/locations.queries";
-
-const UTILITY_FOOTER_LINKS = [
-  { messageKey: "userAgreement", href: "/terms" },
-  { messageKey: "privacyPolicy", href: "/privacy" },
-  { messageKey: "californiaPrivacy", href: "/privacy" },
-  { messageKey: "accessibility", href: "/contact" },
-  { messageKey: "masthead", href: "/" },
-  { messageKey: "visualStories", href: "/villas" },
-  { messageKey: "siteMap", href: "/villas" },
-] as const;
 
 const FOOTER_NAV_LINK =
   "inline-block text-[15px] font-light leading-[1.65] text-stone-400 transition-colors duration-200 hover:text-white";
@@ -49,11 +41,13 @@ export function Footer({
   featuredCategories = [],
 }: FooterProps) {
   const t = useTranslations("layout.footer");
+  const tLayout = useTranslations("layout");
   const tNav = useTranslations("layout.nav");
   const tCommon = useTranslations("common");
   const tHomeFooter = useTranslations("layout.home.footer");
   const tJournal = useTranslations("journal.hub");
   const tJournalArticles = useTranslations("journal.hub.articles");
+  const copyrightYear = new Date().getFullYear();
 
   return (
     <footer className="relative mt-auto w-full bg-[#0a0a0a] font-sans text-stone-300 antialiased">
@@ -81,21 +75,14 @@ export function Footer({
         </div>
 
         <nav
-          className="mt-16 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:mt-20 lg:grid-cols-3 xl:grid-cols-5 xl:gap-x-12"
+          className="mt-16 grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:mt-20 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12"
           aria-label={t("columnsNavAria")}
         >
-          <FooterColumn title={t("exploreTitle")}>
-            <FooterLink href="/">{tNav("home")}</FooterLink>
+          <FooterColumn title={tLayout("megaMenu.realEstate")}>
+            <FooterLink href="/villas">{tNav("villas")}</FooterLink>
             <FooterLink href="/find-villa">{tNav("findVilla")}</FooterLink>
             <FooterLink href={{ pathname: "/", hash: "help" }}>{t("faq")}</FooterLink>
             <FooterLink href="/contact">{tNav("contact")}</FooterLink>
-            <FooterLink href="/villas">{tNav("villas")}</FooterLink>
-          </FooterColumn>
-
-          <FooterColumn title={t("legal")}>
-            <FooterLink href="/terms">{t("terms")}</FooterLink>
-            <FooterLink href="/privacy">{t("privacy")}</FooterLink>
-            <FooterLink href="/about">{tNav("about")}</FooterLink>
           </FooterColumn>
 
           {destinations.length > 0 ? (
@@ -141,33 +128,42 @@ export function Footer({
           </FooterColumn>
         </nav>
 
-        <p className="mt-20 text-[11px] font-light uppercase tracking-[0.2em] text-stone-500 lg:mt-24">
-          {tHomeFooter("paymentsNote")}
-        </p>
+        <div className="mt-20 lg:mt-24">
+          <FooterPaymentMarks ariaLabel={tHomeFooter("paymentMethodsAria")} />
+        </div>
 
         <div className="mt-5 border-t border-stone-800 pt-5 lg:mt-6 lg:pt-6">
-          <nav aria-label={t("utilityNavAria")}>
-            <ul className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-1 sm:gap-y-2">
-              {UTILITY_FOOTER_LINKS.map(({ messageKey, href }, index) => (
-                <li key={messageKey} className="flex items-center">
-                  {index > 0 ? (
-                    <span
-                      aria-hidden
-                      className="mx-2.5 hidden text-stone-700 sm:inline"
-                    >
-                      ·
-                    </span>
-                  ) : null}
-                  <Link href={href} className={FOOTER_UTILITY_LINK}>
-                    {t(`utilityLinks.${messageKey}`)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <nav
+            aria-label={t("utilityNavAria")}
+            className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm font-light text-stone-500"
+          >
+            <span>
+              © {copyrightYear} {tCommon("brand")}
+            </span>
+            <FooterUtilitySeparator />
+            <Link href="/about" className={FOOTER_UTILITY_LINK}>
+              {tNav("about")}
+            </Link>
+            <FooterUtilitySeparator />
+            <Link href="/privacy" className={FOOTER_UTILITY_LINK}>
+              {t("privacy")}
+            </Link>
+            <FooterUtilitySeparator />
+            <Link href="/terms" className={FOOTER_UTILITY_LINK}>
+              {t("terms")}
+            </Link>
           </nav>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterUtilitySeparator() {
+  return (
+    <span aria-hidden className="text-stone-700">
+      ·
+    </span>
   );
 }
 

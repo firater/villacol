@@ -224,7 +224,8 @@
         "discoverTitle": "Каталог",
         "supportTitle": "Поддержка",
         "concierge": "Квиз консьержа",
-        "paymentsNote": "Цены в EUR · Валюта отображения при оплате"
+        "paymentsNote": "Цены в EUR · Валюта отображения при оплате",
+        "paymentMethodsAria": "Принимаем: Visa, Mastercard, American Express и Stripe"
       }
     },
     "villaCard": {
