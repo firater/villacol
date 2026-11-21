@@ -4,11 +4,12 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { ComponentProps } from "react";
 
-const BRIDGE_IMAGES = ["/smr2.webp", "/smr3.jpg", "/smr4.webp"] as const;
-
-const BRIDGE_IMAGE_OFFSETS = ["0px", "1.65rem", "3.1rem"] as const;
-
 type BridgeMessageKey = "featuredBestValueBridge" | "findMyVillaBridge";
+
+const BRIDGE_EDITORIAL_IMAGE_BY_KEY: Record<BridgeMessageKey, string> = {
+  featuredBestValueBridge: "/smr2.webp",
+  findMyVillaBridge: "/smr4.webp",
+};
 
 const BRIDGE_BY_INSTANCE: Record<string, { messageKey: BridgeMessageKey }> = {
   categories: { messageKey: "featuredBestValueBridge" },
@@ -67,30 +68,16 @@ export async function HomeFeaturedBestValueBridge({
 
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:gap-10">
             <div
-              className="relative h-[3.75rem] w-[7.5rem] shrink-0"
+              className="relative h-[5.25rem] w-[7.5rem] shrink-0 overflow-hidden border border-white/90 bg-stone-100 shadow-[0_6px_18px_-10px_rgba(28,25,23,0.45)]"
               aria-hidden
             >
-              {BRIDGE_IMAGES.map((src, index) => (
-                <div
-                  key={src}
-                  className="absolute top-0 overflow-hidden border border-white/90 bg-stone-100 shadow-[0_6px_18px_-10px_rgba(28,25,23,0.45)]"
-                  style={{
-                    left: BRIDGE_IMAGE_OFFSETS[index],
-                    zIndex: index + 1,
-                    width: "2.65rem",
-                    height: "3.5rem",
-                  }}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    width={42}
-                    height={56}
-                    className="h-full w-full object-cover"
-                    sizes="42px"
-                  />
-                </div>
-              ))}
+              <Image
+                src={BRIDGE_EDITORIAL_IMAGE_BY_KEY[preset.messageKey]}
+                alt=""
+                fill
+                className="object-cover object-top"
+                sizes="120px"
+              />
             </div>
 
             <div className="min-w-0 flex-1 text-center sm:text-left">

@@ -7,10 +7,7 @@ import {
   homeViewAllLinkArrowClass,
   homeViewAllLinkClass,
 } from "@/components/home/homeViewAllLinkClass";
-
-const COLLAGE_IMAGES = ["/smr4.webp", "/smr3.jpg", "/smr9.jpg"] as const;
-
-const COLLAGE_OFFSETS = ["0px", "1.35rem", "2.5rem"] as const;
+const BRIDGE_EDITORIAL_IMAGE = "/smr3.jpg";
 
 export async function HomePromotionsElegantBridge() {
   const t = await getTranslations("layout.home.promotionsElegantBridge");
@@ -26,28 +23,17 @@ export async function HomePromotionsElegantBridge() {
           />
 
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-8">
-            <div className="relative h-[3rem] w-[6.25rem] shrink-0" aria-hidden>
-              {COLLAGE_IMAGES.map((src, index) => (
-                <div
-                  key={src}
-                  className="absolute top-0 overflow-hidden border border-white/95 bg-stone-50 shadow-[0_4px_14px_-8px_rgba(28,25,23,0.35)]"
-                  style={{
-                    left: COLLAGE_OFFSETS[index],
-                    zIndex: index + 1,
-                    width: "2.15rem",
-                    height: "2.85rem",
-                  }}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    width={34}
-                    height={46}
-                    className="h-full w-full object-cover"
-                    sizes="34px"
-                  />
-                </div>
-              ))}
+            <div
+              className="relative h-[3.75rem] w-[6.25rem] shrink-0 overflow-hidden border border-white/90 bg-stone-100 shadow-[0_6px_18px_-10px_rgba(28,25,23,0.45)]"
+              aria-hidden
+            >
+              <Image
+                src={BRIDGE_EDITORIAL_IMAGE}
+                alt=""
+                fill
+                className="object-cover object-top"
+                sizes="100px"
+              />
             </div>
 
             <div className="min-w-0 flex-1 text-center sm:text-left">

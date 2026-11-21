@@ -15,8 +15,6 @@ const HERO_SIDE_A =
   "/smr2.webp";
 const HERO_SIDE_B =
   "/smr4.webp";
-const HERO_BADGE =
-  "/best.png";
 
 type Props = {
   locale: Locale;
@@ -85,17 +83,6 @@ export async function HomeHero({ locale }: Props) {
                 style={{ width: "10.2rem", height: "8.5rem" }}
               >
                 <Image src={HERO_SIDE_A} alt="" fill className="object-cover" sizes="170px" />
-              </div>
-            </div>
-            <div className="absolute -right-6 -top-4 z-10">
-              <div className="relative h-[6.8rem] w-[6.8rem] border-[5px] border-white bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.06)]">
-                <Image
-                  src={HERO_BADGE}
-                  alt=""
-                  fill
-                  className="object-contain"
-                  sizes="110px"
-                />
               </div>
             </div>
             <div className="absolute -left-14 top-10 z-10 hidden lg:block">

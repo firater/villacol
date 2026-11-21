@@ -16,9 +16,9 @@ import { Link } from "@/i18n/navigation";
 import type { Currency, Locale } from "@/lib/locales";
 
 import { HeaderAiSearch } from "./HeaderAiSearch";
-import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
+import { HOME_EDITORIAL_SKEW_IMAGE } from "@/lib/home-editorial-skew-image";
 
-const MEGA_MENU_FEATURED_IMAGES = ["/smr2.webp", "/smr3.jpg", "/smr4.webp"] as const;
+import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
 
 /** Expanded navbar when scroll is above this. */
 const HEADER_EXPAND_SCROLL_Y = 20;
@@ -305,19 +305,13 @@ function MegaMenuFeaturedColumn({ onNavigate }: { onNavigate: () => void }) {
         className="group block overflow-hidden border border-stone-200/90 bg-white"
       >
         <div className="relative aspect-[5/4] w-full min-h-[9.5rem] overflow-hidden sm:min-h-[10.5rem] lg:min-h-[11rem]">
-          <div className="absolute inset-0 grid grid-cols-3 gap-px bg-stone-200/90">
-            {MEGA_MENU_FEATURED_IMAGES.map((src) => (
-              <div key={src} className="relative overflow-hidden bg-stone-100">
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  className="object-cover transition duration-500 will-change-transform group-hover:scale-[1.03]"
-                  sizes="(max-width: 1024px) 33vw, 120px"
-                />
-              </div>
-            ))}
-          </div>
+          <Image
+            src={HOME_EDITORIAL_SKEW_IMAGE}
+            alt=""
+            fill
+            className="object-cover object-left transition duration-500 will-change-transform group-hover:scale-[1.03]"
+            sizes="(max-width: 1024px) 50vw, 200px"
+          />
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-20 bg-gradient-to-t from-white via-white/70 to-transparent sm:h-24"
