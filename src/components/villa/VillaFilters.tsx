@@ -15,6 +15,11 @@ import {
   type VillaFilters,
 } from "@/lib/search-params";
 
+import {
+  FILTER_CHECKBOX_CLASS,
+  FILTER_FIELD_CLASS,
+} from "@/lib/brand-form-focus";
+
 import { VillaListingDateFilter } from "./VillaListingDateFilter";
 
 type ListingPath = "/villas" | "/villa-offers";
@@ -125,7 +130,7 @@ export function VillaFilters({
             {t("labels.location")}
           </span>
           <select
-            className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className={FILTER_FIELD_CLASS}
             value={filters.location ?? ""}
             onChange={(e) => {
               const value = e.target.value;
@@ -149,7 +154,7 @@ export function VillaFilters({
             {t("labels.category")}
           </span>
           <select
-            className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+            className={FILTER_FIELD_CLASS}
             value={filters.category ?? ""}
             onChange={(e) => {
               const value = e.target.value;
@@ -177,7 +182,7 @@ export function VillaFilters({
               type="number"
               min={0}
               inputMode="numeric"
-              className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className={FILTER_FIELD_CLASS}
               defaultValue={filters.minPrice ?? ""}
               key={`min-${filters.minPrice ?? "x"}`}
               onBlur={(e) => {
@@ -200,7 +205,7 @@ export function VillaFilters({
               type="number"
               min={0}
               inputMode="numeric"
-              className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className={FILTER_FIELD_CLASS}
               defaultValue={filters.maxPrice ?? ""}
               key={`max-${filters.maxPrice ?? "x"}`}
               onBlur={(e) => {
@@ -225,7 +230,7 @@ export function VillaFilters({
             type="number"
             min={1}
             inputMode="numeric"
-            className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className={FILTER_FIELD_CLASS}
             defaultValue={filters.guests ?? ""}
             key={`guests-${filters.guests ?? "x"}`}
             onBlur={(e) => {
@@ -249,7 +254,7 @@ export function VillaFilters({
             type="number"
             min={1}
             inputMode="numeric"
-            className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className={FILTER_FIELD_CLASS}
             defaultValue={filters.bedrooms ?? ""}
             key={`bedrooms-${filters.bedrooms ?? "x"}`}
             onBlur={(e) => {
@@ -269,7 +274,7 @@ export function VillaFilters({
           <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200/90 bg-amber-50/70 px-3.5 py-3 transition-colors hover:bg-amber-50 dark:border-amber-800/60 dark:bg-amber-950/25 dark:hover:bg-amber-950/40">
             <input
               type="checkbox"
-              className="mt-0.5 size-4 shrink-0 rounded border-amber-300 text-amber-700 focus:ring-amber-500/30 dark:border-amber-700 dark:text-amber-400"
+              className={`size-4 ${FILTER_CHECKBOX_CLASS}`}
               checked={filters.offersOnly === true}
               onChange={(e) => {
                 pushFilters({
@@ -295,7 +300,7 @@ export function VillaFilters({
                   <label className="flex cursor-pointer items-start gap-2 text-sm text-zinc-800 dark:text-zinc-200">
                     <input
                       type="checkbox"
-                      className="mt-0.5 rounded border-zinc-300"
+                      className={`size-4 ${FILTER_CHECKBOX_CLASS}`}
                       checked={amenitySet.has(opt.value)}
                       onChange={() => toggleAmenity(opt.value)}
                     />

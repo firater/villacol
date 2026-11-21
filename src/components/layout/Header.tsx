@@ -12,12 +12,11 @@ import {
 } from "react";
 
 import type { FilterFacetOption } from "@/db/queries/filter-facets.queries";
+import type { LocationNavLink } from "@/db/queries/locations.queries";
 import { Link } from "@/i18n/navigation";
 import type { Currency, Locale } from "@/lib/locales";
 
 import { HeaderAiSearch } from "./HeaderAiSearch";
-import { HOME_EDITORIAL_SKEW_IMAGE } from "@/lib/home-editorial-skew-image";
-
 import { LocaleCurrencyDropdown } from "./LocaleCurrencyDropdown";
 
 /** Expanded navbar when scroll is above this. */
@@ -29,10 +28,17 @@ type Props = {
   locale: Locale;
   currency: Currency;
   categories: FilterFacetOption[];
+  featuredLocations: LocationNavLink[];
   notificationsSlot: ReactNode;
 };
 
-export function Header({ locale, currency, categories, notificationsSlot }: Props) {
+export function Header({
+  locale,
+  currency,
+  categories,
+  featuredLocations,
+  notificationsSlot,
+}: Props) {
   const t = useTranslations("layout");
   const tCommon = useTranslations("common");
   const menuId = useId();
@@ -190,7 +196,7 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-stone-300/50 to-transparent"
           />
-          <div className="mx-auto max-w-7xl px-4 pb-6 pt-12 sm:px-6 lg:px-8 lg:pb-7 lg:pt-[calc(1.75rem+24px)]">
+          <div className="mx-auto max-w-7xl px-4 pb-8 pt-12 sm:px-6 lg:px-8 lg:pb-10 lg:pt-[calc(1.75rem+24px)]">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)_minmax(0,1.05fr)] lg:gap-10 xl:gap-12">
               <MegaMenuHomeColumn onNavigate={closeMenu} />
               <MegaMenuCategoriesColumn
@@ -199,7 +205,10 @@ export function Header({ locale, currency, categories, notificationsSlot }: Prop
                 mobileOpen={mobileCategoriesOpen}
                 onToggleMobile={() => setMobileCategoriesOpen((open) => !open)}
               />
-              <MegaMenuFeaturedColumn onNavigate={closeMenu} />
+              <MegaMenuLocationsColumn
+                locations={featuredLocations}
+                onNavigate={closeMenu}
+              />
             </div>
           </div>
         </nav>
@@ -294,39 +303,50 @@ function MegaMenuCategoriesColumn({
   );
 }
 
-function MegaMenuFeaturedColumn({ onNavigate }: { onNavigate: () => void }) {
+const MEGA_MENU_LOCATIONS_IMAGE = "/mapmenu.png";
+
+function MegaMenuLocationsColumn({
+  locations,
+  onNavigate,
+}: {
+  locations: LocationNavLink[];
+  onNavigate: () => void;
+}) {
   const t = useTranslations("layout");
 
   return (
-    <div className="pt-2 lg:pt-0">
-      <Link
-        href="/villas"
-        onClick={onNavigate}
-        className="group block overflow-hidden border border-stone-200/90 bg-white"
-      >
-        <div className="relative aspect-[5/4] w-full min-h-[9.5rem] overflow-hidden sm:min-h-[10.5rem] lg:min-h-[11rem]">
+    <div className="space-y-5 pt-2 lg:pt-0">
+      <MegaMenuColumnHeading title={t("megaMenu.featuredTitle")} />
+      <div className="overflow-hidden bg-stone-100">
+        <div className="relative h-[4.75rem] w-full">
           <Image
-            src={HOME_EDITORIAL_SKEW_IMAGE}
+            src={MEGA_MENU_LOCATIONS_IMAGE}
             alt=""
             fill
-            className="object-cover object-left transition duration-500 will-change-transform group-hover:scale-[1.03]"
-            sizes="(max-width: 1024px) 50vw, 200px"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-20 bg-gradient-to-t from-white via-white/70 to-transparent sm:h-24"
+            className="object-cover object-center opacity-[0.82] grayscale"
+            sizes="(max-width: 1024px) 90vw, 320px"
           />
         </div>
-        <div className="bg-white px-4 py-3 sm:px-5 sm:py-4">
-          <p className="font-serif text-[1.35rem] leading-snug tracking-tight text-stone-900">
-            {t("megaMenu.featuredTitle")}
-          </p>
-          <p className="mt-1.5 line-clamp-2 text-[0.9375rem] leading-relaxed text-stone-600">
-            {t("megaMenu.featuredBody")}
-          </p>
-          <p className="mt-2 font-serif text-lg italic text-stone-500">{t("megaMenu.featuredPlace")}</p>
-        </div>
-      </Link>
+      </div>
+      <ul className="space-y-2">
+        <MegaMenuLink href="/find-villa" onClick={onNavigate} accent>
+          {t("megaMenu.moreLocations")}
+        </MegaMenuLink>
+        {locations.map((location) => (
+          <li key={location.slug}>
+            <Link
+              href={{
+                pathname: "/locations/[slug]",
+                params: { slug: location.slug },
+              }}
+              onClick={onNavigate}
+              className="inline-block py-0.5 font-serif text-xl leading-snug text-stone-600 transition-colors hover:text-orange-600"
+            >
+              {location.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

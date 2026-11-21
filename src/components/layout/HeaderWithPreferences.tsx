@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { getVillaFilterFacets } from "@/db/queries/filter-facets.queries";
+import { listLocationNavLinks } from "@/db/queries/locations.queries";
 import type { Locale } from "@/lib/locales";
 import { resolvePreferences } from "@/lib/preferences";
 
@@ -18,9 +19,10 @@ type Props = {
  * rest of the tree the way calling it in the layout body does.
  */
 export async function HeaderWithPreferences({ locale }: Props) {
-  const [preferences, facets] = await Promise.all([
+  const [preferences, facets, featuredLocations] = await Promise.all([
     resolvePreferences(),
     getVillaFilterFacets(locale),
+    listLocationNavLinks(locale),
   ]);
 
   return (
@@ -28,6 +30,7 @@ export async function HeaderWithPreferences({ locale }: Props) {
       locale={locale}
       currency={preferences.currency}
       categories={facets.categories.slice(0, 4)}
+      featuredLocations={featuredLocations.slice(0, 4)}
       notificationsSlot={
         <Suspense fallback={<NotificationBellFallback />}>
           <NotificationBellGate />

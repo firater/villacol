@@ -28,11 +28,13 @@
       "realEstate": "Villenportfolio",
       "categoriesColumn": "Aufenthaltskategorien",
       "allCategories": "Alle Kategorien",
+      "allLocations": "Alle Regionen",
+      "moreLocations": "Alle Regionen ansehen",
       "featuredEyebrow": "Ausgewählte Kollektion",
       "featuredKicker": "Für Sie kuratiert",
-      "featuredPlace": "Kalkan entdecken",
-      "featuredTitle": "Mittelmeer-Retreats",
-      "featuredBody": "Handverlesene Villen mit Live-Preisen ab dem nächsten freien Termin.",
+      "featuredPlace": "Beliebte Küstenorte",
+      "featuredTitle": "Regionen",
+      "featuredBody": "Entdecken Sie beliebte Ferienorte am türkischen Mittelmeer — Küstenstädte, Buchten und Villenleben.",
       "moreLinks": "Schnellzugriff"
     },
     "footer": {

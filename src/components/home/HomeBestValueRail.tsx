@@ -70,7 +70,7 @@ export function HomeBestValueRail({
     <div>
       <div className="relative border-y border-stone-200/90 py-2.5 lg:py-3">
         <div className="relative flex min-h-11 items-center justify-end gap-3">
-          <p className="pointer-events-none absolute left-1/2 top-1/2 w-full max-w-[min(100%,calc(100%-6.5rem))] -translate-x-1/2 -translate-y-1/2 px-2 text-center font-serif text-xl font-normal uppercase tracking-[0.14em] text-stone-950 sm:text-2xl">
+          <p className="pointer-events-none absolute left-1/2 top-1/2 w-full max-w-[min(100%,calc(100%-6.5rem))] -translate-x-1/2 -translate-y-1/2 px-2 text-center font-serif text-2xl font-normal uppercase tracking-[0.14em] text-stone-950 sm:text-[1.6875rem]">
             {bannerTitle}
           </p>
           <CarouselArrow

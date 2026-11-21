@@ -28,11 +28,13 @@
       "realEstate": "Villa collection",
       "categoriesColumn": "Stay categories",
       "allCategories": "Browse all categories",
+      "allLocations": "Browse all locations",
+      "moreLocations": "View all locations",
       "featuredEyebrow": "Featured collection",
       "featuredKicker": "Curated for you",
-      "featuredPlace": "Discover Kalkan",
-      "featuredTitle": "Mediterranean retreats",
-      "featuredBody": "Hand-picked villas with live pricing from the next available stay.",
+      "featuredPlace": "Popular coastal destinations",
+      "featuredTitle": "Locations",
+      "featuredBody": "Discover beloved vacation spots on the Turkish Mediterranean — seaside towns, bays, and villa life.",
       "moreLinks": "Quick links"
     },
     "footer": {

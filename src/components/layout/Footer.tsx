@@ -141,12 +141,12 @@ export function Footer({
           </FooterColumn>
         </nav>
 
-        <div className="mt-20 border-t border-stone-800 pt-12 lg:mt-24 lg:pt-14">
-          <p className="text-[11px] font-light uppercase tracking-[0.2em] text-stone-500">
-            {tHomeFooter("paymentsNote")}
-          </p>
+        <p className="mt-20 text-[11px] font-light uppercase tracking-[0.2em] text-stone-500 lg:mt-24">
+          {tHomeFooter("paymentsNote")}
+        </p>
 
-          <nav className="mt-8 lg:mt-9" aria-label={t("utilityNavAria")}>
+        <div className="mt-5 border-t border-stone-800 pt-5 lg:mt-6 lg:pt-6">
+          <nav aria-label={t("utilityNavAria")}>
             <ul className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-1 sm:gap-y-2">
               {UTILITY_FOOTER_LINKS.map(({ messageKey, href }, index) => (
                 <li key={messageKey} className="flex items-center">

@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
 import { submitContactForm } from "@/actions/public/contact.actions";
+import { BRAND_FIELD_FOCUS_CLASS } from "@/lib/brand-form-focus";
 import type { Locale } from "@/lib/locales";
 
 const SUBJECT_KEYS = [
@@ -94,8 +95,7 @@ export function ContactForm() {
     );
   }
 
-  const fieldClass =
-    "mt-1.5 w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-300 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100";
+  const fieldClass = `mt-1.5 w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 transition-colors ${BRAND_FIELD_FOCUS_CLASS} dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100`;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>

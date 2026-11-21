@@ -156,7 +156,7 @@ export function VillaListingDateFilter({ filters, minDate, onCommitStay }: Props
             aria-expanded={datesOpen}
             aria-haspopup="dialog"
             onClick={openPopover}
-            className={`flex min-h-10 items-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-left text-sm text-zinc-900 transition-colors hover:border-zinc-400 hover:bg-zinc-50/80 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-zinc-600 ${
+            className={`flex min-h-10 items-center rounded-lg border border-zinc-300 bg-white px-3 py-2 text-left text-sm text-zinc-900 transition-colors hover:border-zinc-400 hover:bg-zinc-50/80 focus-visible:border-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/25 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-zinc-600 dark:focus-visible:border-brand dark:focus-visible:ring-brand/30 ${
               hasDates ? "min-w-0 flex-1" : "w-full"
             }`}
           >
@@ -173,7 +173,7 @@ export function VillaListingDateFilter({ filters, minDate, onCommitStay }: Props
               type="button"
               onClick={clearDates}
               aria-label={t("clearDates")}
-              className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 transition-colors hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-600 transition-colors hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-900 focus-visible:border-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/25 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-100 dark:focus-visible:border-brand dark:focus-visible:ring-brand/30"
             >
               <X className="size-4" aria-hidden />
             </button>
